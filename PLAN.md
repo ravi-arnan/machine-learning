@@ -28,7 +28,7 @@ Berdasarkan arahan Bapak Adi di perkuliahan daring:
 
 ## Status Pengerjaan
 
-**Kedelapan notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
+**Kesembilan notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
 buku acuan terpakai, ditambah Explainable AI (saran Bapak) dan validasi eksternal.
 
 | Notebook | Isi | Tugas | Bab |
@@ -42,6 +42,13 @@ buku acuan terpakai, ditambah Explainable AI (saran Bapak) dan validasi eksterna
 | `07_explainable_ai` | SHAP global dan individual | D | tambahan |
 | `08_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
 | `09_eksperimen` | Tujuh gagasan peningkatan diuji — enam gagal | F | tambahan |
+
+**Pemeriksaan ulang metodologi (25 Agustus 2026).** Seluruh notebook diperiksa ulang
+baris demi baris. Empat hal diperbaiki dan dijalankan ulang: kontrol negatif alat ukur
+di `09` yang ternyata tidak menguji apa pun, adu model kuat yang tidak adil (penantang
+kini disetel setara), eksperimen batas usia yang angkanya dilaporkan tanpa selnya, dan
+dekomposisi penurunan AUC di `08` yang arah kesimpulannya keliru. Rinciannya di Tugas E,
+Tugas F, dan Bagian 13.
 
 Sisa pekerjaan: membaca kelima artikel, menulis laporan, dan menyiapkan slide.
 
@@ -303,28 +310,55 @@ ditetapkan dari data uji, itu kebocoran informasi dan hasilnya tidak sah.
 Model dilatih pada 253.680 responden CDC, lalu diuji pada pasien Kaggle yang belum
 pernah dilihatnya:
 
-| Model | AUC di CDC (data latih) | AUC di Kaggle (**data luar**) |
-|---|---|---|
-| Logistic Regression | 0,783 | **0,799** |
-| Gradient Boosting | 0,790 | **0,801** |
+| Model | AUC di CDC (data latih) | AUC di CDC (out-of-fold) | AUC di Kaggle (**data luar**) |
+|---|---|---|---|
+| Logistic Regression | 0,783 | 0,783 | **0,799** |
+| Gradient Boosting | 0,786 | 0,785 | **0,802** |
 
-Performa **tidak runtuh** saat dipindahkan ke sumber lain — malah sedikit naik. Ini bukti
-bahwa model menangkap pola risiko stroke yang nyata, bukan kekhasan satu dataset.
+Performa **tidak runtuh** saat dipindahkan ke sumber lain. Ini bukti bahwa model
+menangkap pola risiko stroke yang nyata, bukan kekhasan satu dataset.
 
-Kelima artikel acuan kami tidak melakukan validasi eksternal. Inilah yang membedakan
-proyek ini.
+Kolom out-of-fold ditambahkan supaya perbandingannya sah: angka "data latih" selalu
+optimis. Ternyata keduanya nyaris sama — model sesederhana ini memang tidak menghafal
+253.680 barisnya.
 
-**Catatan jujur.** Enam fitur bersama lebih sedikit daripada sepuluh fitur di model
-utama — tidak ada kadar glukosa, dan usia hanya berupa kelompok, bukan angka pasti.
-Karena itu model validasi eksternal **wajar bila sedikit lebih lemah** daripada model
-utama. Hal ini dilaporkan apa adanya, bukan disembunyikan.
+**Yang tidak boleh disimpulkan.** Angka data luar sedikit lebih tinggi, tetapi itu
+**tidak** berarti model bekerja lebih baik di sana. AUC ikut ditentukan oleh keberagaman
+populasi yang diukur (*spectrum effect*), sehingga AUC dua populasi berbeda memang tidak
+setara. Klaim yang sah: **tidak turun**.
+
+**Berapa harga hanya punya enam fitur?** Ketika baris dan protokolnya benar-benar
+disamakan — 5-fold CV pada 3.391 baris subset selaras yang sama — jawabannya
+**hampir nol**:
+
+| Kondisi (baris & protokol sama) | AUC |
+|---|---|
+| 13 fitur (seluruh fitur Kaggle pada subset selaras) | 0,807 |
+| 6 fitur | 0,810 |
+| 6 fitur, dilatih di CDC lalu diuji di sini | 0,799 |
+
+Kehilangan kadar glukosa dan usia pasti **tidak terukur memakan AUC**. Lalu ke mana
+perginya penurunan dari 0,841? Ke terbuangnya 856 pasien di bawah 18 tahun — dari mereka
+hanya 2 yang berstroke, sehingga mereka kasus negatif yang teramat mudah dan
+menggelembungkan AUC (lihat Tugas F, eksperimen ketujuh).
+
+| Sumber penurunan dari 0,841 | Besarnya |
+|---|---|
+| Terbuangnya pasien di bawah 18 tahun | ± 0,026 |
+| Berkurangnya fitur (15 → 6, termasuk glukosa) | ± 0,000 |
+| Berpindahnya populasi (CDC → Kaggle) | ± 0,011 |
+
+Ini kabar baik yang lebih kuat daripada dugaan awal: enam fitur yang tersedia di survei
+kesehatan mana pun sudah memuat hampir seluruh sinyal. Kadar glukosa — satu-satunya
+yang menuntut tes darah — hampir tidak menambah apa-apa, sehingga alat skrining ini
+dapat dipakai tanpa laboratorium.
 
 Notebook: `notebooks/03_uji_validasi_silang.ipynb` (sudah selesai dan terverifikasi jalan)
 
 ### Tugas F — Eksperimen Mencari Batas Model
 
-Setelah model utama jadi, tujuh gagasan peningkatan diuji satu per satu. **Enam gagal,
-satu berhasil.** Kegagalannya dilaporkan apa adanya karena mengetahui jalan buntu
+Setelah model utama jadi, tujuh gagasan peningkatan diuji satu per satu, ditambah satu
+adu ulang yang seimbang. **Enam gagal, satu berhasil.** Kegagalannya dilaporkan apa adanya karena mengetahui jalan buntu
 sama berharganya, dan jauh lebih jarang ditulis orang.
 
 #### Masalah alat ukur yang harus dibereskan dulu
@@ -335,20 +369,35 @@ rata-rata masing-masing akan menenggelamkan semua selisih dalam derau.
 
 Jalan keluarnya: **uji berpasangan pada lipatan yang persis sama**, lalu ukur simpangan
 baku dari selisihnya. Galat baku turun ke sekitar 0,004 — lima kali lebih peka. Alat
-ukurnya sendiri diuji lebih dulu: ia menangkap perbedaan model acak, dan diam ketika
-dibandingkan dengan dirinya sendiri.
+ukurnya diuji kepekaannya lebih dulu: ia menangkap beda besar (model acak, ΔAUC −0,341),
+beda sedang (C=1,0 vs C=0,1, ΔAUC −0,0019), sampai beda sangat tipis (C=0,15 vs C=0,1,
+ΔAUC −0,0004).
+
+**Batasan alat ukur ini, yang wajib ditulis di laporan.** Lipatan dari
+`RepeatedStratifiedKFold` saling berbagi data latih, jadi ke-25 skornya tidak saling
+bebas dan rumus `simpangan baku / akar(n)` **meremehkan** ragam sebenarnya (Dietterich
+1998; Nadeau & Bengio 2003). Label "nyata" di notebook `09` karena itu terlalu murah —
+ia berarti "selisihnya konsisten antar lipatan", bukan hasil uji hipotesis yang sah.
+Uji yang benar memerlukan *corrected resampled t-test*. Karena itu setiap kesimpulan
+disandarkan pada **besar** selisih, bukan pada labelnya.
 
 #### Hasil ketujuh gagasan
 
 | Gagasan | Hasil |
 |---|---|
 | Rekayasa fitur medis (kategori glukosa ADA, BMI WHO, usia², interaksi, hitungan faktor risiko) | gagal — hanya usia² lolos, besarnya +0,002 AP |
-| Tujuh cara menyeimbangkan (SMOTE, ADASYN, BorderlineSMOTE, SMOTEENN, SMOTETomek, undersampling, class_weight) | **merugikan** — semuanya menurunkan AUC secara nyata |
+| Tujuh cara menyeimbangkan (SMOTE, ADASYN, BorderlineSMOTE, SMOTEENN, SMOTETomek, undersampling, class_weight) | **merugikan** — semuanya menurunkan AUC secara konsisten |
 | Penggabungan model (voting LR+GB, +RF, BalancedRF) | gagal — perubahan di dalam derau |
-| Model lebih kuat (HistGB, ExtraTrees, RandomForest dalam, Naive Bayes, LDA) | **merugikan** — semuanya nyata lebih buruk |
+| Model lebih kuat **tanpa penyetelan** (HistGB, ExtraTrees, RandomForest dalam, Naive Bayes, LDA) | merugikan — semuanya lebih buruk |
+| Model lebih kuat **setelah disetel serius** (HistGB, GridSearch 72 kombinasi) | seri pada AUC (Δ +0,0004), kalah pada AP (Δ −0,011) |
 | Kalibrasi probabilitas (isotonik, sigmoid) | tidak perlu — model sudah jujur sejak awal |
-| Membuang pasien di bawah 18 tahun | AUC turun 0,841 → 0,815 |
+| Membuang pasien di bawah 18 tahun | AUC turun 0,841 → 0,815, tapi soalnya memang jadi lebih sulit |
 | **Ambang berbasis biaya klinis** | **berhasil** |
+
+Catatan keadilan: enam penantang pertama dipakai **apa adanya tanpa penyetelan**,
+sedangkan acuannya sudah disetel di notebook `05`. Karena itu HistGB disetel ulang
+secara sebanding — dan hasilnya hanya menyamai, tidak melampaui. Acuan juga mendapat
+keuntungan kecil: hyperparameternya dipilih memakai bagian dari data yang sama.
 
 #### Temuan paling berharga
 
@@ -361,14 +410,18 @@ Artinya aturan yang tampak sewenang-wenang itu diam-diam menyembunyikan anggapan
 Sekarang anggapan itu terbuka, bisa diperdebatkan, dan bisa diubah pihak rumah sakit
 sesuai kapasitas mereka.
 
-#### Tiga pelajaran untuk laporan
+#### Empat pelajaran untuk laporan
 
 1. **Sederhana menang, dan itu bukan kebetulan.** Batasnya ada pada data, bukan pada
-   model. Semua model yang lebih kuat justru overfitting.
-2. **Nyata secara statistik ≠ berarti secara praktis.** Dengan 125 lipatan, selisih
-   0,002 pun lolos uji statistik.
+   model. Model kuat tanpa penyetelan overfitting; yang disetel serius pun hanya
+   menyamai, dengan biaya kerumitan yang jauh lebih besar.
+2. **Nyata secara statistik ≠ berarti secara praktis.** Dengan 25 lipatan — dan galat
+   baku yang kami akui masih terlalu optimis — selisih 0,0004 pun berlabel "nyata".
 3. **Yang paling berpengaruh bukan modelnya, melainkan pilihan ambangnya** — dan itu
    persoalan kebijakan, bukan persoalan teknis.
+4. **Angka evaluasi ikut ditentukan oleh siapa yang ada di dalam data.** Membuang 856
+   anak-anak menurunkan AUC 0,026 tanpa satu baris kode model pun berubah. Karena itu
+   AUC antar penelitian tidak bisa diadu tanpa memeriksa batas usia populasinya.
 
 ## 9. Struktur Repositori
 
@@ -450,14 +503,33 @@ dinyatakan terang-terangan di bagian pembahasan, bukan disembunyikan.
 - 30,2% data `smoking_status` tidak diketahui, sehingga kesimpulan mengenai pengaruh
   merokok harus disampaikan dengan hati-hati.
 - Validasi eksternal hanya memakai enam fitur yang tersedia di kedua dataset, tanpa
-  kadar glukosa dan dengan usia berupa kelompok. Hasilnya tidak sebanding langsung
-  dengan model utama yang memakai sepuluh fitur.
+  kadar glukosa dan dengan usia berupa kelompok. Angka mentahnya tidak sebanding langsung
+  dengan model utama yang memakai 15 fitur — perbandingan yang sah hanya bisa dilakukan
+  pada baris dan protokol yang disamakan, dan itu sudah dikerjakan di Tugas E.
 - Dataset CDC BRFSS berbasis **laporan mandiri responden**, bukan rekam medis. Riwayat
   stroke yang dilaporkan bisa saja keliru atau tidak terdiagnosis.
 - Kedua dataset berasal dari populasi non-Indonesia. Model tidak boleh diklaim berlaku
   untuk populasi Indonesia tanpa pengujian ulang.
 - Ini adalah alat bantu skrining, **bukan alat diagnosis**. Keputusan medis tetap
   berada di tangan dokter.
+
+**Batasan metodologis yang kami temukan sendiri saat memeriksa ulang notebook:**
+
+- **Uji selisih antar model belum sahih secara statistik.** Lipatan `RepeatedStratifiedKFold`
+  berkorelasi, sehingga galat baku yang kami pakai meremehkan ragam sebenarnya. Label
+  "nyata" di notebook `09` harus dibaca sebagai "konsisten antar lipatan".
+- **Kontrol negatif alat ukur tidak dapat dijalankan** pada model deterministik seperti
+  Logistic Regression + `liblinear`: mengganti seed menghasilkan model yang sama persis,
+  jadi selisih nol adalah konsekuensi definisi, bukan hasil pengukuran.
+- **Imputasi BMI dilatih sebelum data dibagi.** Model Ridge pengisi `bmi` memakai seluruh
+  baris, termasuk yang kemudian menjadi data uji. Kebocorannya ringan karena yang
+  diprediksi adalah `bmi`, bukan `stroke` — dan notebook `04` menunjukkan pilihan
+  imputasi hampir tidak mengubah hasil klasifikasi (AUC 0,838 dengan median vs 0,840
+  dengan regresi). Secara metodologi, imputasi seharusnya berada di dalam pipeline.
+- **AUC tidak sebanding antar populasi.** Perbandingan AUC lintas dataset di Tugas E
+  hanya sah untuk menyimpulkan "tidak runtuh", bukan "lebih baik".
+- **Hyperparameter acuan dipilih memakai sebagian data yang sama** yang kemudian dipakai
+  membandingkannya dengan model lain di notebook `09`.
 
 ## 14. Risiko dan Mitigasi
 
