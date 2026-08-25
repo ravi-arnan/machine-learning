@@ -28,7 +28,7 @@ Berdasarkan arahan Bapak Adi di perkuliahan daring:
 
 ## Status Pengerjaan
 
-**Kesembilan notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
+**Kesepuluh notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
 buku acuan terpakai, ditambah Explainable AI (saran Bapak) dan validasi eksternal.
 
 | Notebook | Isi | Tugas | Bab |
@@ -42,6 +42,7 @@ buku acuan terpakai, ditambah Explainable AI (saran Bapak) dan validasi eksterna
 | `07_explainable_ai` | SHAP global dan individual | D | tambahan |
 | `08_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
 | `09_eksperimen` | Tujuh gagasan peningkatan diuji — enam gagal | F | tambahan |
+| `10_pemeriksaan_ulang` | Kesimpulan sendiri diuji dengan alat lebih ketat | G | tambahan |
 
 **Pemeriksaan ulang metodologi (25 Agustus 2026).** Seluruh notebook diperiksa ulang
 baris demi baris. Empat hal diperbaiki dan dijalankan ulang: kontrol negatif alat ukur
@@ -423,6 +424,53 @@ sesuai kapasitas mereka.
    anak-anak menurunkan AUC 0,026 tanpa satu baris kode model pun berubah. Karena itu
    AUC antar penelitian tidak bisa diadu tanpa memeriksa batas usia populasinya.
 
+### Tugas G — Menguji Kesimpulan Sendiri
+
+Empat notebook pertama membangun model. Tugas F mencoba memperbaikinya dan gagal enam
+kali. Tugas G melakukan hal ketiga yang jarang dikerjakan: **menguji kesimpulan kami
+sendiri dengan alat yang lebih ketat daripada yang dipakai saat menyusunnya.**
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Uji terkoreksi Nadeau–Bengio | **satu klaim dicabut** — penyeimbangan kelas tidak terbukti *memperburuk* |
+| Kurva belajar | **satu klaim dipertajam** — batasnya jenis informasi, bukan jumlah pasien |
+| Selang kepercayaan bootstrap | angka akhir wajib ditulis beserta selangnya |
+| Decision curve (net benefit) | **temuan positif baru** — model unggul atas "periksa semua" |
+
+**1. Uji terkoreksi.** Galat baku berpasangan di Tugas F meremehkan ragam sebenarnya.
+Dengan koreksi Nadeau–Bengio, SMOTE (p = 0,19) dan `class_weight` (p = 0,23) ternyata
+**tidak** nyata lebih buruk. Klaim "cara menyeimbangkan kelas merugikan" karena itu
+dicabut, diganti klaim yang lebih lemah tetapi sahih: tidak satu pun **memperbaiki**.
+Sebaliknya, temuan terpenting justru bertahan pada uji ketat: model kuat tanpa penyetelan
+memang nyata lebih buruk (p = 0,016), dan HistGB yang disetel tetap tidak menang (p = 0,93).
+
+**2. Kurva belajar.** Dengan seperlima data (1.021 baris, 50 kasus stroke) AUC sudah
+0,842; dengan data lima kali lipat, 0,841. Datar sejak awal. Jadi pelajaran "batasnya ada
+pada data" harus dibaca sebagai: **menambah pasien tidak akan menolong; yang menolong
+adalah menambah jenis pemeriksaan** — tekanan darah sistolik, kolesterol, fibrilasi
+atrium, riwayat keluarga. Ini menyambung dengan temuan Tugas E bahwa 6 fitur sama baiknya
+dengan 15.
+
+**3. Selang kepercayaan.** Data uji hanya memuat 38 kasus stroke:
+
+| Ukuran | Nilai | SK 95% |
+|---|---|---|
+| ROC-AUC | 0,840 | 0,78 – 0,89 |
+| recall | 0,816 | **0,69 – 0,93** |
+| precision | 0,121 | 0,08 – 0,16 |
+
+Konsekuensinya untuk laporan: tulis "recall sekitar 0,82 (SK 95%: 0,69–0,93)", jangan
+"81,6%"; dan jangan pernah mengklaim unggul atas penelitian lain berdasarkan selisih yang
+lebih kecil daripada lebar selang ini.
+
+**4. Net benefit (Vickers & Elkin, 2006).** Ini jawaban terukur atas kritik "kenapa tidak
+periksa lanjut semua orang saja?". Pada ambang risiko 5%, net benefit model +0,026
+sementara "periksa semua" sudah **negatif** (−0,001); pada ambang 10%, +0,014 lawan
+−0,057. Model unggul di seluruh rentang ambang yang masuk akal. Precision 0,12 karena itu
+bukan kegagalan — untuk prevalensi 4,87% ia harga yang terukur sepadan.
+
+Notebook: `notebooks/10_pemeriksaan_ulang.ipynb`
+
 ## 9. Struktur Repositori
 
 ```
@@ -438,7 +486,8 @@ machine-learning/
 │   ├── 06_clustering_pca.ipynb      # SELESAI — Tugas C, Bab 8 dan 9
 │   ├── 07_explainable_ai.ipynb      # SELESAI — Tugas D, SHAP
 │   ├── 08_validasi_eksternal.ipynb  # SELESAI — Tugas E
-│   └── 09_eksperimen.ipynb          # SELESAI — Tugas F, eksperimen lanjutan
+│   ├── 09_eksperimen.ipynb          # SELESAI — Tugas F, eksperimen lanjutan
+│   └── 10_pemeriksaan_ulang.ipynb   # SELESAI — Tugas G, pengujian kesimpulan
 ├── laporan/
 │   ├── laporan.docx
 │   └── presentasi.pptx
@@ -488,6 +537,8 @@ Mengikuti ritme mingguan perkuliahan. Sesuaikan Minggu 1 dengan pertemuan beriku
 | Faktor penting versi SHAP sejalan dengan pengetahuan medis | wajib diperiksa |
 | AUC pada validasi eksternal | ≥ 0,75 (tidak runtuh saat pindah sumber data) |
 | Notebook dapat dijalankan ulang dari nol tanpa error | wajib |
+| Angka akhir dilaporkan beserta selang kepercayaan | wajib — sudah dihitung di `10` |
+| Model mengalahkan "periksa semua" pada net benefit | wajib — terbukti di `10` |
 
 **Catatan jujur soal target.** Precision pada kasus ini akan rendah — pada percobaan
 awal kami hanya 0,138. Itu wajar dan memang begitu sifat masalahnya: dari 290 pasien
@@ -515,9 +566,10 @@ dinyatakan terang-terangan di bagian pembahasan, bukan disembunyikan.
 
 **Batasan metodologis yang kami temukan sendiri saat memeriksa ulang notebook:**
 
-- **Uji selisih antar model belum sahih secara statistik.** Lipatan `RepeatedStratifiedKFold`
-  berkorelasi, sehingga galat baku yang kami pakai meremehkan ragam sebenarnya. Label
-  "nyata" di notebook `09` harus dibaca sebagai "konsisten antar lipatan".
+- ~~**Uji selisih antar model belum sahih secara statistik.**~~ **Sudah diselesaikan di
+  notebook `10`** dengan koreksi Nadeau–Bengio. Akibatnya satu kesimpulan Tugas F dicabut:
+  cara-cara menyeimbangkan kelas tidak terbukti memperburuk model, hanya terbukti tidak
+  memperbaikinya.
 - **Kontrol negatif alat ukur tidak dapat dijalankan** pada model deterministik seperti
   Logistic Regression + `liblinear`: mengganti seed menghasilkan model yang sama persis,
   jadi selisih nol adalah konsekuensi definisi, bukan hasil pengukuran.
