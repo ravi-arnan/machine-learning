@@ -21,7 +21,7 @@ Berdasarkan arahan Bapak Adi di perkuliahan daring:
 | 2 | Sudah punya dataset kesehatan (data sekunder/publik) | **selesai** | dua dataset, 5.110 + 253.680 baris, terverifikasi |
 | 3 | Data sudah dicek di Colab: missing value, duplikat, bentuk data | **selesai** | `notebooks/01_cek_data.ipynb` (plus `02` dan `03` sebagai nilai tambah) |
 | 4 | 5 artikel jurnal berbahasa Inggris | **selesai** | `PAPERS.md` |
-| 5 | Link dataset + link paper ditaruh di Google Drive kelompok | **belum** | unggah folder `notebooks/` dan `PAPERS.md` |
+| 5 | Link dataset + link paper ditaruh di Google Drive kelompok | **belum** | unggah folder `notebooks/`, `PAPERS.md`, `LAPORAN.md`, dan `SLIDE.md` |
 | 6 | Absensi dilengkapi | **belum** | - |
 
 ---
@@ -51,7 +51,9 @@ kini disetel setara), eksperimen batas usia yang angkanya dilaporkan tanpa selny
 dekomposisi penurunan AUC di `08` yang arah kesimpulannya keliru. Rinciannya di Tugas E,
 Tugas F, dan Bagian 13.
 
-Sisa pekerjaan: membaca kelima artikel, menulis laporan, dan menyiapkan slide.
+Laporan akhir dan slide presentasi sudah selesai, ada di `LAPORAN.md` dan `SLIDE.md`.
+Sisa pekerjaan: membaca kelima artikel untuk persiapan tanya jawab, lalu mengunggah
+seluruh berkas ke Google Drive kelompok.
 
 ## 1. Judul
 
@@ -475,8 +477,11 @@ Notebook: `notebooks/10_pemeriksaan_ulang.ipynb`
 
 ```
 machine-learning/
+├── README.md                        # petunjuk singkat repositori
 ├── PLAN.md                          # dokumen ini
 ├── PAPERS.md                        # 5 artikel acuan
+├── LAPORAN.md                       # laporan akhir lima bab
+├── SLIDE.md                         # slide presentasi (Marp)
 ├── notebooks/
 │   ├── 01_cek_data.ipynb            # SELESAI: pemeriksaan kondisi data
 │   ├── 02_uji_awal_algoritma.ipynb  # SELESAI: pemilihan algoritma + uji ambang
@@ -488,10 +493,7 @@ machine-learning/
 │   ├── 08_validasi_eksternal.ipynb  # SELESAI: Tugas E
 │   ├── 09_eksperimen.ipynb          # SELESAI: Tugas F, eksperimen lanjutan
 │   └── 10_pemeriksaan_ulang.ipynb   # SELESAI: Tugas G, pengujian kesimpulan
-├── laporan/
-│   ├── laporan.docx
-│   └── presentasi.pptx
-└── requirements.txt
+└── (laporan dan slide diekspor ke PDF atau PPTX saat pengumpulan)
 ```
 
 Seluruh pekerjaan dikerjakan dalam berkas `.ipynb` agar dapat langsung dijalankan di
@@ -523,7 +525,7 @@ Mengikuti ritme mingguan perkuliahan. Sesuaikan Minggu 1 dengan pertemuan beriku
 | 5 | Tugas A tahap 2: KNN, DT, RF, SVM, GB × 4 strategi + tuning | Ravi, Ezza | Tabel perbandingan lengkap |
 | 6 | Tugas C: clustering, PCA, LDA | Ezza | `06_clustering_pca.ipynb` |
 | 7 | Tugas D: SHAP; Tugas E: validasi eksternal | Devin, Ravi | `07` dan `08`, draf laporan |
-| 8 | Revisi, latihan presentasi, pengumpulan | Semua | Laporan + slide final |
+| 8 | Revisi, latihan presentasi, pengumpulan | Semua | `LAPORAN.md` dan `SLIDE.md`, sudah tersedia |
 
 ## 12. Kriteria Keberhasilan
 
