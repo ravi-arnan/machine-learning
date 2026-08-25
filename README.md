@@ -73,6 +73,23 @@ pip install jupyterlab pandas numpy scikit-learn imbalanced-learn shap matplotli
 jupyter lab
 ```
 
+Kesepuluh notebook terakhir diverifikasi jalan dari nol tanpa error pada 26 Agustus 2026,
+dan seluruh angka kuncinya cocok dengan yang tertulis di `LAPORAN.md`.
+
+**Kalau muncul `CERTIFICATE_VERIFY_FAILED` saat notebook mengunduh data.** Ini bukan
+masalah pada notebook, melainkan interpreter Python yang tidak menemukan sertifikat CA
+sistem. Sering terjadi pada lingkungan terisolasi seperti `uv run` atau virtual
+environment tanpa `certifi`. Perbaikannya, arahkan ke CA bundle sistem sebelum menjalankan
+Jupyter:
+
+```bash
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+```
+
+Sesuaikan letak berkasnya bila distribusi yang dipakai menaruhnya di tempat lain, misalnya
+`/etc/pki/tls/certs/ca-bundle.crt` pada Fedora dan RHEL.
+
 ## Sumber data
 
 Keduanya publik, sekunder, dan terunduh langsung dari URL di dalam notebook.

@@ -31,6 +31,13 @@ Berdasarkan arahan Bapak Adi di perkuliahan daring:
 **Kesepuluh notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
 buku acuan terpakai, ditambah Explainable AI (saran Bapak) dan validasi eksternal.
 
+**Verifikasi jalan ulang (26 Agustus 2026).** Kesepuluh notebook dieksekusi berurutan
+dari nol pada lingkungan bersih, seluruhnya lulus tanpa error dalam 6 menit 23 detik.
+Delapan angka kunci di `LAPORAN.md` diadu dengan hasilnya dan seluruhnya cocok: parameter
+hasil GridSearch, recall dan precision pada data uji, AUC validasi eksternal, perbandingan
+13 lawan 6 fitur pada subset selaras, selang kepercayaan bootstrap, tiga nilai p uji
+terkoreksi, dan kurva belajar. Tidak ada angka laporan yang perlu direvisi.
+
 | Notebook | Isi | Tugas | Bab |
 |---|---|---|---|
 | `01_cek_data` | Pemeriksaan kondisi data | - | 2 |
@@ -538,7 +545,7 @@ Mengikuti ritme mingguan perkuliahan. Sesuaikan Minggu 1 dengan pertemuan beriku
 | Perbandingan model diuji terhadap derau, bukan sekadar selisih rata-rata | wajib |
 | Faktor penting versi SHAP sejalan dengan pengetahuan medis | wajib diperiksa |
 | AUC pada validasi eksternal | ≥ 0,75 (tidak runtuh saat pindah sumber data) |
-| Notebook dapat dijalankan ulang dari nol tanpa error | wajib |
+| Notebook dapat dijalankan ulang dari nol tanpa error | wajib, terbukti 26 Agustus 2026 |
 | Angka akhir dilaporkan beserta selang kepercayaan | wajib, sudah dihitung di `10` |
 | Model mengalahkan "periksa semua" pada net benefit | wajib, terbukti di `10` |
 
