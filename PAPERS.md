@@ -1,4 +1,4 @@
-# Lima Artikel Acuan — Kelompok 3
+# Lima Artikel Acuan (Kelompok 3)
 
 **Judul:** Prediksi Risiko Stroke Menggunakan Logistic Regression dan Gradient Boosting dengan Interpretasi Explainable AI
 
@@ -52,7 +52,7 @@ selection and data preprocessing**
 DOI: [10.1186/s12859-024-05866-8](https://doi.org/10.1186/s12859-024-05866-8) · PMID: 39407112 ·
 [Teks lengkap](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11476080/)
 
-> Acuan untuk tahap seleksi fitur dan preprocessing — sesuai penekanan Bapak bahwa
+> Acuan untuk tahap seleksi fitur dan preprocessing, sesuai penekanan Bapak bahwa
 > 60–70% pekerjaan ada di tahap ini.
 
 ---
