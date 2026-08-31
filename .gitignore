@@ -2,3 +2,6 @@
 .claude/
 .ipynb_checkpoints/
 __pycache__/
+.venv/
+artifacts/*.joblib
+artifacts/metadata.json

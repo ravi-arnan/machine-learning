@@ -1,0 +1,100 @@
+DAFTAR PAPER MENGGUNAKAN DATASET STROKE PREDICTION (KAGGLE FEDESORIANO)
+Untuk referensi kombinasi fitur / feature importance, minimal 10 paper (internasional + lokal)
+
+========================================
+INTERNASIONAL (7)
+========================================
+
+1. Evaluating Machine Learning Models for Stroke Prediction Based on Clinical Variables
+   Penulis: Akinwumi dkk., 2025
+   Jurnal: Frontiers in Neurology
+   DOI: 10.3389/fneur.2025.1668420
+   Link: https://doi.org/10.3389/fneur.2025.1668420
+   Catatan: Feature importance pakai Random Forest, hasil: age, average glucose level, BMI paling berpengaruh. Sangat relevan dengan topik kombinasi fitur.
+
+2. Performance Comparison of Feature Selection Techniques for Stroke Prediction Using Multilayer Perceptron
+   Penulis: Folorunsho dkk., 2025
+   Jurnal: FUOYE Journal of Engineering and Technology
+   DOI: 10.4314/fuoyejet.v10i1.6
+   Link: https://doi.org/10.4314/fuoyejet.v10i1.6
+   Catatan: Membandingkan Pearson Correlation vs RFE. Pearson menang, akurasi 99.13%.
+
+3. Stroke Prediction Using SMOTE and Extreme Gradient Boosting
+   Penulis: Hassan dkk., 2025
+   Jurnal: Computer Methods in Biomechanics and Biomedical Engineering
+   DOI: 10.1080/10255842.2025.2570510
+   Link: https://doi.org/10.1080/10255842.2025.2570510
+   Catatan: SMOTE untuk data imbalance + XGBoost.
+
+4. A Machine Learning Framework for Stroke Prediction: Balancing Precision and Recall in Healthcare Analytics
+   Penulis: Gusita dkk., 2025
+   Konferensi: IEEE MeMeA 2025
+   DOI: 10.1109/MeMeA65319.2025.11068036
+   Link: https://doi.org/10.1109/MeMeA65319.2025.11068036
+   Catatan: Fokus trade-off precision-recall, relevan kalau confidence level diukur dari precision.
+
+5. Analysing an Imbalanced Stroke Prediction Dataset Using Machine Learning Techniques
+   Penulis: Elangovan dkk., 2024
+   Jurnal: Karbala International Journal of Modern Science
+   DOI: 10.33640/2405-609x.3355
+   Link: https://doi.org/10.33640/2405-609x.3355
+   Catatan: SMOTE/ADASYN + hybrid NN-Random Forest, F1 75%.
+
+6. RDET Stacking Classifier: A Novel ML Based Approach for Stroke Prediction Using Imbalance Data
+   Penulis: Rehman dkk., 2023
+   Jurnal: PeerJ Computer Science
+   DOI: 10.7717/peerj-cs.1684
+   Link: https://doi.org/10.7717/peerj-cs.1684
+   Catatan: Stacking RF + DT + Extra Tree, SMOTE/ADASYN.
+
+7. Enhancing Stroke Prediction Using the Waikato Environment for Knowledge Analysis
+   Penulis: Altayeb & Arabiat, 2024
+   Jurnal: IAES International Journal of Artificial Intelligence
+   DOI: 10.11591/ijai.v13.i3.pp3010-3017
+   Link: https://doi.org/10.11591/ijai.v13.i3.pp3010-3017
+   Catatan: SVM terbaik, akurasi 94.4%.
+
+========================================
+LOKAL / INDONESIA (5)
+========================================
+
+8. Analysis of Data and Feature Processing on Stroke Prediction Using Wide Range Machine Learning Model
+   Penulis: Wisesty dkk., 2024 (Telkom)
+   Jurnal: Jurnal Online Informatika
+   DOI: 10.15575/join.v9i1.1249
+   Link: https://doi.org/10.15575/join.v9i1.1249
+   Catatan: Pearson Correlation, 5 fitur teratas: age, hypertension, heart disease, avg glucose, marital status. Sangat relevan.
+
+9. Early Stroke Disease Prediction Based on Lifestyle Factors Applied with Machine Learning
+   Penulis: Riska & Farokhah, 2025
+   Jurnal: Jurnal RESTI
+   DOI: 10.29207/resti.v9i5.6495
+   Link: https://doi.org/10.29207/resti.v9i5.6495
+   Catatan: Seleksi fitur Pearson + PCA, 5 dari 10 fitur cukup, akurasi 100% di NB/ID3/SVM/KNN/LR.
+
+10. Optimization of the Artificial Neural Network Algorithm with Genetic Algorithm in Stroke Prediction
+    Penulis: Wulandari dkk., 2024
+    Jurnal: SinkrOn
+    DOI: 10.33395/sinkron.v8i2.13609
+    Link: https://doi.org/10.33395/sinkron.v8i2.13609
+    Catatan: Data Kaggle + Mendeley. Fitur penentu: heart disease, ever married, work type, residence type.
+
+11. Imbalanced Data Handling for Stroke Prediction Using Oversampling and Cost-Sensitive Learning
+    Penulis: Laksono & Andriyani, 2025 (Univ. Teknologi Digital Indonesia)
+    Konferensi: IEEE ISRITI 2025
+    DOI: 10.1109/ISRITI68345.2025.11393348
+    Link: https://doi.org/10.1109/ISRITI68345.2025.11393348
+
+12. Optimizing Machine Learning Models for Stroke Prediction Using Clinical Data and Hyperparameter Tuning
+    Penulis: Siagian dkk., 2025 (Binus)
+    Konferensi: IEEE ICoCSETI 2025
+    DOI: 10.1109/ICoCSETI63724.2025.11019951
+    Link: https://doi.org/10.1109/ICoCSETI63724.2025.11019951
+
+========================================
+CATATAN PENTING UNTUK UJI COBA
+========================================
+
+- Konsensus lintas paper: age, average glucose level, dan BMI konsisten menjadi fitur paling berpengaruh (Frontiers, JOIN Telkom, FUOYE).
+- Dataset ini sangat imbalanced (stroke hanya ~5%), jadi akurasi 95%+ sering menyesatkan. Kebanyakan paper memakai SMOTE/ADASYN + metrik F1/ROC-AUC, bukan akurasi.
+- Untuk topik kombinasi fitur, mulai dari paper no. 1, 2, 8, dan 9 karena sudah menguji seleksi/ranking fitur secara eksplisit.
