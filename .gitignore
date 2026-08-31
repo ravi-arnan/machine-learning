@@ -1,5 +1,6 @@
 *.pdf
 !laporan_temuan.pdf
+!laporan_temuan_full.pdf
 .claude/
 .ipynb_checkpoints/
 __pycache__/
