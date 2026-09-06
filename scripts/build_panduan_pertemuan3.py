@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Bangun PANDUAN_PERTEMUAN3.docx (buku panduan tugas Pertemuan 3).
 
-Struktur mengikuti pola umum modul/guidebook praktikum: cover, kata
-pengantar, daftar isi, daftar gambar, informasi umum (capaian, alat dan
-bahan), Percobaan 1-9 (tujuan, langkah, kode, gambar, output,
+Struktur mengikuti pola umum modul/guidebook praktikum: cover, daftar isi,
+daftar gambar, Percobaan 1-9 (tujuan, langkah, kode, gambar, output,
 pembahasan), rangkuman, lembar kerja, daftar pustaka. Tanpa struktur
 BAB ala laporan formal.
 
-Format visual meniru laporan KKN: A4, margin 1 inci, Times New Roman 12,
-judul tengah tebal, isi justify spasi 1,5. Kode Consolas 10 blok abu-abu.
-Slot screenshot dikosongkan untuk ditempel dari Google Colab.
+Format visual meniru laporan KKN: A4, margin 1 inci, Times New Roman 12
+(dari cover sampai isi), judul tengah tebal, isi justify spasi 1,5.
+Cuplikan kode dan output ditempatkan dalam tabel 1 x 1 selebar margin
+dengan font Courier New 10. Slot screenshot tabel 1 x 1 selebar margin,
+diisi otomatis dari berkas assets/colab/pertemuan3_P{n}.png bila ada.
 
 Pakai: uv run --python 3.13 --with python-docx python3 scripts/build_panduan_pertemuan3.py
 """
@@ -20,10 +21,14 @@ from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, RGBColor
 
 OUT = Path(__file__).resolve().parents[1] / "PANDUAN_PERTEMUAN3.docx"
+LOGO = Path(__file__).resolve().parents[1] / "assets" / "logo-unud.png"
+COLAB = Path(__file__).resolve().parents[1] / "assets" / "colab"
 TNR = "Times New Roman"
+BLACK = RGBColor(0, 0, 0)
+USABLE_CM = 21.0 - 2.54 - 2.54  # lebar area isi A4 margin 1 inci
 
 ANGGOTA = [
     ("1", "2305551036", "Deliana Br Manalu"),
@@ -33,12 +38,23 @@ ANGGOTA = [
 ]
 
 
-def shade(paragraph, fill="F2F2F2"):
-    pPr = paragraph._p.get_or_add_pPr()
-    shd = OxmlElement("w:shd")
-    shd.set(qn("w:val"), "clear")
-    shd.set(qn("w:fill"), fill)
-    pPr.append(shd)
+def fit_margin(tbl):
+    """Buat tabel selebar area isi (margin 1 inci), lebar dibagi rata per kolom."""
+    ncol = max(len(r.cells) for r in tbl.rows) if tbl.rows else 1
+    col_w = Cm(USABLE_CM / ncol)
+    tbl.autofit = False
+    tbl.allow_autofit = False
+    for row in tbl.rows:
+        for c in row.cells:
+            c.width = col_w
+    tblPr = tbl._tbl.tblPr
+    layout = OxmlElement("w:tblLayout")
+    layout.set(qn("w:type"), "fixed")
+    tblPr.append(layout)
+    twips = int(USABLE_CM * 567 / ncol)
+    for gridCol in tbl._tbl.tblGrid.findall(qn("w:gridCol")):
+        gridCol.set(qn("w:w"), str(twips))
+    return tbl
 
 
 def body(doc, text, bold_prefix=None):
@@ -68,6 +84,7 @@ def heading1(doc, text):
     r.font.name = TNR
     r.font.size = Pt(12)
     r.bold = True
+    r.font.color.rgb = BLACK
     return p
 
 
@@ -80,6 +97,7 @@ def heading2(doc, text):
     r.font.name = TNR
     r.font.size = Pt(12)
     r.bold = True
+    r.font.color.rgb = BLACK
     return p
 
 
@@ -106,46 +124,62 @@ def caption(doc, text):
 
 
 def code_block(doc, lines):
-    p = doc.add_paragraph()
+    tbl = doc.add_table(rows=1, cols=1)
+    tbl.style = "Table Grid"
+    fit_margin(tbl)
+    cell = tbl.cell(0, 0)
+    p = cell.paragraphs[0]
     p.paragraph_format.space_before = Pt(6)
     p.paragraph_format.space_after = Pt(6)
     p.paragraph_format.line_spacing = 1.0
-    shade(p)
     for i, line in enumerate(lines):
         r = p.add_run(line if line else " ")
-        r.font.name = "Consolas"
+        r.font.name = "Courier New"
         r.font.size = Pt(10)
         if i < len(lines) - 1:
             r.add_break()
-    return p
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+    return tbl
 
 
 def output_block(doc, lines):
-    p = doc.add_paragraph()
+    tbl = doc.add_table(rows=1, cols=1)
+    tbl.style = "Table Grid"
+    fit_margin(tbl)
+    cell = tbl.cell(0, 0)
+    p = cell.paragraphs[0]
     p.paragraph_format.space_before = Pt(6)
     p.paragraph_format.space_after = Pt(6)
     p.paragraph_format.line_spacing = 1.0
-    shade(p, fill="EFEFEF")
     for i, line in enumerate(lines):
         r = p.add_run(line if line else " ")
-        r.font.name = "Consolas"
+        r.font.name = "Courier New"
         r.font.size = Pt(10)
         if i < len(lines) - 1:
             r.add_break()
-    return p
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+    return tbl
 
 
 def slot_screenshot(doc, gambar_no, keterangan):
     tbl = doc.add_table(rows=1, cols=1)
     tbl.style = "Table Grid"
+    fit_margin(tbl)
     cell = tbl.cell(0, 0)
-    cell.height = Cm(5)
+    cell.width = Cm(USABLE_CM)
     p = cell.paragraphs[0]
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = p.add_run(f"[TEMPEL SCREENSHOT COLAB DI SINI: {keterangan}]")
-    r.font.name = TNR
-    r.font.size = Pt(11)
-    r.italic = True
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after = Pt(6)
+    png = COLAB / f"pertemuan3_P{gambar_no}.png"
+    if png.exists():
+        r = p.add_run()
+        r.add_picture(str(png), width=Cm(USABLE_CM))
+    else:
+        r = p.add_run(f"[TEMPEL SCREENSHOT COLAB DI SINI: {keterangan}]")
+        r.font.name = TNR
+        r.font.size = Pt(11)
+        r.italic = True
     caption(doc, f"Gambar {gambar_no}. {keterangan}")
 
 
@@ -168,29 +202,10 @@ def toc_entry(doc, text):
     return p
 
 
-def add_page_number(doc):
-    p = doc.sections[0].footer.paragraphs[0]
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r = p.add_run()
-    r.font.name = TNR
-    r.font.size = Pt(10)
-    for tag, val, txt in [
-        ("w:fldChar", "begin", None),
-        ("w:instrText", None, "PAGE"),
-        ("w:fldChar", "end", None),
-    ]:
-        el = OxmlElement(tag)
-        if val:
-            el.set(qn("w:fldCharType"), val)
-        else:
-            el.set(qn("xml:space"), "preserve")
-            el.text = txt
-        r._r.append(el)
-
-
 def result_table(doc, headers, rows):
     tbl = doc.add_table(rows=1 + len(rows), cols=len(headers))
     tbl.style = "Table Grid"
+    fit_margin(tbl)
     for j, h in enumerate(headers):
         c = tbl.cell(0, j)
         c.text = ""
@@ -209,6 +224,7 @@ def result_table(doc, headers, rows):
 
 
 def percobaan(doc, no, judul, tujuan, langkah, kode, gambar_ket, output, bahasan):
+    doc.add_page_break()
     heading1(doc, f"Percobaan {no}: {judul}")
     heading2(doc, "Tujuan")
     body(doc, tujuan)
@@ -235,62 +251,35 @@ def main():
     normal.font.name = TNR
     normal.font.size = Pt(12)
 
-    # ---- COVER ----
-    for _ in range(3):
-        doc.add_paragraph()
+    # ---- COVER (ala laporan KK dampingan: judul, logo, disusun oleh, institusi, tahun) ----
+    if not LOGO.exists():
+        raise SystemExit(f"logo tidak ditemukan: {LOGO}")
     centered(doc, "BUKU PANDUAN", bold=True)
     centered(doc, "TUGAS PERTEMUAN 3: PENGKONDISIAN DAN PERULANGAN", bold=True)
     centered(doc, "MATA KULIAH MACHINE LEARNING", bold=True)
-    doc.add_paragraph()
-    centered(doc, "Program Studi S1 Teknologi Informasi")
-    centered(doc, "Universitas Udayana")
-    doc.add_paragraph()
-    centered(doc, "Disusun oleh Kelompok 3:", bold=True)
-    tbl = doc.add_table(rows=1 + len(ANGGOTA), cols=3)
-    tbl.style = "Table Grid"
-    for j, h in enumerate(["No", "NIM", "Nama"]):
-        c = tbl.cell(0, j)
-        c.text = ""
-        r = c.paragraphs[0].add_run(h)
-        r.font.name = TNR
-        r.font.size = Pt(12)
-        r.bold = True
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(12)
+    p.paragraph_format.space_after = Pt(12)
+    p.add_run().add_picture(str(LOGO), width=Cm(4.1))
+    centered(doc, "DISUSUN OLEH:", bold=True)
+    centered(doc, "Kelompok 3", bold=True)
     for i, (no, nim, nama) in enumerate(ANGGOTA, start=1):
-        for j, val in enumerate([no, nim, nama]):
-            c = tbl.cell(i, j)
-            c.text = ""
-            r = c.paragraphs[0].add_run(val)
-            r.font.name = TNR
-            r.font.size = Pt(12)
+        centered(doc, f"{i}. {nama} ({nim})", space_after=0)
     doc.add_paragraph()
     centered(doc, "Dosen Pengampu: Bapak Adi Purnawan")
-    centered(doc, "Tahun 2026")
+    doc.add_paragraph()
+    centered(doc, "PROGRAM STUDI S1 TEKNOLOGI INFORMASI", bold=True)
+    centered(doc, "UNIVERSITAS UDAYANA", bold=True)
+    centered(doc, "TAHUN 2026", bold=True)
 
     doc.add_page_break()
 
-    # ---- KATA PENGANTAR ----
-    heading1(doc, "Kata Pengantar")
-    body(
-        doc,
-        "Puji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa karena atas berkat-Nya buku panduan ini dapat diselesaikan tepat waktu.",
-    )
-    body(
-        doc,
-        "Buku panduan ini disusun untuk memenuhi tugas Pertemuan 3 mata kuliah Machine Learning tentang pengkondisian dan perulangan. Seluruh percobaan memakai dataset kelompok kami (Stroke Prediction Dataset) dan dijalankan di Google Colab, dengan screenshot, output, dan pembahasan pada setiap tahapan. Kami menyadari panduan ini masih jauh dari sempurna sehingga kritik dan saran sangat kami harapkan.",
-    )
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    r = p.add_run("Kelompok 3")
-    r.font.name = TNR
-    r.font.size = Pt(12)
-
-    # ---- DAFTAR ISI ----
+    # ---- DAFTAR ISI (tanpa nomor halaman) ----
     heading1(doc, "Daftar Isi")
     for entri in [
-        "Kata Pengantar",
         "Daftar Isi",
         "Daftar Gambar",
-        "Informasi Umum",
         "Percobaan 1: Memuat Data",
         "Percobaan 2: Ekspresi Boolean",
         "Percobaan 3: Percabangan If-Elif-Else",
@@ -306,6 +295,8 @@ def main():
     ]:
         toc_entry(doc, entri)
 
+    doc.add_page_break()
+
     # ---- DAFTAR GAMBAR ----
     heading1(doc, "Daftar Gambar")
     for entri in [
@@ -320,32 +311,6 @@ def main():
         "Gambar 9. Penyaringan data latih dan rekapitulasi alasan penolakan",
     ]:
         toc_entry(doc, entri)
-
-    # ---- INFORMASI UMUM ----
-    heading1(doc, "Informasi Umum")
-    heading2(doc, "Capaian pembelajaran")
-    body(
-        doc,
-        "Setelah mengikuti pertemuan ini, mahasiswa mampu mengevaluasi ekspresi Boolean, menyusun keputusan dengan if-elif-else, memilih for atau while sesuai masalah, menggunakan break dan continue secara tepat, serta menyaring data sederhana dengan kontrol alur.",
-    )
-    heading2(doc, "Alat dan bahan")
-    numbered(
-        doc,
-        [
-            "Google Colab (tidak perlu instalasi, cukup akun Google).",
-            "Notebook pertemuan3_pengkodisian_perulangan.ipynb di repositori kelompok.",
-            "Dataset Stroke Prediction Dataset (Kaggle, fedesoriano), dimuat langsung dari URL di dalam notebook sehingga tidak ada berkas yang perlu diunggah.",
-        ],
-    )
-    heading2(doc, "Cara menjalankan")
-    numbered(
-        doc,
-        [
-            "Buka Google Colab, pilih File lalu Upload Notebook, lalu pilih berkas notebook kelompok.",
-            "Pilih Runtime lalu Run all dan tunggu sampai seluruh sel selesai.",
-            "Cocokkan setiap Percobaan 1 sampai 9 di panduan ini dengan sel Colab yang bersangkutan, lalu tempel screenshotnya pada slot yang tersedia.",
-        ],
-    )
 
     # ---- PERCOBAAN 1 ----
     percobaan(
@@ -768,6 +733,7 @@ def main():
     )
 
     # ---- RANGKUMAN ----
+    doc.add_page_break()
     heading1(doc, "Rangkuman")
     body(
         doc,
@@ -787,6 +753,7 @@ def main():
     )
 
     # ---- LEMBAR KERJA ----
+    doc.add_page_break()
     heading1(doc, "Lembar Kerja")
     numbered(
         doc,
@@ -798,6 +765,7 @@ def main():
     )
 
     # ---- DAFTAR PUSTAKA ----
+    doc.add_page_break()
     heading1(doc, "Daftar Pustaka")
     for entri in [
         "Slide Pertemuan 3 Machine Learning: Pengkondisian dan Perulangan, S1 Teknologi Informasi.",
@@ -811,7 +779,6 @@ def main():
         r.font.name = TNR
         r.font.size = Pt(12)
 
-    add_page_number(doc)
     doc.save(OUT)
     print("tersimpan:", OUT)
 
