@@ -7,3 +7,5 @@ __pycache__/
 .venv/
 artifacts/*.joblib
 artifacts/metadata.json
+PANDUAN_PERTEMUAN3.docx
+.~lock.*#
