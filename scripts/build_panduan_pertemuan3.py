@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Bangun PANDUAN_PERTEMUAN3.docx (buku panduan tugas Pertemuan 3).
 
-Struktur mengikuti pola umum modul/guidebook praktikum: cover, daftar isi,
-daftar gambar, Percobaan 1-9 (tujuan, langkah, kode, gambar, output,
-pembahasan), rangkuman, lembar kerja, daftar pustaka. Tanpa struktur
+Struktur mengikuti pola umum laporan/guidebook praktikum: cover, daftar isi,
+daftar gambar, Tahapan 1-9 (tujuan, alur, kode, gambar, output,
+pembahasan), kesimpulan, daftar pustaka. Tanpa struktur
 BAB ala laporan formal.
 
 Format visual meniru laporan KKN: A4, margin 1 inci, Times New Roman 12
@@ -101,16 +101,6 @@ def heading2(doc, text):
     return p
 
 
-def numbered(doc, items):
-    for i, langkah in enumerate(items, start=1):
-        p = doc.add_paragraph()
-        p.paragraph_format.line_spacing = 1.5
-        p.paragraph_format.space_after = Pt(3)
-        r = p.add_run(f"{i}. {langkah}")
-        r.font.name = TNR
-        r.font.size = Pt(12)
-
-
 def caption(doc, text):
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -118,7 +108,7 @@ def caption(doc, text):
     p.paragraph_format.space_after = Pt(6)
     r = p.add_run(text)
     r.font.name = TNR
-    r.font.size = Pt(12)
+    r.font.size = Pt(10)
     r.bold = True
     return p
 
@@ -223,19 +213,26 @@ def result_table(doc, headers, rows):
     doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
 
+def langkah_narasi(doc, items):
+    kalimat = " ".join(i if i.rstrip().endswith(".") else i + "." for i in items)
+    body(doc, kalimat)
+
+
 def percobaan(doc, no, judul, tujuan, langkah, kode, gambar_ket, output, bahasan):
     doc.add_page_break()
-    heading1(doc, f"Percobaan {no}: {judul}")
+    heading1(doc, f"Tahapan {no}: {judul}")
     heading2(doc, "Tujuan")
     body(doc, tujuan)
-    heading2(doc, "Langkah percobaan")
-    numbered(doc, langkah)
+    heading2(doc, "Alur pengerjaan")
+    langkah_narasi(doc, langkah)
     heading2(doc, "Kode program")
     code_block(doc, kode)
+    caption(doc, f"Kode Program Tahapan {no}")
     heading2(doc, "Hasil (screenshot)")
     slot_screenshot(doc, no, gambar_ket)
     heading2(doc, "Output")
     output_block(doc, output)
+    caption(doc, f"Output Tahapan {no}")
     heading2(doc, "Pembahasan")
     for teks in bahasan:
         body(doc, teks)
@@ -280,17 +277,16 @@ def main():
     for entri in [
         "Daftar Isi",
         "Daftar Gambar",
-        "Percobaan 1: Memuat Data",
-        "Percobaan 2: Ekspresi Boolean",
-        "Percobaan 3: Percabangan If-Elif-Else",
-        "Percobaan 4: Perulangan For",
-        "Percobaan 5: Perulangan While",
-        "Percobaan 6: Break dan Continue",
-        "Percobaan 7: Nested Loop",
-        "Percobaan 8: Comprehension",
-        "Percobaan 9: Menyaring Data Latih",
-        "Rangkuman",
-        "Lembar Kerja",
+        "Tahapan 1: Memuat Data",
+        "Tahapan 2: Ekspresi Boolean",
+        "Tahapan 3: Percabangan If-Elif-Else",
+        "Tahapan 4: Perulangan For",
+        "Tahapan 5: Perulangan While",
+        "Tahapan 6: Break dan Continue",
+        "Tahapan 7: Nested Loop",
+        "Tahapan 8: Comprehension",
+        "Tahapan 9: Menyaring Data Latih",
+        "Kesimpulan",
         "Daftar Pustaka",
     ]:
         toc_entry(doc, entri)
@@ -379,7 +375,7 @@ def main():
             "lansia + hipertensi + smoking diketahui: 261",
         ],
         [
-            'Nilai "Unknown" pada smoking_status menempati sekitar 30 persen data. Itu adalah missing value tersembunyi: bukan kategori bermakna sehingga pada Percobaan 9 baris tersebut dilewati dengan continue. Baris bmi kosong hanya sekitar 4 persen dan BMI di atas 60 hanya 13 baris.'
+            'Nilai "Unknown" pada smoking_status menempati sekitar 30 persen data. Itu adalah missing value tersembunyi: bukan kategori bermakna sehingga pada Tahapan 9 baris tersebut dilewati dengan continue. Baris bmi kosong hanya sekitar 4 persen dan BMI di atas 60 hanya 13 baris.'
         ],
     )
 
@@ -732,36 +728,16 @@ def main():
         ],
     )
 
-    # ---- RANGKUMAN ----
+    # ---- KESIMPULAN ----
     doc.add_page_break()
-    heading1(doc, "Rangkuman")
+    heading1(doc, "Kesimpulan")
     body(
         doc,
-        "Kontrol alur adalah fondasi pipeline data. Kondisi membuat program adaptif, loop mengotomatisasi proses berulang, dan break serta continue menangani kasus khusus. Kualitas data dimulai dari logika yang jelas.",
+        "Kesimpulan dari seluruh tahapan adalah bahwa kontrol alur merupakan fondasi dari pengolahan data. Melalui sembilan tahapan pada dataset Stroke Prediction Dataset, kami memperoleh beberapa temuan penting. Pertama, urutan pengecekan dalam percabangan sangat menentukan hasil: batas paling ketat harus diperiksa lebih dahulu karena cabang pertama yang bernilai True yang akan dieksekusi. Kedua, for dan while menjawab kebutuhan yang berbeda, yaitu menelusuri koleksi yang sudah ada berbanding berhenti saat kondisi tertentu terpenuhi. Ketiga, continue terbukti menjadi alat utama dalam penyaringan data, sedangkan break hanya tepat dipakai untuk interupsi darurat.",
     )
-    caption(doc, "Tabel 3. Panduan memilih struktur kontrol alur")
-    result_table(
+    body(
         doc,
-        ["Kebutuhan", "Struktur yang dipakai"],
-        [
-            ["Keputusan berlapis", "if-elif-else, batas ketat terlebih dahulu"],
-            ["Menelusuri koleksi", "for dengan enumerate atau zip"],
-            ["Berhenti ikut kondisi", "while, pengendali selalu maju"],
-            ["Mengabaikan satu item", "continue"],
-            ["Menghentikan seluruh proses", "break, hanya untuk keadaan darurat"],
-        ],
-    )
-
-    # ---- LEMBAR KERJA ----
-    doc.add_page_break()
-    heading1(doc, "Lembar Kerja")
-    numbered(
-        doc,
-        [
-            "Mengapa rata-rata usia 100 baris pertama (67,28) jauh di atas rata-rata global (43,23)? Jelaskan dengan susunan dataset.",
-            "Mengapa loop while pada Percobaan 5 mencetak 8 baris padahal nilai epoch 7 tercetak 0,1? Jelaskan peran pembulatan.",
-            "Mengapa smoking_unknown tercatat 1.483 padahal total Unknown 1.544? Jelaskan pengaruh urutan pemeriksaan.",
-        ],
+        "Temuan kuantitatif pada dataset memperkuat hal tersebut. Nilai smoking_status Unknown menempati 1.544 baris atau sekitar 30 persen data, yang merupakan missing value tersembunyi, sehingga pada penyaringan data latih baris tersebut dilewati dan tercatat 1.483 kali sebagai alasan penolakan. Baris bmi kosong hanya 201 baris atau sekitar 4 persen, dan BMI di atas 60 hanya 13 baris. Hasil penyaringan akhir menghasilkan 3.425 baris valid (67,0 persen) dan 1.685 baris ditolak (33,0 persen), dengan rincian bmi_kosong 201, smoking_unknown 1.483, dan gender_other 1. Perbandingan loop terhadap pandas pada agregasi usia 100 baris pertama menghasilkan nilai yang identik, sehingga logika perulangan yang kami tulis terbukti benar.",
     )
 
     # ---- DAFTAR PUSTAKA ----
