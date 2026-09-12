@@ -47,6 +47,19 @@ berdiri sendiri**: fungsi preprocessing sengaja disalin ke notebook `05` sampai 
 masing-masing tetap bisa dijalankan sendiri di Colab tanpa mengimpor notebook lain dan
 tanpa bertukar berkas CSV.
 
+### Notebook jalur belajar (dasar)
+
+Selain sepuluh notebook di atas, ada beberapa notebook pendamping yang mengulas ulang
+langkah awal dengan pendekatan berbeda:
+
+| Notebook | Isi |
+|---|---|
+| `02_analisis_model` | Perbandingan **KNN dan Naive Bayes yang diimplementasikan manual** (tanpa scikit-learn), evaluasi metrik dihitung manual |
+| `03_model_library` | Model memakai **scikit-learn**: Logistic Regression, Decision Tree, Random Forest, SVM, plus scaling dan class_weight |
+
+Data mentah stroke (5.110 x 12) disimpan di `data/healthcare-stroke-data.csv` dan
+dimuat langsung oleh notebook lewat URL raw GitHub.
+
 ## Menjalankan
 
 ### Google Colab
