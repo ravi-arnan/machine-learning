@@ -20,7 +20,7 @@ def split_data(
     seed: int = SEED,
     test_size: float = 0.30,
 ):
-    """70/15/15 stratified split matching notebook 05."""
+    """70/15/15 stratified split matching notebook 07."""
     y = df["stroke"]
     X = df.drop(columns=["stroke"])
     X_train, X_rest, y_train, y_rest = train_test_split(

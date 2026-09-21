@@ -80,7 +80,7 @@ def dbscan_risk_flag(
     imputer: BmiImputer | None = None,
     scaler=None,
 ) -> dict:
-    """Flag patients in DBSCAN noise cluster (high stroke rate in notebook 06)."""
+    """Flag patients in DBSCAN noise cluster (high stroke rate in notebook 08)."""
     from sklearn.preprocessing import StandardScaler
 
     row = pd.DataFrame([patient])

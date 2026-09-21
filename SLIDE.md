@@ -26,7 +26,7 @@ Bapak Adi Purnawan
 Deliana Br Manalu - Ravi Arnan Irianto - Ezza Putra Wibawa - Devin
 
 <!--
-Perkenalan singkat. Sebutkan bahwa seluruh hasil ada di sepuluh notebook
+Perkenalan singkat. Sebutkan bahwa seluruh hasil ada di tiga belas notebook
 yang bisa dijalankan ulang di Colab tanpa mengunggah berkas apa pun.
 -->
 
@@ -428,13 +428,13 @@ untuk prevalensi 4,87%.
 
 # Terima kasih
 
-Sepuluh notebook, seluruhnya dapat dijalankan ulang di Google Colab
+Tiga belas notebook, seluruhnya dapat dijalankan ulang di Google Colab
 
 <span class="kecil">
 
-`01` cek data - `02` uji algoritma - `03` uji validasi silang - `04` preprocessing
-`05` klasifikasi - `06` clustering dan PCA - `07` explainable AI
-`08` validasi eksternal - `09` eksperimen - `10` pemeriksaan ulang
+`01` cek data - `02` bersihkan data - `03a`/`03b` model manual - `04` model library
+`05` uji algoritma - `06` uji validasi silang - `07` klasifikasi - `08` clustering dan PCA
+`09` explainable AI - `10` validasi eksternal - `11` eksperimen - `12` pemeriksaan ulang
 
 </span>
 

@@ -388,7 +388,7 @@ pdf.bullet(
     "stroke_ml/preprocessing.py:BmiImputer -> Ridge regression untuk imputasi bmi (Bab 3-4 buku)"
 )
 pdf.bullet(
-    "stroke_ml/models.py & notebooks/05_klasifikasi.ipynb -> Logistic Regression p=1/(1+exp(-(w·x+b))), cost + L1/L2, Gradient Boosting additive trees"
+    "stroke_ml/models.py & notebooks/07_klasifikasi.ipynb -> Logistic Regression p=1/(1+exp(-(w·x+b))), cost + L1/L2, Gradient Boosting additive trees"
 )
 pdf.bullet(
     "stroke_ml/threshold.py -> penyetelan ambang keputusan (recall >=0.80) dan ambang berbasis biaya fn_cost=20"

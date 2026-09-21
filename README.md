@@ -25,37 +25,32 @@ CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis n
 | `SLIDE.md` | Slide presentasi, 26 halaman, format Marp |
 | `PLAN.md` | Rencana proyek, pembagian tugas, batasan penelitian |
 | `PAPERS.md` | Lima artikel acuan berbahasa Inggris beserta DOI dan PMID |
-| `notebooks/` | Sepuluh notebook berisi seluruh kode dan hasil |
+| `notebooks/` | Tiga belas notebook berisi seluruh kode dan hasil |
 
 ## Peta notebook
 
 | Notebook | Isi | Tugas | Bab buku |
 |---|---|---|---|
-| `01_cek_data` | Pemeriksaan kondisi data | - | 2 |
-| `02_uji_awal_algoritma` | Pemilihan algoritma dan uji ambang | - | 5 sampai 7 |
-| `03_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
-| `04_preprocessing` | Imputasi BMI dengan regresi | B | 2, 3, 4 |
-| `05_klasifikasi` | Enam algoritma kali empat strategi, GridSearch | A | 5, 6, 7 |
-| `06_clustering_pca` | K-Means, Hierarchical, DBSCAN, PCA, LDA | C | 8, 9 |
-| `07_explainable_ai` | SHAP global dan individual | D | tambahan |
-| `08_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
-| `09_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
-| `10_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
+| `01_cek_data` | Pemeriksaan kondisi data, tanpa mengubah apa pun | - | 2 |
+| `02_bersihkan_data` | Pembersihan data, imputasi BMI dengan regresi | B | 2, 3, 4 |
+| `03a_knn_manual` | KNN manual tanpa scikit-learn, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
+| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
+| `04_model_library` | Model memakai scikit-learn: Logistic Regression, Decision Tree, Random Forest, SVM | - | - |
+| `05_uji_awal_algoritma` | Pemilihan algoritma dan uji ambang | - | 5 sampai 7 |
+| `06_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
+| `07_klasifikasi` | Enam algoritma kali empat strategi, GridSearch | A | 5, 6, 7 |
+| `08_clustering_pca` | K-Means, Hierarchical, DBSCAN, PCA, LDA | C | 8, 9 |
+| `09_explainable_ai` | SHAP global dan individual | D | tambahan |
+| `10_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
+| `11_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
+| `12_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
 
-Urutan penomoran mengikuti alur cerita, bukan ketergantungan teknis. **Setiap notebook
-berdiri sendiri**: fungsi preprocessing sengaja disalin ke notebook `05` sampai `08` agar
-masing-masing tetap bisa dijalankan sendiri di Colab tanpa mengimpor notebook lain dan
-tanpa bertukar berkas CSV.
-
-### Notebook jalur belajar (dasar)
-
-Selain sepuluh notebook di atas, ada beberapa notebook pendamping yang mengulas ulang
-langkah awal dengan pendekatan berbeda:
-
-| Notebook | Isi |
-|---|---|
-| `02_analisis_model` | Perbandingan **KNN dan Naive Bayes yang diimplementasikan manual** (tanpa scikit-learn), evaluasi metrik dihitung manual |
-| `03_model_library` | Model memakai **scikit-learn**: Logistic Regression, Decision Tree, Random Forest, SVM, plus scaling dan class_weight |
+Notebook `03a`, `03b`, dan `04` adalah jalur belajar: algoritma dibedah dulu secara manual,
+baru kemudian dipakai lewat library. Nomor `01` sampai `12` mengikuti alur belajar dan alur
+cerita, bukan ketergantungan teknis. Setiap notebook berdiri sendiri: notebook lanjutan
+menyalin fungsi pembersihan yang sama, sedangkan notebook model manual membaca berkas
+`artifacts/stroke_bersih.csv` hasil notebook `02`, sehingga semuanya tetap bisa dijalankan
+sendiri di Colab tanpa mengimpor notebook lain.
 
 Data mentah stroke (5.110 x 12) disimpan di `data/healthcare-stroke-data.csv` dan
 dimuat langsung oleh notebook lewat URL raw GitHub.
@@ -86,8 +81,9 @@ pip install jupyterlab pandas numpy scikit-learn imbalanced-learn shap matplotli
 jupyter lab
 ```
 
-Kesepuluh notebook terakhir diverifikasi jalan dari nol tanpa error pada 26 Agustus 2026,
-dan seluruh angka kuncinya cocok dengan yang tertulis di `LAPORAN.md`.
+Seluruh notebook diverifikasi jalan dari nol tanpa error, dan seluruh angka kuncinya
+cocok dengan yang tertulis di `LAPORAN.md`. Notebook jalur belajar `03a` dan `03b`
+diverifikasi pada 21 September 2026.
 
 **Kalau muncul `CERTIFICATE_VERIFY_FAILED` saat notebook mengunduh data.** Ini bukan
 masalah pada notebook, melainkan interpreter Python yang tidak menemukan sertifikat CA
@@ -136,5 +132,5 @@ dibahas di `LAPORAN.md`:
 - **Setiap angka akhir dilaporkan beserta selang kepercayaannya**, karena data uji hanya
   memuat 38 kasus stroke.
 - **Kegagalan ikut dilaporkan.** Tujuh gagasan peningkatan diuji dan enam gagal.
-- **Kesimpulan kami sendiri diuji ulang** dengan koreksi Nadeau-Bengio di notebook `10`,
+- **Kesimpulan kami sendiri diuji ulang** dengan koreksi Nadeau-Bengio di notebook `12`,
   dan satu klaim akhirnya dicabut.

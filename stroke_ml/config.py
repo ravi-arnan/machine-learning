@@ -23,7 +23,7 @@ BMI_IMPUTE_FEATURES = [
     "smoking_status",
 ]
 
-# Six features aligned with CDC BRFSS external validation (notebook 08).
+# Six features aligned with CDC BRFSS external validation (notebook 10).
 SURVEY_FEATURES = [
     "gender",
     "age",

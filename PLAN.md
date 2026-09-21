@@ -19,7 +19,7 @@ Berdasarkan arahan Bapak Adi di perkuliahan daring:
 |---|---|---|---|
 | 1 | Kelompok dilengkapi di Google Form / spreadsheet kelas | **belum** | isi kolom "Ide Project" |
 | 2 | Sudah punya dataset kesehatan (data sekunder/publik) | **selesai** | dua dataset, 5.110 + 253.680 baris, terverifikasi |
-| 3 | Data sudah dicek di Colab: missing value, duplikat, bentuk data | **selesai** | `notebooks/01_cek_data.ipynb` (plus `02` dan `03` sebagai nilai tambah) |
+| 3 | Data sudah dicek di Colab: missing value, duplikat, bentuk data | **selesai** | `notebooks/01_cek_data.ipynb` (plus `05` dan `06` sebagai nilai tambah) |
 | 4 | 5 artikel jurnal berbahasa Inggris | **selesai** | `PAPERS.md` |
 | 5 | Link dataset + link paper ditaruh di Google Drive kelompok | **belum** | unggah folder `notebooks/`, `PAPERS.md`, `LAPORAN.md`, dan `SLIDE.md` |
 | 6 | Absensi dilengkapi | **belum** | - |
@@ -28,34 +28,49 @@ Berdasarkan arahan Bapak Adi di perkuliahan daring:
 
 ## Status Pengerjaan
 
-**Kesepuluh notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
+**Ketiga belas notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
 buku acuan terpakai, ditambah Explainable AI (saran Bapak) dan validasi eksternal.
 
-**Verifikasi jalan ulang (26 Agustus 2026).** Kesepuluh notebook dieksekusi berurutan
+**Verifikasi jalan ulang (26 Agustus 2026).** Sepuluh notebook inti dieksekusi berurutan
 dari nol pada lingkungan bersih, seluruhnya lulus tanpa error dalam 6 menit 23 detik.
 Delapan angka kunci di `LAPORAN.md` diadu dengan hasilnya dan seluruhnya cocok: parameter
 hasil GridSearch, recall dan precision pada data uji, AUC validasi eksternal, perbandingan
 13 lawan 6 fitur pada subset selaras, selang kepercayaan bootstrap, tiga nilai p uji
 terkoreksi, dan kurva belajar. Tidak ada angka laporan yang perlu direvisi.
 
+**Penomoran ulang (21 September 2026).** Langkah pembersihan data dinaikkan menjadi `02`
+(sebelumnya `04_preprocessing`) supaya urutannya cek data, bersihkan data, baru model.
+Notebook jalur belajar manual dipecah menjadi `03a_knn_manual` dan
+`03b_naive_bayes_manual`, lalu `04_model_library` memakai scikit-learn. Nomor sesudahnya
+disesuaikan, dari `05_uji_awal_algoritma` sampai `12_pemeriksaan_ulang`.
+
+**Pembagian peran dipertegas (21 September 2026).** Notebook `01` kini murni memeriksa
+kondisi data, tanpa mengubah apa pun; pengisian `bmi` dan penyimpanan berkas bersih
+pindah ke `02`. Notebook model manual (`03a` dan `03b`) ditambah pembanding **skor
+risiko klinis CHA2DS2-VASc** yang diimplementasikan manual, supaya model dibandingkan
+dengan cara yang sudah dipakai di dunia medis, bukan hanya dengan sesama model.
+
 | Notebook | Isi | Tugas | Bab |
 |---|---|---|---|
-| `01_cek_data` | Pemeriksaan kondisi data | - | 2 |
-| `02_uji_awal_algoritma` | Pemilihan algoritma + uji ambang | - | 5–7 |
-| `03_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
-| `04_preprocessing` | Imputasi BMI dengan regresi | B | 2, 3, 4 |
-| `05_klasifikasi` | 6 algoritma × 4 strategi + GridSearch | A | 5, 6, 7 |
-| `06_clustering_pca` | K-Means, Hierarchical, DBSCAN, PCA, LDA | C | 8, 9 |
-| `07_explainable_ai` | SHAP global dan individual | D | tambahan |
-| `08_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
-| `09_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
-| `10_pemeriksaan_ulang` | Kesimpulan sendiri diuji dengan alat lebih ketat | G | tambahan |
+| `01_cek_data` | Pemeriksaan kondisi data, tanpa mengubah apa pun | - | 2 |
+| `02_bersihkan_data` | Pembersihan data + imputasi BMI | B | 2, 3, 4 |
+| `03a_knn_manual` | KNN manual, tanpa scikit-learn, plus skor klinis CHA2DS2-VASc | - | - |
+| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, plus skor klinis CHA2DS2-VASc | - | - |
+| `04_model_library` | Model memakai scikit-learn | - | - |
+| `05_uji_awal_algoritma` | Pemilihan algoritma + uji ambang | - | 5–7 |
+| `06_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
+| `07_klasifikasi` | 6 algoritma × 4 strategi + GridSearch | A | 5, 6, 7 |
+| `08_clustering_pca` | K-Means, Hierarchical, DBSCAN, PCA, LDA | C | 8, 9 |
+| `09_explainable_ai` | SHAP global dan individual | D | tambahan |
+| `10_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
+| `11_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
+| `12_pemeriksaan_ulang` | Kesimpulan sendiri diuji dengan alat lebih ketat | G | tambahan |
 
 **Pemeriksaan ulang metodologi (25 Agustus 2026).** Seluruh notebook diperiksa ulang
 baris demi baris. Empat hal diperbaiki dan dijalankan ulang: kontrol negatif alat ukur
-di `09` yang ternyata tidak menguji apa pun, adu model kuat yang tidak adil (penantang
+di `11` yang ternyata tidak menguji apa pun, adu model kuat yang tidak adil (penantang
 kini disetel setara), eksperimen batas usia yang angkanya dilaporkan tanpa selnya, dan
-dekomposisi penurunan AUC di `08` yang arah kesimpulannya keliru. Rinciannya di Tugas E,
+dekomposisi penurunan AUC di `10` yang arah kesimpulannya keliru. Rinciannya di Tugas E,
 Tugas F, dan Bagian 13.
 
 Laporan akhir dan slide presentasi sudah selesai, ada di `LAPORAN.md` dan `SLIDE.md`.
@@ -255,7 +270,7 @@ pintar; keduanya hanya menggeser ambang keputusan. Terbukti: menyetel ambang ke 
 memberi hasil yang praktis identik dengan SMOTE, tanpa membangkitkan 4.600 baris data
 sintetis.
 
-Notebook pengujian: `notebooks/02_uji_awal_algoritma.ipynb` (sudah selesai dan
+Notebook pengujian: `notebooks/05_uji_awal_algoritma.ipynb` (sudah selesai dan
 terverifikasi jalan). Angka di atas masih sementara: hyperparameter belum disetel dan
 preprocessing belum final.
 
@@ -363,7 +378,7 @@ kesehatan mana pun sudah memuat hampir seluruh sinyal. Kadar glukosa, satu-satun
 yang menuntut tes darah, hampir tidak menambah apa-apa, sehingga alat skrining ini
 dapat dipakai tanpa laboratorium.
 
-Notebook: `notebooks/03_uji_validasi_silang.ipynb` (sudah selesai dan terverifikasi jalan)
+Notebook: `notebooks/06_uji_validasi_silang.ipynb` (sudah selesai dan terverifikasi jalan)
 
 ### Tugas F: Eksperimen Mencari Batas Model
 
@@ -386,7 +401,7 @@ beda sedang (C=1,0 vs C=0,1, ΔAUC −0,0019), sampai beda sangat tipis (C=0,15 
 **Batasan alat ukur ini, yang wajib ditulis di laporan.** Lipatan dari
 `RepeatedStratifiedKFold` saling berbagi data latih, jadi ke-25 skornya tidak saling
 bebas dan rumus `simpangan baku / akar(n)` **meremehkan** ragam sebenarnya (Dietterich
-1998; Nadeau & Bengio 2003). Label "nyata" di notebook `09` karena itu terlalu murah:
+1998; Nadeau & Bengio 2003). Label "nyata" di notebook `11` karena itu terlalu murah:
 ia berarti "selisihnya konsisten antar lipatan", bukan hasil uji hipotesis yang sah.
 Uji yang benar memerlukan *corrected resampled t-test*. Karena itu setiap kesimpulan
 disandarkan pada **besar** selisih, bukan pada labelnya.
@@ -405,13 +420,13 @@ disandarkan pada **besar** selisih, bukan pada labelnya.
 | **Ambang berbasis biaya klinis** | **berhasil** |
 
 Catatan keadilan: enam penantang pertama dipakai **apa adanya tanpa penyetelan**,
-sedangkan acuannya sudah disetel di notebook `05`. Karena itu HistGB disetel ulang
+sedangkan acuannya sudah disetel di notebook `07`. Karena itu HistGB disetel ulang
 secara sebanding, dan hasilnya hanya menyamai, tidak melampaui. Acuan juga mendapat
 keuntungan kecil: hyperparameternya dipilih memakai bagian dari data yang sama.
 
 #### Temuan paling berharga
 
-Aturan "kejar recall ≥ 0,80" yang dipakai di notebook `05` menghasilkan ambang 0,053.
+Aturan "kejar recall ≥ 0,80" yang dipakai di notebook `07` menghasilkan ambang 0,053.
 Ketika ambang dihitung ulang dari anggapan biaya, ambang optimal untuk rasio **20 : 1**
 adalah 0,054, nyaris identik.
 
@@ -478,7 +493,7 @@ sementara "periksa semua" sudah **negatif** (−0,001); pada ambang 10%, +0,014 
 −0,057. Model unggul di seluruh rentang ambang yang masuk akal. Precision 0,12 karena itu
 bukan kegagalan; untuk prevalensi 4,87% ia harga yang terukur sepadan.
 
-Notebook: `notebooks/10_pemeriksaan_ulang.ipynb`
+Notebook: `notebooks/12_pemeriksaan_ulang.ipynb`
 
 ## 9. Struktur Repositori
 
@@ -490,16 +505,19 @@ machine-learning/
 ├── LAPORAN.md                       # laporan akhir lima bab
 ├── SLIDE.md                         # slide presentasi (Marp)
 ├── notebooks/
-│   ├── 01_cek_data.ipynb            # SELESAI: pemeriksaan kondisi data
-│   ├── 02_uji_awal_algoritma.ipynb  # SELESAI: pemilihan algoritma + uji ambang
-│   ├── 03_uji_validasi_silang.ipynb # SELESAI: uji kelayakan validasi eksternal
-│   ├── 04_preprocessing.ipynb       # SELESAI: Tugas B, imputasi BMI
-│   ├── 05_klasifikasi.ipynb         # SELESAI: Tugas A, 6 algoritma x 4 strategi
-│   ├── 06_clustering_pca.ipynb      # SELESAI: Tugas C, Bab 8 dan 9
-│   ├── 07_explainable_ai.ipynb      # SELESAI: Tugas D, SHAP
-│   ├── 08_validasi_eksternal.ipynb  # SELESAI: Tugas E
-│   ├── 09_eksperimen.ipynb          # SELESAI: Tugas F, eksperimen lanjutan
-│   └── 10_pemeriksaan_ulang.ipynb   # SELESAI: Tugas G, pengujian kesimpulan
+│   ├── 01_cek_data.ipynb            # SELESAI: pemeriksaan kondisi data (tanpa mengubah)
+│   ├── 02_bersihkan_data.ipynb      # SELESAI: Tugas B, pembersihan + imputasi BMI
+│   ├── 03a_knn_manual.ipynb         # SELESAI: KNN manual + skor klinis CHA2DS2-VASc
+│   ├── 03b_naive_bayes_manual.ipynb # SELESAI: Naive Bayes manual + skor klinis
+│   ├── 04_model_library.ipynb       # SELESAI: model memakai scikit-learn
+│   ├── 05_uji_awal_algoritma.ipynb  # SELESAI: pemilihan algoritma + uji ambang
+│   ├── 06_uji_validasi_silang.ipynb # SELESAI: uji kelayakan validasi eksternal
+│   ├── 07_klasifikasi.ipynb         # SELESAI: Tugas A, 6 algoritma x 4 strategi
+│   ├── 08_clustering_pca.ipynb      # SELESAI: Tugas C, Bab 8 dan 9
+│   ├── 09_explainable_ai.ipynb      # SELESAI: Tugas D, SHAP
+│   ├── 10_validasi_eksternal.ipynb  # SELESAI: Tugas E
+│   ├── 11_eksperimen.ipynb          # SELESAI: Tugas F, eksperimen lanjutan
+│   └── 12_pemeriksaan_ulang.ipynb   # SELESAI: Tugas G, pengujian kesimpulan
 └── (laporan dan slide diekspor ke PDF atau PPTX saat pengumpulan)
 ```
 
@@ -514,10 +532,10 @@ tidak boleh ada yang menjawab "itu bagian teman saya".
 
 | Anggota | Peran | Tanggung jawab |
 |---|---|---|
-| Deliana Br Manalu | Data & preprocessing | Pemeriksaan kedua dataset, imputasi, encoding, notebook `01` dan `04`, Tugas B |
-| Ravi Arnan Irianto | Klasifikasi, tuning & validasi eksternal | Tugas A: 6 algoritma × 4 strategi, cross-validation, GridSearch, notebook `02` dan `05`; Tugas E: penyelarasan fitur dan pengujian lintas dataset, notebook `03` dan `08` |
-| Ezza Putra Wibawa | Clustering & reduksi dimensi | Tugas C: Bab 8 dan 9, notebook `06` |
-| Devin | Explainable AI & dokumentasi | Tugas D: SHAP, penyusunan laporan, pembuatan slide, notebook `07` |
+| Deliana Br Manalu | Data & preprocessing | Pemeriksaan kedua dataset, imputasi, encoding, notebook `01` dan `02`, Tugas B |
+| Ravi Arnan Irianto | Klasifikasi, tuning & validasi eksternal | Tugas A: 6 algoritma × 4 strategi, cross-validation, GridSearch, notebook `05` dan `07`; Tugas E: penyelarasan fitur dan pengujian lintas dataset, notebook `06` dan `10` |
+| Ezza Putra Wibawa | Clustering & reduksi dimensi | Tugas C: Bab 8 dan 9, notebook `08` |
+| Devin | Explainable AI & dokumentasi | Tugas D: SHAP, penyusunan laporan, pembuatan slide, notebook `09` |
 
 ## 11. Timeline
 
@@ -527,11 +545,11 @@ Mengikuti ritme mingguan perkuliahan. Sesuaikan Minggu 1 dengan pertemuan beriku
 |---|---|---|---|
 | 1 | **Kumpulkan:** dataset + hasil cek data + 5 paper ke Google Drive | Semua | sudah siap |
 | 2 | Baca kelima paper, tulis ringkasan tiap paper 1 paragraf | Semua | Bab tinjauan pustaka |
-| 3 | Preprocessing lengkap + Tugas B (imputasi BMI) | Deliana | `04_preprocessing.ipynb` |
-| 4 | Tugas A tahap 1: Logistic Regression + regularisasi L1/L2 | Ravi | `05_klasifikasi.ipynb` tahap awal |
+| 3 | Preprocessing lengkap + Tugas B (imputasi BMI) | Deliana | `02_bersihkan_data.ipynb` |
+| 4 | Tugas A tahap 1: Logistic Regression + regularisasi L1/L2 | Ravi | `07_klasifikasi.ipynb` tahap awal |
 | 5 | Tugas A tahap 2: KNN, DT, RF, SVM, GB × 4 strategi + tuning | Ravi, Ezza | Tabel perbandingan lengkap |
-| 6 | Tugas C: clustering, PCA, LDA | Ezza | `06_clustering_pca.ipynb` |
-| 7 | Tugas D: SHAP; Tugas E: validasi eksternal | Devin, Ravi | `07` dan `08`, draf laporan |
+| 6 | Tugas C: clustering, PCA, LDA | Ezza | `08_clustering_pca.ipynb` |
+| 7 | Tugas D: SHAP; Tugas E: validasi eksternal | Devin, Ravi | `09` dan `10`, draf laporan |
 | 8 | Revisi, latihan presentasi, pengumpulan | Semua | `LAPORAN.md` dan `SLIDE.md`, sudah tersedia |
 
 ## 12. Kriteria Keberhasilan
@@ -546,8 +564,8 @@ Mengikuti ritme mingguan perkuliahan. Sesuaikan Minggu 1 dengan pertemuan beriku
 | Faktor penting versi SHAP sejalan dengan pengetahuan medis | wajib diperiksa |
 | AUC pada validasi eksternal | ≥ 0,75 (tidak runtuh saat pindah sumber data) |
 | Notebook dapat dijalankan ulang dari nol tanpa error | wajib, terbukti 26 Agustus 2026 |
-| Angka akhir dilaporkan beserta selang kepercayaan | wajib, sudah dihitung di `10` |
-| Model mengalahkan "periksa semua" pada net benefit | wajib, terbukti di `10` |
+| Angka akhir dilaporkan beserta selang kepercayaan | wajib, sudah dihitung di `12` |
+| Model mengalahkan "periksa semua" pada net benefit | wajib, terbukti di `12` |
 
 **Catatan jujur soal target.** Precision pada kasus ini akan rendah: pada percobaan
 awal kami hanya 0,138. Itu wajar dan memang begitu sifat masalahnya: dari 290 pasien
@@ -576,7 +594,7 @@ dinyatakan terang-terangan di bagian pembahasan, bukan disembunyikan.
 **Batasan metodologis yang kami temukan sendiri saat memeriksa ulang notebook:**
 
 - ~~**Uji selisih antar model belum sahih secara statistik.**~~ **Sudah diselesaikan di
-  notebook `10`** dengan koreksi Nadeau–Bengio. Akibatnya satu kesimpulan Tugas F dicabut:
+  notebook `12`** dengan koreksi Nadeau–Bengio. Akibatnya satu kesimpulan Tugas F dicabut:
   cara-cara menyeimbangkan kelas tidak terbukti memperburuk model, hanya terbukti tidak
   memperbaikinya.
 - **Kontrol negatif alat ukur tidak dapat dijalankan** pada model deterministik seperti
@@ -584,13 +602,13 @@ dinyatakan terang-terangan di bagian pembahasan, bukan disembunyikan.
   jadi selisih nol adalah konsekuensi definisi, bukan hasil pengukuran.
 - **Imputasi BMI dilatih sebelum data dibagi.** Model Ridge pengisi `bmi` memakai seluruh
   baris, termasuk yang kemudian menjadi data uji. Kebocorannya ringan karena yang
-  diprediksi adalah `bmi`, bukan `stroke`, dan notebook `04` menunjukkan pilihan
+  diprediksi adalah `bmi`, bukan `stroke`, dan notebook `02` menunjukkan pilihan
   imputasi hampir tidak mengubah hasil klasifikasi (AUC 0,838 dengan median vs 0,840
   dengan regresi). Secara metodologi, imputasi seharusnya berada di dalam pipeline.
 - **AUC tidak sebanding antar populasi.** Perbandingan AUC lintas dataset di Tugas E
   hanya sah untuk menyimpulkan "tidak runtuh", bukan "lebih baik".
 - **Hyperparameter acuan dipilih memakai sebagian data yang sama** yang kemudian dipakai
-  membandingkannya dengan model lain di notebook `09`.
+  membandingkannya dengan model lain di notebook `11`.
 
 ## 14. Risiko dan Mitigasi
 

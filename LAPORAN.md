@@ -5,12 +5,12 @@
 
 | NIM | Nama | Kontribusi utama |
 |---|---|---|
-| 2305551036 | Deliana Br Manalu | Pemeriksaan data dan preprocessing (notebook `01`, `04`) |
-| 2305551076 | Ravi Arnan Irianto | Klasifikasi, penyetelan, validasi eksternal (notebook `02`, `03`, `05`, `08`) |
-| 2305551144 | Ezza Putra Wibawa | Clustering dan reduksi dimensi (notebook `06`) |
-| 2305551173 | Devin | Explainable AI dan dokumentasi (notebook `07`, laporan, slide) |
+| 2305551036 | Deliana Br Manalu | Pemeriksaan data dan preprocessing (notebook `01`, `02`) |
+| 2305551076 | Ravi Arnan Irianto | Klasifikasi, penyetelan, validasi eksternal (notebook `05`, `06`, `07`, `10`) |
+| 2305551144 | Ezza Putra Wibawa | Clustering dan reduksi dimensi (notebook `08`) |
+| 2305551173 | Devin | Explainable AI dan dokumentasi (notebook `09`, laporan, slide) |
 
-Seluruh kode dan hasil ada di sepuluh notebook pada folder `notebooks/`. Setiap notebook
+Seluruh kode dan hasil ada di tiga belas notebook pada folder `notebooks/`. Setiap notebook
 memuat datanya langsung dari URL sehingga dapat dijalankan ulang di Google Colab tanpa
 mengunggah berkas apa pun.
 
@@ -255,7 +255,7 @@ berbagi data latih sehingga ke-25 skornya tidak saling bebas, dan rumus simpanga
 dibagi akar n meremehkan ragam sebenarnya (Dietterich, 1998; Nadeau dan Bengio, 2003).
 Karena itu seluruh perbandingan pada Bab IV disandarkan pada besar selisih, bukan pada
 label "nyata", dan setiap klaim penting diuji ulang dengan koreksi Nadeau-Bengio pada
-notebook `10`.
+notebook `12`.
 
 ## 3.6 Validasi Eksternal
 
@@ -282,7 +282,7 @@ Boosting untuk memeriksa apakah keempat cara itu sepakat.
 
 # BAB IV HASIL DAN PEMBAHASAN
 
-## 4.1 Pemilihan Algoritma (Notebook `02`)
+## 4.1 Pemilihan Algoritma (Notebook `05`)
 
 Pengujian awal dengan 5-fold cross-validation dan hyperparameter bawaan:
 
@@ -305,7 +305,7 @@ membuat model lebih pintar, keduanya hanya menggeser ambang keputusan. Terbukti:
 menyetel ambang ke 0,048 memberi hasil yang praktis identik dengan SMOTE, tanpa
 membangkitkan sekitar 4.600 baris data sintetis.
 
-## 4.2 Imputasi BMI (Notebook `04`, Tugas B)
+## 4.2 Imputasi BMI (Notebook `02`, Tugas B)
 
 Model Ridge dipilih untuk mengisi 201 nilai `bmi` yang hilang. Namun temuan yang paling
 layak dilaporkan justru bersifat negatif: ketiga strategi penanganan `bmi` memberi hasil
@@ -313,7 +313,7 @@ klasifikasi akhir yang hampir sama, yaitu ROC-AUC 0,838 dengan median berbanding
 dengan regresi. Preprocessing yang lebih canggih tidak otomatis berarti model lebih baik,
 dan itu hanya dapat diketahui kalau diukur.
 
-## 4.3 Model Akhir (Notebook `05`, Tugas A)
+## 4.3 Model Akhir (Notebook `07`, Tugas A)
 
 Hasil GridSearchCV pada data latih:
 
@@ -349,7 +349,7 @@ stroke. Untuk alat skrining awal hal ini masih dapat diterima karena tindak lanj
 adalah pemeriksaan lebih lanjut oleh dokter, bukan pengobatan langsung. Bagian 4.7
 mengukur apakah harga itu sepadan.
 
-## 4.4 Clustering dan Reduksi Dimensi (Notebook `06`, Tugas C)
+## 4.4 Clustering dan Reduksi Dimensi (Notebook `08`, Tugas C)
 
 K-Means menghasilkan kelompok dengan proporsi stroke yang jelas berbeda meski label tidak
 pernah diberikan saat pelatihan, dari 0,28% pada kelompok anak-anak sampai 8,03% pada
@@ -370,7 +370,7 @@ memprediksi label yang sama. Versi yang benar meletakkan LDA di dalam pipeline
 cross-validation, dan itulah yang kami laporkan. Kebocoran jenis ini mudah terlewat dan
 sering muncul pada penelitian sejenis.
 
-## 4.5 Explainable AI (Notebook `07`, Tugas D)
+## 4.5 Explainable AI (Notebook `09`, Tugas D)
 
 Empat cara pemeringkatan fitur dibandingkan: SHAP pada Logistic Regression, SHAP pada
 Gradient Boosting, besar koefisien Logistic Regression, dan feature importance Gradient
@@ -406,7 +406,7 @@ memutuskan, bukan apa yang menyebabkan stroke. Keduanya sering tertukar. Kalau m
 banyak bersandar pada usia, artinya usia berguna untuk memprediksi di dalam data ini,
 bukan bukti hubungan sebab-akibat.
 
-## 4.6 Validasi Eksternal (Notebook `03` dan `08`, Tugas E)
+## 4.6 Validasi Eksternal (Notebook `06` dan `10`, Tugas E)
 
 Model dilatih pada 253.680 responden CDC lalu diuji pada pasien Kaggle yang belum pernah
 dilihatnya:
@@ -451,7 +451,7 @@ kesehatan mana pun sudah memuat hampir seluruh sinyal, dan kadar glukosa yang me
 tes darah hampir tidak menambah apa-apa. Alat skrining ini karena itu dapat dipakai tanpa
 laboratorium.
 
-## 4.7 Tujuh Gagasan Peningkatan (Notebook `09`, Tugas F)
+## 4.7 Tujuh Gagasan Peningkatan (Notebook `11`, Tugas F)
 
 Setelah model utama jadi, tujuh gagasan peningkatan diuji satu per satu. Enam gagal, satu
 berhasil. Kegagalannya dilaporkan apa adanya karena mengetahui jalan buntu sama
@@ -469,19 +469,19 @@ berharganya dan jauh lebih jarang ditulis orang.
 | Ambang berbasis biaya klinis | berhasil |
 
 Catatan keadilan yang wajib disertakan: enam penantang pertama dipakai apa adanya tanpa
-penyetelan, sedangkan acuan sudah disetel di notebook `05`. Karena itu HistGB disetel
+penyetelan, sedangkan acuan sudah disetel di notebook `07`. Karena itu HistGB disetel
 ulang secara sebanding dengan 72 kombinasi, skor dan pembagian lipatan yang sama, dan
 hasilnya hanya menyamai, tidak melampaui.
 
 Satu-satunya yang berhasil adalah gagasan terakhir, dan itulah temuan paling berharga
-dari keseluruhan proyek. Aturan "kejar recall minimal 0,80" yang dipakai di notebook `05`
+dari keseluruhan proyek. Aturan "kejar recall minimal 0,80" yang dipakai di notebook `07`
 menghasilkan ambang 0,053. Ketika ambang dihitung ulang dari anggapan biaya klinis,
 ambang optimal untuk rasio 20 banding 1 adalah 0,054, nyaris identik. Artinya aturan yang
 tampak sewenang-wenang itu diam-diam menyembunyikan anggapan bahwa melewatkan satu pasien
 stroke dua puluh kali lebih merugikan daripada satu alarm palsu. Sekarang anggapan itu
 terbuka, dapat diperdebatkan, dan dapat diubah pihak rumah sakit sesuai kapasitas mereka.
 
-## 4.8 Menguji Kesimpulan Sendiri (Notebook `10`, Tugas G)
+## 4.8 Menguji Kesimpulan Sendiri (Notebook `12`, Tugas G)
 
 Empat notebook pertama membangun model, Tugas F mencoba memperbaikinya dan gagal enam
 kali, dan Tugas G mengerjakan hal ketiga yang jarang dilakukan: menguji kesimpulan kami
@@ -566,7 +566,7 @@ terlihat, bukan menyembunyikannya di dalam kode.
 - Dataset CDC BRFSS berbasis laporan mandiri responden, bukan rekam medis, sehingga
   riwayat stroke yang dilaporkan bisa saja keliru atau tidak terdiagnosis.
 - Model pengisi `bmi` dilatih sebelum data dibagi, sehingga ada kebocoran ringan. Yang
-  diprediksi adalah `bmi` dan bukan `stroke`, dan notebook `04` menunjukkan pilihan
+  diprediksi adalah `bmi` dan bukan `stroke`, dan notebook `02` menunjukkan pilihan
   imputasi hampir tidak mengubah hasil klasifikasi (0,838 berbanding 0,840). Secara
   metodologi, imputasi seharusnya berada di dalam pipeline.
 - AUC tidak sebanding antar populasi. Perbandingan lintas dataset di Bagian 4.6 hanya sah
@@ -627,16 +627,19 @@ terlihat, bukan menyembunyikannya di dalam kode.
 
 | Notebook | Isi | Tugas | Bab buku |
 |---|---|---|---|
-| `01_cek_data` | Pemeriksaan kondisi data | - | 2 |
-| `02_uji_awal_algoritma` | Pemilihan algoritma dan uji ambang | - | 5 sampai 7 |
-| `03_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
-| `04_preprocessing` | Imputasi BMI dengan regresi | B | 2, 3, 4 |
-| `05_klasifikasi` | Enam algoritma kali empat strategi, GridSearch | A | 5, 6, 7 |
-| `06_clustering_pca` | K-Means, Hierarchical, DBSCAN, PCA, LDA | C | 8, 9 |
-| `07_explainable_ai` | SHAP global dan individual | D | tambahan |
-| `08_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
-| `09_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
-| `10_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
+| `01_cek_data` | Pemeriksaan kondisi data, tanpa mengubah apa pun | - | 2 |
+| `02_bersihkan_data` | Pembersihan data, imputasi BMI dengan regresi | B | 2, 3, 4 |
+| `03a_knn_manual` | KNN manual tanpa scikit-learn, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
+| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
+| `04_model_library` | Model memakai scikit-learn | - | - |
+| `05_uji_awal_algoritma` | Pemilihan algoritma dan uji ambang | - | 5 sampai 7 |
+| `06_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
+| `07_klasifikasi` | Enam algoritma kali empat strategi, GridSearch | A | 5, 6, 7 |
+| `08_clustering_pca` | K-Means, Hierarchical, DBSCAN, PCA, LDA | C | 8, 9 |
+| `09_explainable_ai` | SHAP global dan individual | D | tambahan |
+| `10_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
+| `11_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
+| `12_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
 
 Seluruh Bab 2 sampai 9 buku acuan terpakai, ditambah Explainable AI dan validasi
 eksternal sebagai materi di luar buku.

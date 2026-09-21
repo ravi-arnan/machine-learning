@@ -48,7 +48,7 @@ def fit_dbscan_detector(
     X: pd.DataFrame,
 ) -> tuple[DBSCAN, list[str], BmiImputer, StandardScaler]:
     """
-    Fit DBSCAN on scaled numeric clinical features (same spirit as notebook 06).
+    Fit DBSCAN on scaled numeric clinical features (same spirit as notebook 08).
     Returns the fitted model and the column list used.
     """
     imputer = BmiImputer()
