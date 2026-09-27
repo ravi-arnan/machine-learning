@@ -31,7 +31,7 @@ CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis n
 
 | Notebook | Isi | Tugas | Bab buku |
 |---|---|---|---|
-| `01_cek_data` | Pemeriksaan kondisi data, tanpa mengubah apa pun | - | 2 |
+| `01_cek_data` | Pemeriksaan kondisi data + grafik korelasi tiap fitur ke target, tanpa mengubah apa pun | - | 2 |
 | `02_bersihkan_data` | Pembersihan data, imputasi BMI dengan regresi | B | 2, 3, 4 |
 | `03a_knn_manual` | KNN manual tanpa scikit-learn, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
 | `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |

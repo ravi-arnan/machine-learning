@@ -44,15 +44,15 @@ Notebook jalur belajar manual dipecah menjadi `03a_knn_manual` dan
 `03b_naive_bayes_manual`, lalu `04_model_library` memakai scikit-learn. Nomor sesudahnya
 disesuaikan, dari `05_uji_awal_algoritma` sampai `12_pemeriksaan_ulang`.
 
-**Pembagian peran dipertegas (21 September 2026).** Notebook `01` kini murni memeriksa
-kondisi data, tanpa mengubah apa pun; pengisian `bmi` dan penyimpanan berkas bersih
-pindah ke `02`. Notebook model manual (`03a` dan `03b`) ditambah pembanding **skor
+**Pembagian peran dipertegas (21 September 2026).** Notebook `01` kini memeriksa kondisi
+data beserta grafik korelasi tiap fitur ke target, tanpa mengubah apa pun; pengisian `bmi`
+dan penyimpanan berkas bersih pindah ke `02`. Notebook model manual (`03a` dan `03b`) ditambah pembanding **skor
 risiko klinis CHA2DS2-VASc** yang diimplementasikan manual, supaya model dibandingkan
 dengan cara yang sudah dipakai di dunia medis, bukan hanya dengan sesama model.
 
 | Notebook | Isi | Tugas | Bab |
 |---|---|---|---|
-| `01_cek_data` | Pemeriksaan kondisi data, tanpa mengubah apa pun | - | 2 |
+| `01_cek_data` | Pemeriksaan kondisi data + grafik korelasi tiap fitur ke target, tanpa mengubah apa pun | - | 2 |
 | `02_bersihkan_data` | Pembersihan data + imputasi BMI | B | 2, 3, 4 |
 | `03a_knn_manual` | KNN manual, tanpa scikit-learn, plus skor klinis CHA2DS2-VASc | - | - |
 | `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, plus skor klinis CHA2DS2-VASc | - | - |
@@ -505,7 +505,7 @@ machine-learning/
 ├── LAPORAN.md                       # laporan akhir lima bab
 ├── SLIDE.md                         # slide presentasi (Marp)
 ├── notebooks/
-│   ├── 01_cek_data.ipynb            # SELESAI: pemeriksaan kondisi data (tanpa mengubah)
+│   ├── 01_cek_data.ipynb            # SELESAI: cek data + grafik korelasi fitur ke target
 │   ├── 02_bersihkan_data.ipynb      # SELESAI: Tugas B, pembersihan + imputasi BMI
 │   ├── 03a_knn_manual.ipynb         # SELESAI: KNN manual + skor klinis CHA2DS2-VASc
 │   ├── 03b_naive_bayes_manual.ipynb # SELESAI: Naive Bayes manual + skor klinis
