@@ -6,11 +6,12 @@
 | NIM | Nama | Kontribusi utama |
 |---|---|---|
 | 2305551036 | Deliana Br Manalu | Pemeriksaan data dan preprocessing (notebook `01`, `02`) |
-| 2305551076 | Ravi Arnan Irianto | Klasifikasi, penyetelan, validasi eksternal (notebook `05`, `06`, `07`, `10`) |
+| 2305551076 | Ravi Arnan Irianto | Klasifikasi, penyetelan, validasi eksternal, uji kombinasi atribut (notebook `05`, `06`, `07`, `10`, `13`) |
 | 2305551144 | Ezza Putra Wibawa | Clustering dan reduksi dimensi (notebook `08`) |
 | 2305551173 | Devin | Explainable AI dan dokumentasi (notebook `09`, laporan, slide) |
 
-Seluruh kode dan hasil ada di tiga belas notebook pada folder `notebooks/`. Setiap notebook
+Seluruh kode ada di empat belas notebook pada folder `notebooks/`, dan hasil eksekusinya
+(keluaran beserta grafik) di folder `colab-hasil/`. Setiap notebook
 memuat datanya langsung dari URL sehingga dapat dijalankan ulang di Google Colab tanpa
 mengunggah berkas apa pun.
 
@@ -524,6 +525,32 @@ model +0,014 berbanding 0,057 di bawah nol. Model unggul di seluruh rentang amba
 masuk akal. Precision 0,12 karena itu bukan kegagalan, melainkan harga yang terukur
 sepadan untuk prevalensi 4,87%.
 
+## 4.9 Uji Kombinasi Atribut dan Confidence Level (Notebook `13`)
+
+Arahan dosen pada Pertemuan 3 meminta menentukan fitur utama dan kombinasi atribut
+terbaik untuk **confidence level, bukan akurasi**. Notebook `13` menjawabnya dengan
+mengadu delapan kombinasi atribut memakai protokol yang sama: baris dan lipatan
+cross-validation identik, probabilitas out-of-fold, dan setiap average precision (AP)
+diberi selang kepercayaan bootstrap 95%.
+
+**Kombinasi terbaik adalah inti klinis** (usia, hipertensi, penyakit jantung, glukosa),
+dengan AP 0,184 (SK 95%: 0,155 sampai 0,224). Menambah `bmi` tidak mengubah apa pun,
+menambah seluruh fitur dasar memberi AP 0,183, dan menambah fitur turunan if-else justru
+menurunkannya ke 0,179. Selang semua kombinasi saling bertindihan lebar, sehingga
+perbedaan yang sangat kecil tidak kami klaim bermakna.
+
+**Ablation menunjukkan usia paling berpengaruh.** Dibuang, AP anjlok dari 0,183 ke 0,125
+(selisih 0,058), sekitar sepuluh kali selisih atribut berikutnya. Glukosa menyusul
+kedua (selisih 0,006). Empat kelompok lain justru menaikkan AP sedikit saat dibuang,
+tanda mereka sudah tidak menambah apa pun.
+
+**Kesimpulan ini bukan cuma tentang modelnya.** Diulang dengan Gradient Boosting, KNN,
+dan Gaussian Naive Bayes: Logistic Regression dan Naive Bayes sama-sama memilih inti
+klinis, Gradient Boosting condong ke lebih banyak fitur (tetapi bedanya di dalam derau),
+dan KNN tetap paling buruk, sejalan dengan hasil manualnya di Bagian 4.1. Hasil ini
+menyambung dengan korelasi di notebook `01` dan SHAP di notebook `09`: tiga cara
+berbeda menunjuk usia dan glukosa sebagai faktor paling menentukan.
+
 ---
 
 # BAB V PENUTUP
@@ -543,6 +570,9 @@ sepadan untuk prevalensi 4,87%.
 3. **Faktor yang dipakai model sejalan dengan pengetahuan medis.** Lima fitur teratas
    menurut gabungan empat cara pemeringkatan adalah usia, kadar glukosa, hipertensi,
    penyakit jantung, dan status merokok, seluruhnya faktor risiko stroke yang mapan.
+   Uji kombinasi atribut di notebook `13` menegaskan bahwa inti klinis (usia, hipertensi,
+   penyakit jantung, glukosa) sudah memberi confidence terbaik, dan menambah fitur lain
+   tidak menambah apa pun.
 4. **Model bertahan pada sumber data yang berbeda.** ROC-AUC 0,799 sampai 0,802 pada
    validasi eksternal, tanpa keruntuhan. Enam fitur yang tersedia di survei kesehatan mana
    pun sudah memuat hampir seluruh sinyal, sehingga alat skrining ini tidak memerlukan
@@ -640,6 +670,7 @@ terlihat, bukan menyembunyikannya di dalam kode.
 | `10_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
 | `11_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
 | `12_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
+| `13_uji_kombinasi_atribut` | Uji kombinasi atribut terhadap confidence level (precision dan average precision) | - | tambahan |
 
 Seluruh Bab 2 sampai 9 buku acuan terpakai, ditambah Explainable AI dan validasi
 eksternal sebagai materi di luar buku.

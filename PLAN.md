@@ -28,7 +28,7 @@ Berdasarkan arahan Bapak Adi di perkuliahan daring:
 
 ## Status Pengerjaan
 
-**Ketiga belas notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
+**Keempat belas notebook selesai dan terverifikasi berjalan tanpa error.** Seluruh Bab 2–9
 buku acuan terpakai, ditambah Explainable AI (saran Bapak) dan validasi eksternal.
 
 **Verifikasi jalan ulang (26 Agustus 2026).** Sepuluh notebook inti dieksekusi berurutan
@@ -65,6 +65,7 @@ dengan cara yang sudah dipakai di dunia medis, bukan hanya dengan sesama model.
 | `10_validasi_eksternal` | Validasi silang dua arah | E | tambahan |
 | `11_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
 | `12_pemeriksaan_ulang` | Kesimpulan sendiri diuji dengan alat lebih ketat | G | tambahan |
+| `13_uji_kombinasi_atribut` | Uji kombinasi atribut terhadap confidence level, cari atribut paling berpengaruh | - | tambahan |
 
 **Pemeriksaan ulang metodologi (25 Agustus 2026).** Seluruh notebook diperiksa ulang
 baris demi baris. Empat hal diperbaiki dan dijalankan ulang: kontrol negatif alat ukur
@@ -495,6 +496,27 @@ bukan kegagalan; untuk prevalensi 4,87% ia harga yang terukur sepadan.
 
 Notebook: `notebooks/12_pemeriksaan_ulang.ipynb`
 
+### Analisis Tambahan: Kombinasi Atribut dan Confidence Level
+
+Arahan dosen pada Pertemuan 3 meminta menentukan fitur utama dan kombinasi atribut
+terbaik untuk **confidence level, bukan akurasi**. Notebook `13` menjawabnya: delapan
+kombinasi atribut diadu pada protokol yang sama, diukur **precision** dan **average
+precision (AP)** dengan selang kepercayaan bootstrap 95%, lalu ditelusuri lewat
+ablation dan seleksi maju.
+
+| Pemeriksaan | Hasil |
+|---|---|
+| Kombinasi dengan AP terbaik | inti klinis (usia, hipertensi, jantung, glukosa), AP 0,184 (SK 95% 0,155 sampai 0,224) |
+| Menambah bmi (kombinasi F) | tidak mengubah AP sama sekali |
+| Menambah semua fitur dasar | AP 0,183, di dalam derau |
+| Menambah fitur turunan if-else | AP justru turun ke 0,179 |
+| Atribut paling berpengaruh | usia, dibuang AP anjlok 0,183 ke 0,125; glukosa menyusul kedua |
+| Ketahanan di model lain | Naive Bayes memilih inti klinis, Gradient Boosting condong ke lebih banyak fitur, KNN tetap paling buruk |
+
+Kesimpulannya sejalan dengan korelasi di notebook `01` dan SHAP di notebook `09`:
+usia dan glukosa paling menentukan, sisanya hampir tidak menambah confidence.
+Notebook: `notebooks/13_uji_kombinasi_atribut.ipynb`.
+
 ## 9. Struktur Repositori
 
 ```
@@ -517,7 +539,9 @@ machine-learning/
 │   ├── 09_explainable_ai.ipynb      # SELESAI: Tugas D, SHAP
 │   ├── 10_validasi_eksternal.ipynb  # SELESAI: Tugas E
 │   ├── 11_eksperimen.ipynb          # SELESAI: Tugas F, eksperimen lanjutan
-│   └── 12_pemeriksaan_ulang.ipynb   # SELESAI: Tugas G, pengujian kesimpulan
+│   ├── 12_pemeriksaan_ulang.ipynb   # SELESAI: Tugas G, pengujian kesimpulan
+│   └── 13_uji_kombinasi_atribut.ipynb  # SELESAI: uji kombinasi atribut dan confidence level
+├── colab-hasil/                     # hasil eksekusi seluruh notebook di Colab (beroutput)
 └── (laporan dan slide diekspor ke PDF atau PPTX saat pengumpulan)
 ```
 
