@@ -34,8 +34,8 @@ CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis n
 |---|---|---|---|
 | `01_cek_data` | Pemeriksaan kondisi data + grafik korelasi tiap fitur ke target, tanpa mengubah apa pun | - | 2 |
 | `02_bersihkan_data` | Pembersihan data, imputasi BMI dengan regresi | B | 2, 3, 4 |
-| `03a_knn_manual` | KNN manual tanpa scikit-learn, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
-| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
+| `03a_knn_manual` | KNN manual tanpa scikit-learn, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
+| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
 | `04_model_library` | Model memakai scikit-learn: Logistic Regression, Decision Tree, Random Forest, SVM | - | - |
 | `05_uji_awal_algoritma` | Pemilihan algoritma dan uji ambang | - | 5 sampai 7 |
 | `06_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |

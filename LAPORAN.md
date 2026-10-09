@@ -551,6 +551,14 @@ dan KNN tetap paling buruk, sejalan dengan hasil manualnya di Bagian 4.1. Hasil 
 menyambung dengan korelasi di notebook `01` dan SHAP di notebook `09`: tiga cara
 berbeda menunjuk usia dan glukosa sebagai faktor paling menentukan.
 
+**Dijalankan penuh pada model manual.** Kedelapan kombinasi yang sama juga diadu memakai
+KNN dan Gaussian Naive Bayes yang ditulis dari nol di notebook `03a` dan `03b`, dengan
+lima lipatan stratified dan selang kepercayaan bootstrap yang dibangun manual tanpa
+scikit-learn. Naive Bayes manual memilih inti klinis (AP 0,170, praktis seri dengan inti
+klinis + bmi), sedangkan KNN manual terbaik pada usia + glukosa (AP 0,144) dan paling
+lemah di antara ketiga model. Pola utamanya seragam: menambah atribut tidak menambah
+confidence.
+
 ---
 
 # BAB V PENUTUP
@@ -659,8 +667,8 @@ terlihat, bukan menyembunyikannya di dalam kode.
 |---|---|---|---|
 | `01_cek_data` | Pemeriksaan kondisi data + grafik korelasi tiap fitur ke target, tanpa mengubah apa pun | - | 2 |
 | `02_bersihkan_data` | Pembersihan data, imputasi BMI dengan regresi | B | 2, 3, 4 |
-| `03a_knn_manual` | KNN manual tanpa scikit-learn, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
-| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, plus skor klinis CHA2DS2-VASc sebagai pembanding | - | - |
+| `03a_knn_manual` | KNN manual tanpa scikit-learn, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
+| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
 | `04_model_library` | Model memakai scikit-learn | - | - |
 | `05_uji_awal_algoritma` | Pemilihan algoritma dan uji ambang | - | 5 sampai 7 |
 | `06_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |

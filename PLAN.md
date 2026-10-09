@@ -54,8 +54,8 @@ dengan cara yang sudah dipakai di dunia medis, bukan hanya dengan sesama model.
 |---|---|---|---|
 | `01_cek_data` | Pemeriksaan kondisi data + grafik korelasi tiap fitur ke target, tanpa mengubah apa pun | - | 2 |
 | `02_bersihkan_data` | Pembersihan data + imputasi BMI | B | 2, 3, 4 |
-| `03a_knn_manual` | KNN manual, tanpa scikit-learn, plus skor klinis CHA2DS2-VASc | - | - |
-| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, plus skor klinis CHA2DS2-VASc | - | - |
+| `03a_knn_manual` | KNN manual, tanpa scikit-learn, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
+| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
 | `04_model_library` | Model memakai scikit-learn | - | - |
 | `05_uji_awal_algoritma` | Pemilihan algoritma + uji ambang | - | 5–7 |
 | `06_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
@@ -515,7 +515,15 @@ ablation dan seleksi maju.
 
 Kesimpulannya sejalan dengan korelasi di notebook `01` dan SHAP di notebook `09`:
 usia dan glukosa paling menentukan, sisanya hampir tidak menambah confidence.
-Notebook: `notebooks/13_uji_kombinasi_atribut.ipynb`.
+
+**Diulang pada model manual.** Uji yang sama dijalankan penuh memakai KNN dan Naive Bayes
+yang ditulis dari nol di notebook `03a` dan `03b`, supaya kombinasi atributnya juga
+terukur pada dua model jalur belajar itu, bukan hanya jalur scikit-learn. Naive Bayes
+manual memilih inti klinis (AP 0,170, praktis seri dengan inti klinis + bmi), sedangkan
+KNN manual terbaik pada usia + glukosa (AP 0,144) dan jauh di bawah keduanya. Pola
+utamanya sama: menambah atribut tidak menambah confidence.
+Notebook: `notebooks/13_uji_kombinasi_atribut.ipynb`, `notebooks/03a_knn_manual.ipynb`,
+dan `notebooks/03b_naive_bayes_manual.ipynb`.
 
 ## 9. Struktur Repositori
 
