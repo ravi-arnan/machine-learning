@@ -3,7 +3,9 @@
 Folder ini berisi hasil menjalankan seluruh notebook proyek di VM Google Colab,
 **satu berkas per notebook**, lengkap dengan output dan grafiknya.
 
-- Dijalankan dengan **Colab CLI** (`colab exec`) pada VM **GPU T4**.
+- Dijalankan dengan **Colab CLI** (`colab exec`). Tidak ada notebook yang memakai
+  GPU: sebagian sesi memakai runtime GPU T4, sedangkan `03a` dan `03b` memakai
+  runtime CPU.
 - Berkas di sini adalah **keluaran** (generated), bukan sumber. Kode aslinya ada di
   `../notebooks/`; isi kode di sini identik, hanya ditambah output eksekusi.
 - Nama berkas mengikuti notebook asalnya dengan akhiran `_hasil`.
