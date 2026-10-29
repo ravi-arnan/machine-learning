@@ -50,12 +50,31 @@ dan penyimpanan berkas bersih pindah ke `02`. Notebook model manual (`03a` dan `
 risiko klinis CHA2DS2-VASc** yang diimplementasikan manual, supaya model dibandingkan
 dengan cara yang sudah dipakai di dunia medis, bukan hanya dengan sesama model.
 
+**Uji kombinasi atribut dijalankan penuh pada model manual (12 Oktober 2026).**
+Kedelapan kombinasi atribut yang semula hanya diuji lewat scikit-learn di notebook
+`13` kini diadu ulang memakai **KNN dan Gaussian Naive Bayes yang ditulis dari nol**
+di `03a` dan `03b`, dengan lipatan stratified dan selang kepercayaan bootstrap yang
+juga dibangun manual. Sebagai penutup, sub-bab `6d` di `03b` menyandingkan kedua
+model manual pada delapan kombinasi yang sama: **Naive Bayes mengalahkan KNN di
+seluruh kombinasi** (selisih AP 0,023 sampai 0,054), dan kombinasi terbaik keseluruhan
+adalah inti klinis + bmi pada Naive Bayes (AP 0,1704). Kedua notebook dijalankan ulang
+di Colab dan folder `colab-hasil/` diperbarui.
+
+**Penyelarasan agenda presentasi mingguan (21 Oktober 2026).** Presentasi model manual
+`03a` (KNN) dan `03b` (Naive Bayes) serta uji kombinasi atribut (`13`) telah selesai
+dibawakan di kelas. Agenda presentasi mingguan berikutnya adalah notebook **`04_model_library`**
+(membandingkan 4 model klasifikasi scikit-learn: Logistic Regression, Decision Tree, Random
+Forest, dan SVM). Berkas `04` diputuskan tetap utuh sebagai satu kesatuan tanpa dipecah
+menjadi `04a`/`04b` untuk menjaga kesederhanaan dan keterpaduan tabel F1-score pembanding.
+
+**Penyelesaian dan Presentasi Notebook 04 (26 Oktober 2026).** Notebook `04_model_library` diperkaya dengan 5 visualisasi pendukung presentasi (Confusion Matrix 2x2, Grouped Bar Chart Akurasi vs Recall, Kurva ROC gabungan 4 model, Feature Importance ganda, dan diagram pohon keputusan). Berkas `notebooks/04_model_library.ipynb` dan `colab-hasil/04_model_library_hasil.ipynb` dieksekusi dan di-push ke GitHub (`28d9e2c`). Seluruh rekaman presentasi 4 anggota kelompok (Ezza, Deliana, Devin, Ravi) digabungkan menjadi satu video utuh Full HD 1080p berdurasi 23 menit 11 detik (`presentasi_kelompok3_FINAL.mp4`, 61,5 MB) dan progres mingguan resmi disubmit.
+
 | Notebook | Isi | Tugas | Bab |
 |---|---|---|---|
 | `01_cek_data` | Pemeriksaan kondisi data + grafik korelasi tiap fitur ke target, tanpa mengubah apa pun | - | 2 |
 | `02_bersihkan_data` | Pembersihan data + imputasi BMI | B | 2, 3, 4 |
 | `03a_knn_manual` | KNN manual, tanpa scikit-learn, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
-| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
+| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level dan banding KNN vs Naive Bayes | - | - |
 | `04_model_library` | Model memakai scikit-learn | - | - |
 | `05_uji_awal_algoritma` | Pemilihan algoritma + uji ambang | - | 5–7 |
 | `06_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
@@ -522,6 +541,11 @@ terukur pada dua model jalur belajar itu, bukan hanya jalur scikit-learn. Naive 
 manual memilih inti klinis (AP 0,170, praktis seri dengan inti klinis + bmi), sedangkan
 KNN manual terbaik pada usia + glukosa (AP 0,144) dan jauh di bawah keduanya. Pola
 utamanya sama: menambah atribut tidak menambah confidence.
+
+Sub-bab `6d` di `03b` menyandingkan kedua model manual pada delapan kombinasi yang
+sama. **Naive Bayes mengalahkan KNN di seluruh kombinasi** (selisih AP 0,023 sampai
+0,054), terbesar pada kombinasi paling ramping, usia saja (0,166 lawan 0,112).
+Kombinasi terbaik keseluruhan adalah inti klinis + bmi pada Naive Bayes, AP 0,1704.
 Notebook: `notebooks/13_uji_kombinasi_atribut.ipynb`, `notebooks/03a_knn_manual.ipynb`,
 dan `notebooks/03b_naive_bayes_manual.ipynb`.
 
@@ -537,8 +561,8 @@ machine-learning/
 ├── notebooks/
 │   ├── 01_cek_data.ipynb            # SELESAI: cek data + grafik korelasi fitur ke target
 │   ├── 02_bersihkan_data.ipynb      # SELESAI: Tugas B, pembersihan + imputasi BMI
-│   ├── 03a_knn_manual.ipynb         # SELESAI: KNN manual + skor klinis CHA2DS2-VASc
-│   ├── 03b_naive_bayes_manual.ipynb # SELESAI: Naive Bayes manual + skor klinis
+│   ├── 03a_knn_manual.ipynb         # SELESAI: KNN manual + skor klinis + uji 8 kombinasi atribut
+│   ├── 03b_naive_bayes_manual.ipynb # SELESAI: Naive Bayes manual + skor klinis + uji kombinasi + banding KNN
 │   ├── 04_model_library.ipynb       # SELESAI: model memakai scikit-learn
 │   ├── 05_uji_awal_algoritma.ipynb  # SELESAI: pemilihan algoritma + uji ambang
 │   ├── 06_uji_validasi_silang.ipynb # SELESAI: uji kelayakan validasi eksternal

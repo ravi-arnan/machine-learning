@@ -559,6 +559,13 @@ klinis + bmi), sedangkan KNN manual terbaik pada usia + glukosa (AP 0,144) dan p
 lemah di antara ketiga model. Pola utamanya seragam: menambah atribut tidak menambah
 confidence.
 
+**Banding langsung kedua model manual** ada di sub-bab `6d` pada `03b`. Pada delapan
+kombinasi yang sama, **Naive Bayes mengalahkan KNN di seluruh kombinasi**, dengan
+selisih AP 0,023 sampai 0,054; selisih terbesar justru pada kombinasi paling ramping,
+usia saja (0,166 lawan 0,112). Arah preferensinya sama di kedua model, yaitu kombinasi
+ramping di sekitar inti klinis mengungguli kombinasi paling lengkap, sehingga kombinasi
+terbaik keseluruhan adalah inti klinis + bmi pada Naive Bayes, AP 0,1704.
+
 ---
 
 # BAB V PENUTUP
@@ -578,9 +585,9 @@ confidence.
 3. **Faktor yang dipakai model sejalan dengan pengetahuan medis.** Lima fitur teratas
    menurut gabungan empat cara pemeringkatan adalah usia, kadar glukosa, hipertensi,
    penyakit jantung, dan status merokok, seluruhnya faktor risiko stroke yang mapan.
-   Uji kombinasi atribut di notebook `13` menegaskan bahwa inti klinis (usia, hipertensi,
-   penyakit jantung, glukosa) sudah memberi confidence terbaik, dan menambah fitur lain
-   tidak menambah apa pun.
+   Uji kombinasi atribut di notebook `13`, dan pengulangannya pada model manual di `03a`
+   dan `03b`, menegaskan bahwa inti klinis (usia, hipertensi, penyakit jantung, glukosa)
+   sudah memberi confidence terbaik, dan menambah fitur lain tidak menambah apa pun.
 4. **Model bertahan pada sumber data yang berbeda.** ROC-AUC 0,799 sampai 0,802 pada
    validasi eksternal, tanpa keruntuhan. Enam fitur yang tersedia di survei kesehatan mana
    pun sudah memuat hampir seluruh sinyal, sehingga alat skrining ini tidak memerlukan
@@ -668,7 +675,7 @@ terlihat, bukan menyembunyikannya di dalam kode.
 | `01_cek_data` | Pemeriksaan kondisi data + grafik korelasi tiap fitur ke target, tanpa mengubah apa pun | - | 2 |
 | `02_bersihkan_data` | Pembersihan data, imputasi BMI dengan regresi | B | 2, 3, 4 |
 | `03a_knn_manual` | KNN manual tanpa scikit-learn, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
-| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level | - | - |
+| `03b_naive_bayes_manual` | Gaussian Naive Bayes manual, skor klinis CHA2DS2-VASc, plus uji 8 kombinasi atribut terhadap confidence level dan banding KNN vs Naive Bayes | - | - |
 | `04_model_library` | Model memakai scikit-learn | - | - |
 | `05_uji_awal_algoritma` | Pemilihan algoritma dan uji ambang | - | 5 sampai 7 |
 | `06_uji_validasi_silang` | Uji kelayakan validasi eksternal | - | - |
