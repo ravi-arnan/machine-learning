@@ -1,0 +1,59 @@
+{
+  "model_type": "VotingClassifier (Soft Voting)",
+  "base_estimators": [
+    "LogisticRegression",
+    "RandomForestClassifier",
+    "GradientBoostingClassifier"
+  ],
+  "dataset": "artifacts/stroke_bersih_3k.csv",
+  "dataset_rows": 3000,
+  "stroke_prevalence": 0.261,
+  "validation_metrics": {
+    "roc_auc": 0.8319379211762304,
+    "pr_auc": 0.6391909097189081,
+    "best_f1_threshold": 0.37,
+    "best_youden_threshold": 0.33999999999999997
+  },
+  "test_metrics": {
+    "roc_auc": 0.8747465414132081,
+    "pr_auc": 0.6496704216351942,
+    "scenarios": {
+      "Ambang Standar (t = 0,50)": {
+        "threshold": 0.5,
+        "accuracy": 0.8,
+        "recall": 0.5213675213675214,
+        "precision": 0.6421052631578947,
+        "specificity": 0.8978978978978979,
+        "f1_score": 0.5754716981132075,
+        "tp": 61,
+        "fp": 34,
+        "fn": 56,
+        "tn": 299
+      },
+      "Ambang Optimal F1 (t = 0.37)": {
+        "threshold": 0.37,
+        "accuracy": 0.8177777777777778,
+        "recall": 0.811965811965812,
+        "precision": 0.6129032258064516,
+        "specificity": 0.8198198198198198,
+        "f1_score": 0.6985294117647058,
+        "tp": 95,
+        "fp": 60,
+        "fn": 22,
+        "tn": 273
+      },
+      "Ambang Optimal Youden (t = 0.34)": {
+        "threshold": 0.33999999999999997,
+        "accuracy": 0.8177777777777778,
+        "recall": 0.8717948717948718,
+        "precision": 0.6035502958579881,
+        "specificity": 0.7987987987987988,
+        "f1_score": 0.7132867132867133,
+        "tp": 102,
+        "fp": 67,
+        "fn": 15,
+        "tn": 266
+      }
+    }
+  }
+}

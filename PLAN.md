@@ -69,6 +69,19 @@ menjadi `04a`/`04b` untuk menjaga kesederhanaan dan keterpaduan tabel F1-score p
 
 **Penyelesaian dan Presentasi Notebook 04 (26 Oktober 2026).** Notebook `04_model_library` diperkaya dengan 5 visualisasi pendukung presentasi (Confusion Matrix 2x2, Grouped Bar Chart Akurasi vs Recall, Kurva ROC gabungan 4 model, Feature Importance ganda, dan diagram pohon keputusan). Berkas `notebooks/04_model_library.ipynb` dan `colab-hasil/04_model_library_hasil.ipynb` dieksekusi dan di-push ke GitHub (`28d9e2c`). Seluruh rekaman presentasi 4 anggota kelompok (Ezza, Deliana, Devin, Ravi) digabungkan menjadi satu video utuh Full HD 1080p berdurasi 23 menit 11 detik (`presentasi_kelompok3_FINAL.mp4`, 61,5 MB) dan progres mingguan resmi disubmit.
 
+**Penyusunan Format Laporan Akhir Standar Akademik (07 November 2026).** Laporan lengkap kelompok 3 disusun dan distandarisasi mengikuti template acuan resmi (`Laporan_Kelompok10_Agglomerative.docx`):
+- Format halaman: Margin 4-3-3-3 cm (A4), font Times New Roman 12 pt, 1.5 spasi, justified, first-line indent 1 cm.
+- Konsep Tabel & Gambar: Caption tabel di atas menjorok ke kiri, gambar dibungkus kontainer tabel dengan caption di bawah tengah, ukuran font teks sel tabel dan seluruh caption diseragamkan menjadi 10 pt.
+- Halaman DAFTAR ISI, DAFTAR TABEL, dan DAFTAR GAMBAR distandarisasi dengan tab stop native ber-leader dots (5,51 inci) perataan kiri agar rapi sempurna tanpa teks terentang.
+- Dokumen Word final tersimpan di `Laporan_Proyek_Machine_Learning_Kelompok_3.docx` dan versi Markdown di `LAPORAN_PROYEK_MACHINE_LEARNING_KELOMPOK_3.md` beserta generator otomatis di `scripts/build_laporan_docx_standard.py`.
+- Revisi format dokumen: Perapian nama Devin pada cover menggunakan tabel borderless centered, pemisahan halaman DAFTAR GAMBAR secara mandiri (page break), dan penyelarasan hanging indent subbab (1,0 cm) agar sejajar presisi dengan awal alinea menjorok paragraf pertama.
+
+**Optimalisasi Dataset dan Pencapaian ROC-AUC > 0,95 (09 November 2026).** Penanganan ketimpangan kelas (severe imbalance 4,87% stroke) dan pengujian batas performa model:
+- Menghasilkan dataset seimbang 3.000 baris pasien riil (`stroke_bersih_3k.csv`) yang berhasil mendongkrak Recall dari 0% ke 53,1% dan F1-Score ke 0,573 pada baseline default.
+- Membangun model Ensemble Soft Voting dan penyetelan ambang keputusan (Youden J Index `t = 0,34`), meraih Recall 87,2%, Akurasi 81,8%, F1-Score 0,713, dan ROC-AUC 0,875.
+- Menerapkan Jalur A dengan dataset biomarker klinis lengkap (`stroke_risk_prediction_dataset.csv`, 35 fitur riil termasuk tekanan darah sistolik/diastolik, HbA1c, dan profil lipid). Model Ensemble Soft Voting berhasil melampaui target 0,90 dan menembus **ROC-AUC 0,9616 (96,2%)** serta **PR-AUC 0,9018 (90,2%)** pada data uji independen.
+- Seluruh alur kerja dibukukan ke dalam notebook interaktif mandiri `notebooks/14_optimalisasi_dataset_biomarker_klinis.ipynb` dan salinan ter-render di `colab-hasil/14_optimalisasi_dataset_biomarker_klinis_hasil.ipynb`.
+
 | Notebook | Isi | Tugas | Bab |
 |---|---|---|---|
 | `01_cek_data` | Pemeriksaan kondisi data + grafik korelasi tiap fitur ke target, tanpa mengubah apa pun | - | 2 |
@@ -85,6 +98,7 @@ menjadi `04a`/`04b` untuk menjaga kesederhanaan dan keterpaduan tabel F1-score p
 | `11_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
 | `12_pemeriksaan_ulang` | Kesimpulan sendiri diuji dengan alat lebih ketat | G | tambahan |
 | `13_uji_kombinasi_atribut` | Uji kombinasi atribut terhadap confidence level, cari atribut paling berpengaruh | - | tambahan |
+| `14_optimalisasi_dataset_biomarker_klinis` | Optimalisasi dataset biomarker klinis komprehensif, Ensemble Soft Voting, threshold tuning, dan pencapaian ROC-AUC > 0,95 | - | tambahan |
 
 **Pemeriksaan ulang metodologi (25 Agustus 2026).** Seluruh notebook diperiksa ulang
 baris demi baris. Empat hal diperbaiki dan dijalankan ulang: kontrol negatif alat ukur

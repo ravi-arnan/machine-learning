@@ -1,0 +1,51 @@
+{
+  "model_type": "VotingClassifier (Soft Voting) on Clinical Biomarkers",
+  "dataset": "artifacts/stroke_clinical_clean_3k.csv",
+  "num_features": 35,
+  "cv_results": {
+    "Logistic Regression": {
+      "roc_auc": 0.9467462225367622,
+      "pr_auc": 0.8640047047751743,
+      "accuracy": 0.8906666666666666,
+      "recall": 0.682153991497402,
+      "precision": 0.8362076613341888,
+      "f1": 0.7511235717682572
+    },
+    "Gradient Boosting": {
+      "roc_auc": 0.9235400576192528,
+      "pr_auc": 0.8137247994990398,
+      "accuracy": 0.8466666666666667,
+      "recall": 0.4277846008502598,
+      "precision": 0.8774606041787522,
+      "f1": 0.5744931451685195
+    },
+    "Random Forest": {
+      "roc_auc": 0.9201778458598662,
+      "pr_auc": 0.8066346288047843,
+      "accuracy": 0.7866666666666667,
+      "recall": 0.1265564478034955,
+      "precision": 0.9549019607843137,
+      "f1": 0.2221718350072818
+    },
+    "Ensemble Soft Voting": {
+      "roc_auc": 0.9571828813189145,
+      "pr_auc": 0.8934218908458392,
+      "accuracy": 0.8746666666666666,
+      "recall": 0.49922531884742555,
+      "precision": 0.9676624771245026,
+      "f1": 0.6582971178951501
+    }
+  },
+  "test_results": {
+    "roc_auc": 0.9616346955796498,
+    "pr_auc": 0.9018295698575122,
+    "accuracy": 0.8644444444444445,
+    "recall": 0.45871559633027525,
+    "precision": 0.9615384615384616,
+    "f1": 0.6211180124223602,
+    "tp": 50,
+    "fp": 2,
+    "fn": 59,
+    "tn": 339
+  }
+}

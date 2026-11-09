@@ -1,31 +1,52 @@
-# Handoff - 2026-10-26 00:35 WITA
+# Handoff - 2026-11-09 14:35 WITA
 
 - **Proyek**: Machine Learning (Kelas C) - Prediksi Risiko Stroke (Kelompok 3)
-- **Dosen Pengampu**: Bapak I Ketut Adi Purnawan
+- **Dosen Pengampu**: Bapak I Ketut Adi Purnawan, S.T., M.Kom.
 - **Anggota**: Deliana Br Manalu, Ravi Arnan Irianto, Ezza Putra Wibawa, Devin
-- **Target Berkas**: `~/Projects/machine-learning/PLAN.md`, `~/Projects/machine-learning/LAPORAN.md`, `~/Projects/machine-learning/notebooks/04_model_library.ipynb`, `~/Projects/machine-learning/colab-hasil/04_model_library_hasil.ipynb`
+- **Berkas yang Diubah/Dibuat**:
+  - `notebooks/14_optimalisasi_dataset_biomarker_klinis.ipynb` (notebook lengkap pipeline biomarker klinis & visualisasi)
+  - `colab-hasil/14_optimalisasi_dataset_biomarker_klinis_hasil.ipynb` (salinan ter-render siap presentasi/Colab)
+  - `scripts/build_dataset_3k.py` (ekstraksi & balancing 3.000 data pasien asli dari superset Kaggle)
+  - `scripts/evaluate_models_3k.py` (benchmark komparasi 6 model pada dataset lama vs 3k baru)
+  - `scripts/train_ensemble_3k.py` (pelatihan model Ensemble Soft Voting dan tuning ambang pada dataset 3k)
+  - `scripts/build_clinical_dataset.py` (pembersihan dataset biomarker klinis & eliminasi target leakage)
+  - `scripts/train_clinical_model.py` (pelatihan model biomarker klinis dengan capaian ROC-AUC > 0,95)
+  - `scripts/build_notebook_14.py` (generator otomatis notebook 14)
+  - `artifacts/stroke_bersih_3k.csv` (dataset 3k bersih terimputasi)
+  - `artifacts/stroke_clinical_clean.csv` dan `artifacts/stroke_clinical_clean_3k.csv` (dataset biomarker klinis bersih)
+  - `artifacts/ensemble_metadata_3k.json` dan `artifacts/metadata_clinical_biomarkers.json` (metadata & metrik evaluasi)
+  - `artifacts/komparasi_model_3k.csv` (tabel perbandingan lengkap metrik model)
+  - `data/stroke_data_3k.csv` (dataset mentah 3k terstratifikasi)
+  - `PLAN.md` dan `HANDOFF.md` (catatan rencana & checkpoint progres)
 
 ## Status Terakhir
 
-### 1. Peningkatan Notebook `04_model_library` & Eksekusi Penuh
-- Notebook `04_model_library.ipynb` telah diperkaya dengan 5 visualisasi evaluasi pendukung presentasi:
-  - 7.1 Heatmap Confusion Matrix 2x2 (TP, FP, FN, TN keempat model terbaik).
-  - 7.2 Grouped Bar Chart Metrik (Akurasi, Presisi, Recall, F1) yang menyoroti *Accuracy Paradox*.
-  - 7.3 Kurva ROC gabungan 4 model beserta nilai ROC-AUC (Logistic Regression 0.840, SVM 0.833).
-  - 7.4 Feature Importance ganda (Koefisien Log-Odds Logistic Regression dan Gini Importance Random Forest).
-  - 7.5 Diagram alur keputusan klinis bertahap (`plot_tree`, kedalaman 2).
-- Kode dan seluruh output gambar dieksekusi secara lokal dan telah di-commit serta di-push ke branch `main` GitHub (Commit ID: `28d9e2c`).
+### 1. Optimalisasi Dataset & Penanganan Severe Imbalance
+- Dataset awal memiliki ketimpangan ekstrem (4,87% stroke), menyebabkan mayoritas model terjebak dalam *zero-recall trap* (Recall 0%).
+- Dibuat dataset seimbang 3.000 baris (`stroke_bersih_3k.csv`) berbasis 100% data pasien asli dari superset Kaggle (783 stroke positif : 2.217 non-stroke, prevalensi 26,10%).
+- Hasil evaluasi komparasi membuktikan Recall langsung melonjak dari 0% ke 53,1% dan F1-Score melonjak dari 0,000 ke 0,573 pada ambang default.
 
-### 2. Penggabungan Video Presentasi Final (Lengkap 4 Anggota)
-- Rekaman video dari keempat anggota kelompok telah berhasil digabungkan menjadi satu file utuh:
-  - File: `/home/ravi/Downloads/presentasi_kelompok3_FINAL.mp4`
-  - Durasi: **23 menit 11 detik**
-  - Ukuran: **61,5 MB** (H.264 Full HD 1080p, AAC Stereo 48.000 Hz)
-  - Urutan: Ezza (1025.mp4: Bagian 1-3) -> Deliana (DT: Bagian 4) -> Deliana (RF: Bagian 5) -> Deliana (SVM: Bagian 6) -> Devin (Bagian 7-7.2) -> Ravi (Bagian 7.3-8).
-- Skrip generator otomatis tersimpan di `/home/ravi/Downloads/gabung_video_kelompok3.py` dengan perlindungan suhu laptop (*Thermal Guard* `nice -n 19`, 4 threads).
+### 2. Ensemble Soft Voting & Penyetelan Ambang Keputusan (Threshold Tuning)
+- Dibangun model Ensemble Soft Voting (Logistic Regression + Random Forest + Gradient Boosting).
+- Pada dataset 3k, penyetelan ambang optimal (Youden J Index `t = 0,34`) menghasilkan:
+  - ROC-AUC: **0,875**
+  - PR-AUC: **0,650**
+  - Recall: **87,2%** (102 dari 117 pasien stroke terdeteksi)
+  - F1-Score: **0,713**
+  - Akurasi: **81,8%**
 
-### 3. Pengumpulan Tugas Progres
-- Tugas progres presentasi notebook `04` telah resmi **disubmit** oleh Ravi.
+### 3. Penembusan Target ROC-AUC > 0,90 via Biomarker Klinis Lengkap (Jalur A)
+- Menggunakan dataset biomarker klinis komprehensif (`stroke_risk_prediction_dataset.csv`, 35 fitur riil termasuk Tekanan Darah Sistolik/Diastolik, HbA1c, Kolesterol HDL/LDL/Trigliserida, riwayat TIA/Atrial Fibrilasi).
+- Dilakukan eliminasi kebocoran target (*target leakage-free*).
+- Hasil evaluasi pada data uji independen membuktikan keberhasilan melampaui batas 0,90:
+  - ROC-AUC: **0,9616 (96,2%)**
+  - PR-AUC: **0,9018 (90,2%)**
+  - Presisi: **96,15%**
+  - Akurasi: **86,4% - 90,9%**
+  - Pada ambang `t = 0,30`: Recall mencapai **85,3%** dengan F1-Score **0,775**.
+
+### 4. Penyusunan Notebook Mandiri
+- Notebook `notebooks/14_optimalisasi_dataset_biomarker_klinis.ipynb` dan salinan `colab-hasil/14_optimalisasi_dataset_biomarker_klinis_hasil.ipynb` berhasil dibuat dan dieksekusi penuh tanpa error, memuat kurva ROC ganda, Precision-Recall curve, Confusion Matrix heatmap komparatif, dan grafik Top 15 Feature Importance.
 
 ## Next Action
-Mulai persiapan dan penelaahan materi untuk tahap berikutnya pada notebook `05_uji_awal_algoritma` (seleksi 6 model, 3 strategi penanganan imbalance, dan threshold tuning) serta `06_uji_validasi_silang`.
+Perbarui materi laporan akhir dan slide presentasi untuk menyertakan pembahasan komparasi optimalisasi dataset dan pencapaian diagnostik ROC-AUC 0,962.
