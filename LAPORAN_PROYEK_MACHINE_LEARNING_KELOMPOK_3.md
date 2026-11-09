@@ -403,3 +403,4 @@ Keterpaduan modul kode pada direktori `notebooks/` disajikan pada tabel pemetaan
 | `11` | `11_eksperimen.ipynb` | Pengujian 7 hipotesis peningkatan performa model | Tugas F |
 | `12` | `12_pemeriksaan_ulang.ipynb` | Uji statistik Nadeau-Bengio, Learning Curve, dan Net Benefit Analysis | Tugas G |
 | `13` | `13_uji_kombinasi_atribut.ipynb` | Eksplorasi 8 kombinasi atribut terhadap confidence level | - |
+| `14` | `14_optimalisasi_dataset_biomarker_klinis.ipynb` | Optimalisasi dataset biomarker klinis lengkap, penanganan severe imbalance, Soft Voting Ensemble, dan pencapaian ROC-AUC 0,962 | - |

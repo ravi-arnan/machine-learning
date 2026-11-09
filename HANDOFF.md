@@ -17,6 +17,7 @@
   - `artifacts/ensemble_metadata_3k.json` dan `artifacts/metadata_clinical_biomarkers.json` (metadata & metrik evaluasi)
   - `artifacts/komparasi_model_3k.csv` (tabel perbandingan lengkap metrik model)
   - `data/stroke_data_3k.csv` (dataset mentah 3k terstratifikasi)
+  - `README.md`, `LAPORAN.md`, dan `LAPORAN_PROYEK_MACHINE_LEARNING_KELOMPOK_3.md` (pembaruan dokumentasi & peta notebook 14)
   - `PLAN.md` dan `HANDOFF.md` (catatan rencana & checkpoint progres)
 
 ## Status Terakhir

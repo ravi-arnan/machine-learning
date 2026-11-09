@@ -25,7 +25,7 @@ CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis n
 | `SLIDE.md` | Slide presentasi, 26 halaman, format Marp |
 | `PLAN.md` | Rencana proyek, pembagian tugas, batasan penelitian |
 | `PAPERS.md` | Lima artikel acuan berbahasa Inggris beserta DOI dan PMID |
-| `notebooks/` | Empat belas notebook berisi seluruh kode (tanpa output) |
+| `notebooks/` | Lima belas notebook berisi seluruh kode (tanpa output) |
 | `colab-hasil/` | Keluaran menjalankan seluruh notebook di Colab, satu berkas beroutput per notebook |
 
 ## Peta notebook
@@ -46,9 +46,10 @@ CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis n
 | `11_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
 | `12_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
 | `13_uji_kombinasi_atribut` | Uji kombinasi atribut terhadap confidence level (precision dan average precision), cari atribut paling berpengaruh | - | tambahan |
+| `14_optimalisasi_dataset_biomarker_klinis` | Optimalisasi dataset biomarker klinis lengkap, penanganan severe imbalance, Soft Voting Ensemble, dan pencapaian ROC-AUC 0,962 | - | tambahan |
 
 Notebook `03a`, `03b`, dan `04` adalah jalur belajar: algoritma dibedah dulu secara manual,
-baru kemudian dipakai lewat library. Nomor `01` sampai `13` mengikuti alur belajar dan alur
+baru kemudian dipakai lewat library. Nomor `01` sampai `14` mengikuti alur belajar dan alur
 cerita, bukan ketergantungan teknis. Setiap notebook berdiri sendiri: notebook lanjutan
 menyalin fungsi pembersihan yang sama, sedangkan notebook model manual membaca berkas
 `artifacts/stroke_bersih.csv` hasil notebook `02`, sehingga semuanya tetap bisa dijalankan

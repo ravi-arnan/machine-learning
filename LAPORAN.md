@@ -686,6 +686,7 @@ terlihat, bukan menyembunyikannya di dalam kode.
 | `11_eksperimen` | Tujuh gagasan peningkatan diuji, enam gagal | F | tambahan |
 | `12_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
 | `13_uji_kombinasi_atribut` | Uji kombinasi atribut terhadap confidence level (precision dan average precision) | - | tambahan |
+| `14_optimalisasi_dataset_biomarker_klinis` | Optimalisasi dataset biomarker klinis lengkap, penanganan severe imbalance, Soft Voting Ensemble, dan pencapaian ROC-AUC 0,962 | - | tambahan |
 
 Seluruh Bab 2 sampai 9 buku acuan terpakai, ditambah Explainable AI dan validasi
 eksternal sebagai materi di luar buku.
