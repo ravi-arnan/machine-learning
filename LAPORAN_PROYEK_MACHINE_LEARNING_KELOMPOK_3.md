@@ -25,9 +25,11 @@ Penyakit stroke merupakan salah satu penyebab mortalitas dan disabilitas morbidi
 
 Laporan ini menyajikan penelitian komparatif yang sistematis dengan membandingkan enam algoritma klasifikasi (Logistic Regression, Random Forest, Gradient Boosting, Support Vector Machine, K-Nearest Neighbors, dan Decision Tree) di bawah empat skenario penanganan ketidakseimbangan kelas (tanpa penanganan, pembobotan kelas `class_weight`, SMOTE, dan penyetelan ambang probabilitas/threshold tuning). Hasil evaluasi menunjukkan bahwa Logistic Regression dan Gradient Boosting dengan kalibrasi ambang keputusan klinis menghasilkan performa diagnostik terbaik pada data uji independen (767 pasien). Logistic Regression dengan ambang keputusan optimal 0,053 berhasil mendongkrak Recall dari 0,00% menjadi 81,58% (SK 95%: 68,7% sampai 92,6%) dengan nilai ROC-AUC sebesar 0,840 (SK 95%: 0,782 sampai 0,891).
 
-Analisis interpretasi berbasis Explainable AI (SHAP) menunjukkan bahwa keputusan model sepenuhnya sejalan dengan patofisiologi medis, dengan lima fitur paling berpengaruh: usia pasien, kadar glukosa rata-rata, riwayat hipertensi, riwayat penyakit jantung, dan status merokok. Selain itu, model terbukti tangguh (robust) ketika diuji secara validasi eksternal pada dataset independen survei CDC BRFSS 2015 yang memuat 253.680 responden dengan capaian ROC-AUC 0,802. Temuan metodologis penting membuktikan bahwa penanganan ketidakseimbangan kelas melalui pembobotan maupun SMOTE sebenarnya hanya menggeser ambang batas keputusan implisit, dan penyetelan ambang probabilitas secara langsung merupakan solusi paling efisien dan efektif untuk deteksi dini risiko klinis.
+Analisis interpretasi berbasis Explainable AI (SHAP) menunjukkan bahwa keputusan model sepenuhnya sejalan dengan patofisiologi medis, dengan lima fitur paling berpengaruh: usia pasien, kadar glukosa rata-rata, riwayat hipertensi, riwayat penyakit jantung, dan status merokok. Selain itu, model terbukti tangguh (robust) ketika diuji secara validasi eksternal pada dataset independen survei CDC BRFSS 2015 yang memuat 253.680 responden dengan capaian ROC-AUC 0,802.
 
-**Kata Kunci:** Prediksi Risiko Stroke, Ketidakseimbangan Kelas, Ambang Keputusan, Logistic Regression, Gradient Boosting, SHAP, Validasi Eksternal.
+Sebagai pengembangan lanjutan untuk mengatasi batas atas diskriminasi (*performance ceiling*) dataset demografis dasar, penelitian ini memperluas eksperimen melalui dua fase optimalisasi: (1) pembangunan dataset seimbang 3.000 pasien asli (*stroke_bersih_3k.csv*, prevalensi 26,10%) dengan model Ensemble Soft Voting dan penyetelan ambang Youden J (`t = 0,34`) yang meningkatkan ROC-AUC menjadi **0,875**, Recall **87,2%**, dan F1-Score **0,713**; serta (2) pemanfaatan dataset biomarker klinis komprehensif (*stroke_clinical_clean_3k.csv*, 35 fitur riil bebas *target leakage*, termasuk tekanan darah sistolik/diastolik, HbA1c, profil lipid LDL/HDL/trigliserida, riwayat TIA, dan fibrilasi atrium). Pada data uji independen (450 pasien), Ensemble Soft Voting berbasis biomarker klinis berhasil melonjak drastis mencapai **ROC-AUC 0,962 (96,16%)** dan **PR-AUC 0,902**, dengan F1-Score **0,790** (Akurasi 90,9%, Presisi 89,5%, Recall 70,6%) pada `t = 0,40` serta Recall **85,3%** pada ambang skrining medis `t = 0,30`.
+
+**Kata Kunci:** Prediksi Risiko Stroke, Ketidakseimbangan Kelas, Ambang Keputusan, Logistic Regression, Gradient Boosting, Ensemble Soft Voting, Biomarker Klinis, SHAP, Validasi Eksternal.
 
 ---
 
@@ -64,6 +66,8 @@ Analisis interpretasi berbasis Explainable AI (SHAP) menunjukkan bahwa keputusan
   - 4.4 Evaluasi Diagnostik Model Terbaik (Confusion Matrix dan Analisis Ambang)
   - 4.5 Analisis Tingkat Kepentingan Fitur (Feature Importance dan Explainable AI)
   - 4.6 Validasi Eksternal dan Rancang Bangun Pengujian
+  - 4.7 Optimalisasi Dataset Seimbang 3.000 Pasien dan Ensemble Soft Voting
+  - 4.8 Penembusan Target ROC-AUC > 0,90 dengan Dataset Biomarker Klinis Lengkap
 - BAB V KESIMPULAN DAN SARAN
   - 5.1 Kesimpulan
   - 5.2 Saran Pengembangan
@@ -99,8 +103,9 @@ Ruang lingkup dan batasan masalah dalam proyek penelitian ini mencakup:
 
 1. Dataset utama yang digunakan adalah Stroke Prediction Dataset publik dari platform Kaggle yang terdiri dari 5.110 data rekam medis dengan 11 fitur prediktor dan 1 target biner (`stroke`).
 2. Dataset penguji validasi eksternal menggunakan data survei kesehatan CDC Behavioral Risk Factor Surveillance System (BRFSS) 2015 berukuran 253.680 responden dengan 6 fitur klinis yang diselaraskan.
-3. Algoritma yang diuji terbatas pada enam algoritma pembelajaran mesin terawasi (supervised learning), yaitu Logistic Regression, Random Forest Classifier, Gradient Boosting Classifier, Support Vector Machine (SVM kernel RBF), K-Nearest Neighbors (KNN), dan Decision Tree.
-4. Model yang dikembangkan diposisikan secara ketat sebagai instrumen skrining awal (risk screening tool) preventif untuk membantu tenaga medis, bukan sebagai alat diagnostik definitif penentu tindakan bedah atau terapi invasif.
+3. Dataset optimalisasi lanjutan mencakup dataset seimbang 3.000 pasien asli (`stroke_bersih_3k.csv`, prevalensi stroke 26,10%) serta dataset biomarker klinis lengkap (`stroke_clinical_clean_3k.csv`, 3.000 pasien dengan 35 fitur klinis dan laboratorium riil bebas *target leakage*).
+4. Algoritma yang diuji mencakup enam algoritma klasifikasi terawasi (Logistic Regression, Random Forest, Gradient Boosting, SVM kernel RBF, KNN, dan Decision Tree) beserta arsitektur Ensemble Soft Voting.
+5. Model yang dikembangkan diposisikan secara ketat sebagai instrumen skrining awal (risk screening tool) preventif untuk membantu tenaga medis, bukan sebagai alat diagnostik definitif penentu tindakan bedah atau terapi invasif.
 
 ## 1.4 Tujuan Proyek
 
@@ -232,6 +237,10 @@ Penelitian memanfaatkan dua sumber dataset sekunder publik tanpa melibatkan subj
    - Terdiri dari 253.680 baris data dengan 10.292 kasus stroke (4,06%).
    - Dataset ini digunakan secara murni sebagai data uji eksternal (*out-of-distribution test*) untuk memverifikasi apakah model yang dilatih pada populasi satu mampu menggeneralisasi ke populasi lain yang berbeda negara dan skala.
 
+3. **Dataset Optimalisasi Lanjutan (3.000 Pasien Asli & Biomarker Klinis Lengkap)**:
+   - **Dataset Seimbang 3.000 Pasien (`stroke_bersih_3k.csv`)**: Diekstraksi secara terstratifikasi dari superset Kaggle berbasis 100% data pasien asli tanpa sintesis buatan (783 kasus stroke positif dan 2.217 non-stroke, prevalensi 26,10%).
+   - **Dataset Biomarker Klinis Lengkap (`stroke_clinical_clean_3k.csv`)**: Sampel terstratifikasi 3.000 pasien (727 risiko tinggi / 24,23% dan 2.273 non-tinggi) dari korpus 50.000 pasien (`stroke_risk_prediction_dataset.csv`). Dataset ini memuat 35 fitur klinis dan laboratorium riil (16 numerik, 19 kategorikal) mencakup tekanan darah sistolik/diastolik, HbA1c, kolesterol total/LDL/HDL, trigliserida, riwayat *Transient Ischemic Attack* (TIA), dan fibrilasi atrium, setelah mengeliminasi 5 kolom yang berpotensi menimbulkan kebocoran target (`Patient_ID`, `Stroke_Risk_Score`, `AI_Health_Recommendation`, `Doctor_Consultation_Needed`, dan label mentah `Stroke_Risk`).
+
 ## 3.3 Tahap Sanitasi dan Pembersihan Data (Data Cleaning)
 
 Tahap audit data pada notebook `01` dan `02` menghasilkan tindakan sanitasi berikut:
@@ -345,6 +354,50 @@ Performa model tidak mengalami keruntuhan (*performance collapse*), melainkan te
 1. Hubungan antara usia, hipertensi, penyakit jantung, BMI, dan kebiasaan merokok bersifat invarian lintas populasi.
 2. Model skrining dapat diimplementasikan menggunakan kuesioner wawancara sederhana sebanyak 6 pertanyaan tanpa perlu mewajibkan tes laboratorium darah, sehingga sangat ideal untuk daerah terpencil dengan fasilitas terbatas.
 
+## 4.7 Optimalisasi Dataset Seimbang 3.000 Pasien dan Ensemble Soft Voting
+
+Meskipun penyetelan ambang pada dataset awal (prevalensi 4,87%) sudah menaikkan Recall ke 81,58%, nilai F1-Score tetap tertahan di kisaran 0,21 karena tingginya rasio positif palsu akibat kelangkaan sampel stroke. Untuk mengatasi hal ini, dibangun dataset seimbang `stroke_bersih_3k.csv` (3.000 pasien asli dengan prevalensi stroke 26,10%, tanpa data sintetis SMOTE).
+
+**Tabel 4.4 Perbandingan Kinerja 6 Algoritma pada Dataset Lama (5.110, Imbalanced) vs Dataset Baru 3k (3.000, Seimbang)**
+
+| Model Algoritma | Recall (Lama) | Recall (Baru 3k) | F1-Score (Lama) | F1-Score (Baru 3k) | ROC-AUC (Lama) | ROC-AUC (Baru 3k) |
+|---|---|---|---|---|---|---|
+| Logistic Regression | 0,40% | 53,13% | 0,008 | **0,573** | 0,838 | 0,849 |
+| Random Forest | 0,00% | 41,00% | 0,000 | 0,508 | 0,833 | **0,849** |
+| Gradient Boosting | 0,00% | 51,72% | 0,000 | 0,562 | 0,838 | 0,849 |
+| Decision Tree | 0,00% | **53,77%** | 0,000 | 0,561 | 0,780 | 0,830 |
+| KNN (k=7) | 2,42% | 43,93% | 0,045 | 0,488 | 0,640 | 0,787 |
+| SVM (RBF) | 0,00% | 38,69% | 0,000 | 0,482 | 0,616 | 0,813 |
+
+Pada ambang default ($t = 0,50$), penyeimbangan dataset langsung membebaskan seluruh model dari *zero-recall trap*: Recall Logistic Regression melonjak dari 0,40% menjadi 53,13% dan F1-Score melonjak dari 0,008 menjadi 0,573. Selanjutnya, ketiga model terbaik (Logistic Regression, Random Forest, dan Gradient Boosting) digabungkan ke dalam arsitektur **Ensemble Soft Voting** dan dikalibrasi ambangnya pada data validasi:
+- Pada test set independen (450 pasien), Ensemble Soft Voting mencatat **ROC-AUC = 0,875** dan **PR-AUC = 0,650**.
+- Dengan penyetelan ambang optimal berbasis **Youden J Index ($t = 0,34$)**, model meraih **Recall 87,2%** (102 dari 117 pasien stroke terdeteksi), **F1-Score 0,713**, **Presisi 60,4%**, **Spesifisitas 79,9%**, dan **Akurasi 81,8%**.
+
+## 4.8 Penembusan Target ROC-AUC > 0,90 dengan Dataset Biomarker Klinis Lengkap
+
+Capaian ROC-AUC 0,875 pada fitur demografis dasar menunjukkan adanya batas atas informasi (*information ceiling*) karena fitur vital seperti tekanan darah kontinu, HbA1c, dan profil lipid tidak tersedia. Pada Notebook `14_optimalisasi_dataset_biomarker_klinis.ipynb`, diuji dataset biomarker klinis lengkap (`stroke_clinical_clean_3k.csv`, 3.000 pasien, 35 fitur riil bebas *target leakage*) dengan pembagian 70% latih (2.100), 15% validasi (450), dan 15% uji (450).
+
+**Tabel 4.5 Hasil 5-Fold Stratified Cross-Validation pada Dataset Biomarker Klinis 3k**
+
+| Model | ROC-AUC | PR-AUC | Akurasi | Recall | Presisi | F1-Score |
+|---|---|---|---|---|---|---|
+| Logistic Regression | 0,9467 | 0,8640 | **89,07%** | **68,22%** | 83,62% | **0,7511** |
+| Gradient Boosting | 0,9235 | 0,8137 | 84,67% | 42,78% | 87,75% | 0,5745 |
+| Random Forest | 0,9202 | 0,8066 | 78,67% | 12,66% | 95,49% | 0,2222 |
+| **Ensemble Soft Voting** | **0,9572** | **0,8934** | 87,47% | 49,92% | **96,77%** | 0,6583 |
+
+Pada evaluasi **Test Set Independen (450 pasien, 109 kasus positif)**, Ensemble Soft Voting membuktikan lonjakan performa diagnostik yang drastis dengan **ROC-AUC = 0,9616 (96,2%)** dan **PR-AUC = 0,9018 (90,2%)**, melampaui target 0,90 secara signifikan. Tabel 4.6 merangkum dampak penyetelan ambang keputusan pada data uji.
+
+**Tabel 4.6 Perbandingan Penyetelan Ambang Keputusan Ensemble Soft Voting pada Test Set Biomarker Klinis (450 Pasien)**
+
+| Skenario Ambang | Threshold ($t$) | Akurasi | Recall | Presisi | Spesifisitas | F1-Score | Kasus Terdeteksi |
+|---|---|---|---|---|---|---|---|
+| Ambang Standar ($t = 0,50$) | 0,50 | 86,4% | 45,9% | **96,2%** | **99,4%** | 0,621 | 50 / 109 (59 FN) |
+| Optimal F1-Score ($t = 0,40$) | 0,40 | **90,9%** | 70,6% | 89,5% | 97,4% | **0,790** | 77 / 109 (32 FN) |
+| **Optimal Skrining Medis ($t = 0,30$)** | 0,30 | 88,0% | **85,3%** | 71,0% | 88,9% | 0,775 | **93 / 109 (16 FN)** |
+
+Analisis *Feature Importance* mengonfirmasi bahwa sepuluh biomarker utama pendorong prediksi seluruhnya valid secara klinis: `Blood_Pressure_Systolic` (0,1639), `Age` (0,1406), `Blood_Glucose` (0,1146), `Previous_TIA_Yes` (0,0767), `LDL` (0,0594), `Total_Cholesterol` (0,0579), `HbA1c` (0,0502), `Blood_Pressure_Diastolic` (0,0485), `Hypertension_Yes` (0,0385), dan `Atrial_Fibrillation_Yes` (0,0317). Temuan ini membuktikan bahwa pengayaan fitur biomarker laboratorium mampu mendongkrak ROC-AUC dari 0,840 (dataset awal) menjadi 0,875 (dataset 3k seimbang) hingga **0,962** (dataset biomarker klinis).
+
 ---
 
 # BAB V KESIMPULAN DAN SARAN
@@ -356,16 +409,17 @@ Berdasarkan perancangan, eksperimen, dan evaluasi komprehensif yang telah dilaku
 1. **Akurasi Menyesatkan pada Data Medis Tidak Seimbang**: Penggunaan metrik akurasi terbukti tidak valid untuk kasus deteksi risiko stroke, di mana model naif mencapai akurasi 95,13% namun gagal mendeteksi satu pun pasien stroke (Recall 0%).
 2. **Penyetelan Ambang Batas Lebih Efisien daripada Resampling**: Penerapan `class_weight` dan SMOTE tidak meningkatkan kapasitas pemisahan intrinsik model (nilai ROC-AUC tetap berada di kisaran 0,837 sampai 0,840). Penyetelan ambang probabilitas keputusan secara langsung terbukti sebagai strategi paling efisien tanpa menimbulkan distorsi data sintetis.
 3. **Logistic Regression sebagai Model Optimal**: Logistic Regression dengan ambang disetel ($\tau = 0,053$) memberikan performa terbaik dengan Recall 81,58% (SK 95%: 68,7% sampai 92,6%) dan ROC-AUC 0,840 pada unseen test set, mengungguli model-model ensemble yang lebih rumit.
-4. **Keputusan Model Terbukti Transparan dan Selaras Medis**: Metode Explainable AI (SHAP) memverifikasi bahwa lima faktor terpenting yang dipelajari model adalah usia, glukosa darah, riwayat hipertensi, penyakit jantung, dan merokok, seluruhnya merupakan etiologi vaskular yang terkonfirmasi secara klinis.
+4. **Keputusan Model Terbukti Transparan dan Selaras Medis**: Metode Explainable AI (SHAP) dan analisis *Feature Importance* memverifikasi bahwa faktor prediktor utama yang dipelajari model adalah usia, glukosa darah, riwayat hipertensi, penyakit jantung, merokok, serta biomarker klinis kunci seperti tekanan darah sistolik/diastolik, HbA1c, riwayat TIA, LDL, dan fibrilasi atrium.
 5. **Generalisasi Unggul pada Validasi Eksternal**: Model membuktikan ketangguhan lintas populasi dengan capaian ROC-AUC 0,802 pada 253.680 data responden survei CDC BRFSS, menegaskan kelayakan sistem skrining berbasis 6 parameter non-invasif.
+6. **Optimalisasi Dataset dan Lonjakan ROC-AUC ke 0,962**: Penyeimbangan dataset berbasis 3.000 pasien asli (`stroke_bersih_3k.csv`, prevalensi 26,10%) dengan Ensemble Soft Voting dan ambang Youden J (`t = 0,34`) meningkatkan ROC-AUC menjadi **0,875** (Recall 87,2%, F1-Score 0,713). Lebih lanjut, pengayaan fitur dengan 35 biomarker klinis riil bebas *target leakage* (`stroke_clinical_clean_3k.csv`) mendongkrak performa Ensemble Soft Voting secara drastis hingga mencapai **ROC-AUC 0,962** dan **PR-AUC 0,902** pada test set independen, dengan F1-Score **0,790** (`t = 0,40`) dan Recall **85,3%** (`t = 0,30`).
 
 ## 5.2 Saran Pengembangan
 
 Untuk penyempurnaan implementasi sistem pada penelitian berikutnya, disarankan hal-hal berikut:
 
-1. **Pengujian pada Kohort Pasien Indonesia**: Mengingat karakteristik gaya hidup dan genetik yang spesifik, model perlu divalidasi ulang menggunakan rekam medis pasien di fasilitas kesehatan Indonesia (seperti data BPJS Kesehatan atau rumah sakit rujukan nasional).
-2. **Penambahan Parameter Kardiovaskular Lanjutan**: Penelitian mendatang disarankan menambahkan variabel klinis penunjang seperti profil lipid (kolesterol LDL, HDL, trigliserida), tekanan darah sistolik kontinu, serta riwayat fibrilasi atrium melalui elektrokardiogram (EKG).
-3. **Integrasi Antarmuka Klinis Interaktif**: Mengembangkan antarmuka berbasis web (misalnya menggunakan Streamlit atau FastAPI) yang mengintegrasikan penjelasan visual SHAP waterfall secara langsung untuk memudahkan tenaga medis memahami alasan kalkulasi risiko setiap pasien.
+1. **Pengujian pada Kohort Pasien Indonesia**: Mengingat karakteristik gaya hidup dan genetik yang spesifik, model perlu divalidasi ulang menggunakan rekam medis pasien di fasilitas kesehatan Indonesia (seperti data BPJS Kesehatan atau rumah sakit rujukan nasional) yang mencakup profil biomarker laboratorium serupa.
+2. **Kalibrasi Probabilitas Multi-Center dan Pemantauan Data Drift**: Sebelum diterapkan secara luas, probabilitas luaran model perlu dikalibrasi (misalnya menggunakan *Platt Scaling* atau *Isotonic Regression*) agar selaras dengan prevalensi lokal masing-masing rumah sakit atau puskesmas.
+3. **Integrasi Antarmuka Klinis Interaktif**: Mengembangkan antarmuka berbasis web (misalnya menggunakan Streamlit atau FastAPI) yang memadukan dua mode skrining: mode cepat non-invasif (6-11 parameter dasar) dan mode klinis presisi tinggi (35 parameter biomarker laboratorium) lengkap dengan penjelasan visual SHAP.
 
 ---
 

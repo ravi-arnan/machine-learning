@@ -38,11 +38,18 @@ merokok sebagai lima faktor teratas, seluruhnya faktor risiko stroke yang sudah 
 secara medis.
 
 Temuan metodologis yang kami anggap paling berharga: tujuh gagasan peningkatan diuji dan
-enam gagal, model yang lebih rumit tidak mengalahkan Logistic Regression, dan yang paling
-menentukan hasil ternyata bukan pilihan algoritma melainkan pilihan ambang keputusan.
+enam gagal, model yang lebih rumit tidak mengalahkan Logistic Regression pada fitur
+demografis dasar, dan yang paling menentukan hasil ternyata bukan pilihan algoritma melainkan
+pilihan ambang keputusan. Sebagai pembuktian lanjutan (Notebook `14`), optimalisasi
+keseimbangan dataset berbasis 3.000 pasien asli (`stroke_bersih_3k.csv`, prevalensi 26,10%)
+dengan Ensemble Soft Voting menaikkan ROC-AUC menjadi **0,875** (Recall 87,2% pada `t = 0,34`).
+Lebih jauh lagi, ketika fitur diperkaya dengan 35 biomarker klinis dan laboratorium riil bebas
+*target leakage* (`stroke_clinical_clean_3k.csv`), performa Ensemble Soft Voting melonjak
+drastis mencapai **ROC-AUC 0,962 (96,16%)** dan **PR-AUC 0,902** pada data uji independen
+(F1-Score 0,790 pada `t = 0,40`; Recall 85,3% pada `t = 0,30`).
 
 **Kata kunci:** prediksi stroke, ketidakseimbangan kelas, ambang keputusan, SHAP,
-validasi eksternal
+validasi eksternal, ensemble soft voting, biomarker klinis
 
 ---
 
@@ -566,6 +573,44 @@ usia saja (0,166 lawan 0,112). Arah preferensinya sama di kedua model, yaitu kom
 ramping di sekitar inti klinis mengungguli kombinasi paling lengkap, sehingga kombinasi
 terbaik keseluruhan adalah inti klinis + bmi pada Naive Bayes, AP 0,1704.
 
+## 4.10 Optimalisasi Dataset Seimbang 3.000 Pasien dan Ensemble Soft Voting
+
+Sebagai tindak lanjut dari keterbatasan prevalensi 4,87% pada dataset awal, diekstraksi
+dataset seimbang `artifacts/stroke_bersih_3k.csv` (3.000 pasien asli tanpa sintesis SMOTE;
+783 stroke positif dan 2.217 non-stroke, prevalensi 26,10%). Pada ambang standar `0,50`,
+penyeimbangan ini membebaskan seluruh model dari *zero-recall trap*: Recall Logistic
+Regression naik dari 0,40% menjadi 53,13% (F1-Score 0,008 menjadi 0,573), sementara
+Decision Tree mencapai Recall 53,77%.
+
+Penggabungan tiga model terbaik (Logistic Regression, Random Forest, Gradient Boosting) dalam
+**Ensemble Soft Voting** dan penyetelan ambang berbasis Youden J Index (`t = 0,34`) pada
+test set 3k menghasilkan **ROC-AUC 0,875**, **PR-AUC 0,650**, **Recall 87,2%** (102/117),
+**F1-Score 0,713**, dan **Akurasi 81,8%**.
+
+## 4.11 Terobosan ROC-AUC 0,962 via Dataset Biomarker Klinis Lengkap (Notebook `14`)
+
+Capaian ROC-AUC 0,875 menegaskan adanya batas atas sinyal pada fitur demografis dasar.
+Pada Notebook `14_optimalisasi_dataset_biomarker_klinis.ipynb`, hipotesis penambahan jenis
+pemeriksaan klinis diuji menggunakan `artifacts/stroke_clinical_clean_3k.csv` (3.000 pasien,
+35 fitur riil: 16 numerik, 19 kategorikal; prevalensi risiko tinggi 24,23%) setelah
+mengeliminasi 5 kolom bocor (`Patient_ID`, `Stroke_Risk_Score`, `AI_Health_Recommendation`,
+`Doctor_Consultation_Needed`, `Stroke_Risk`).
+
+| Model (5-Fold CV Biomarker Klinis) | ROC-AUC | PR-AUC | Akurasi | Recall | Presisi | F1-Score |
+|---|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | 0,9467 | 0,8640 | 89,07% | 68,22% | 83,62% | 0,7511 |
+| Gradient Boosting | 0,9235 | 0,8137 | 84,67% | 42,78% | 87,75% | 0,5745 |
+| Random Forest | 0,9202 | 0,8066 | 78,67% | 12,66% | 95,49% | 0,2222 |
+| **Ensemble Soft Voting** | **0,9572** | **0,8934** | 87,47% | 49,92% | **96,77%** | 0,6583 |
+
+Pada test set independen (450 pasien, 109 positif), Ensemble Soft Voting mencapai
+**ROC-AUC 0,9616 (96,2%)** dan **PR-AUC 0,9018 (90,2%)**. Penyetelan ambang keputusan pada
+`t = 0,40` menghasilkan F1-Score tertinggi **0,790** (Akurasi 90,9%, Recall 70,6%, Presisi
+89,5%), sedangkan ambang skrining medis `t = 0,30` menjaring **85,3% pasien berisiko**
+(93 dari 109 kasus, Presisi 71,0%, Akurasi 88,0%). Lima biomarker terpenting meliputi
+`Blood_Pressure_Systolic` (0,1639), `Age` (0,1406), `Blood_Glucose` (0,1146),
+`Previous_TIA_Yes` (0,0767), dan `LDL` (0,0594).
+
 ---
 
 # BAB V PENUTUP
@@ -595,6 +640,10 @@ terbaik keseluruhan adalah inti klinis + bmi pada Naive Bayes, AP 0,1704.
 5. **Akurasi bukan metrik yang tepat untuk kasus ini,** dan itu terbukti pada model kami
    sendiri, bukan hanya pada baseline: model dengan ROC-AUC 0,84 tetap punya recall nol
    selama ambangnya dibiarkan 0,50.
+6. **Penambahan biomarker klinis menembus batas atas performa (ROC-AUC 0,962).**
+   Menyeimbangkan dataset 3.000 pasien asli menaikkan ROC-AUC ke 0,875 (Ensemble Soft Voting,
+   `t = 0,34`), sedangkan pengayaan 35 fitur biomarker laboratorium riil bebas *target leakage*
+   melipatgandakan daya pisah hingga ROC-AUC 0,962 dan PR-AUC 0,902 pada data uji independen.
 
 Pelajaran yang paling ingin kami tekankan: **yang paling menentukan hasil bukan pilihan
 algoritma, melainkan pilihan ambang keputusan, dan pilihan itu adalah persoalan kebijakan

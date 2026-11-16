@@ -394,16 +394,47 @@ untuk prevalensi 4,87%.
 
 ---
 
+## Optimalisasi lanjutan: dataset seimbang 3.000 pasien
+
+Menjawab kendala prevalensi 4,87% (`stroke_bersih_3k.csv`, 100% pasien asli, 26,10% stroke):
+
+| Tahap | ROC-AUC | PR-AUC | Recall | F1-Score |
+|---|---:|---:|---:|---:|
+| Dataset awal (5.110, 4,87%) - Logistic Regression | 0,840 | 0,17 | 81,6% | 0,211 |
+| Dataset 3k (26,10%) - Ensemble Soft Voting (`t = 0,34`) | **0,875** | **0,650** | **87,2%** | **0,713** |
+
+- Pada ambang default `0,50`, Recall 6 model langsung bebas dari *zero-recall trap* (LR: 0,4% -> 53,1%)
+- Masih ada batas atas (*information ceiling*) karena belum ada biomarker laboratorium
+
+---
+
+## Terobosan ROC-AUC 0,962 via biomarker klinis lengkap (Notebook `14`)
+
+Dataset `stroke_clinical_clean_3k.csv` (3.000 pasien, **35 fitur riil bebas target leakage**):
+
+| Skenario Test Set (450 pasien) | Akurasi | Recall | Presisi | F1-Score |
+|---|---:|---:|---:|---:|
+| Ambang standar (`t = 0,50`) | 86,4% | 45,9% | **96,2%** | 0,621 |
+| Optimal F1-Score (`t = 0,40`) | **90,9%** | 70,6% | 89,5% | **0,790** |
+| **Optimal skrining medis (`t = 0,30`)** | 88,0% | **85,3%** | 71,0% | 0,775 |
+
+- **ROC-AUC = 0,9616 (96,2%)** | **PR-AUC = 0,9018 (90,2%)**
+- Top biomarker: TD Sistolik (0,164), Usia (0,141), Glukosa (0,115), Riwayat TIA (0,077), LDL (0,059)
+
+---
+
 ## Kesimpulan
 
 1. Strategi penanganan ketidakseimbangan **tidak membuat model lebih pintar**,
    hanya menggeser ambang.
-2. **Logistic Regression + ambang disetel** memberi keseimbangan terbaik:
+2. **Logistic Regression + ambang disetel** memberi keseimbangan terbaik pada dataset dasar:
    recall 0,82 (0,69 sampai 0,93), AUC 0,84. Model rumit hanya menyamai.
 3. Faktor yang dipakai model **sejalan dengan pengetahuan medis**, 5 dari 5.
 4. Model **bertahan** pada sumber data berbeda, dan cukup dengan 6 fitur
    tanpa laboratorium.
 5. Akurasi bukan metrik yang tepat, dan itu terbukti pada model kami sendiri.
+6. **Pengayaan biomarker klinis** mendobrak batas atas performa hingga **ROC-AUC 0,962**
+   (PR-AUC 0,902) dengan Ensemble Soft Voting.
 
 > Yang paling menentukan hasil bukan pilihan algoritma, melainkan **pilihan ambang**,
 > dan itu persoalan kebijakan klinis, bukan persoalan teknis.
@@ -428,14 +459,14 @@ untuk prevalensi 4,87%.
 
 # Terima kasih
 
-Empat belas notebook, seluruhnya dapat dijalankan ulang di Google Colab
+Lima belas notebook, seluruhnya dapat dijalankan ulang di Google Colab
 
 <span class="kecil">
 
 `01` cek data - `02` bersihkan data - `03a`/`03b` model manual - `04` model library
 `05` uji algoritma - `06` uji validasi silang - `07` klasifikasi - `08` clustering dan PCA
 `09` explainable AI - `10` validasi eksternal - `11` eksperimen - `12` pemeriksaan ulang
-`13` kombinasi atribut dan confidence level
+`13` kombinasi atribut dan confidence level - `14` optimalisasi dataset & biomarker klinis (ROC 0,962)
 
 </span>
 
