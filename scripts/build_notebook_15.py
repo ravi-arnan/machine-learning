@@ -166,7 +166,7 @@ Sesuai arahan evaluasi, kita memeriksa dan menampilkan kondisi seluruh baris men
     cells.append(
         nbf.v4.new_code_cell(
             r"""GITHUB_RAW_URL = (
-    "https://raw.githubusercontent.com/ravi-arman/machine-learning/main/"
+    "https://raw.githubusercontent.com/ravi-arnan/machine-learning/main/"
     "datasets/stroke_risk_prediction_dataset.csv"
 )
 
