@@ -632,21 +632,23 @@ Validation Set, dan *Ensemble Soft Voting*):
 | Logistic Regression | Baseline | 0,50 | 0,9571 | 0,8916 | 89,95% | 76,07% | 81,25% | 0,7858 | 330 |
 | Logistic Regression | Improved | 0,42 | 0,9571 | 0,8916 | 90,02% | 81,15% | 78,42% | 0,7976 | 260 |
 | Random Forest | Baseline | 0,50 | 0,9503 | 0,8663 | 87,61% | 54,17% | 91,10% | 0,6794 | 632 |
-| Random Forest | Improved | 0,47 | 0,9533 | 0,8772 | 89,77% | 78,83% | 78,94% | 0,7888 | 292 |
+| Random Forest | Improved | 0,40 | 0,9562 | 0,8833 | 90,07% | 79,41% | 79,58% | 0,7949 | 284 |
 | Gradient Boosting | Baseline | 0,50 | 0,9795 | 0,9456 | 91,14% | 65,63% | 96,79% | 0,7822 | 474 |
-| **Gradient Boosting** | **Improved** | **0,38** | **0,9859** | **0,9623** | **94,43%** | **88,03%** | **88,87%** | **0,8845** | **165** |
-| Ensemble Soft Voting | Improved | 0,42 | 0,9807 | 0,9490 | 93,39% | 86,87% | 86,00% | 0,8644 | 181 |
+| **Gradient Boosting** | **Improved** | **0,41** | **0,9947** | **0,9850** | **96,57%** | **92,75%** | **93,09%** | **0,9292** | **100** |
+| Ensemble Soft Voting | Improved | 0,42 | 0,9872 | 0,9655 | 94,90% | 88,54% | 90,24% | 0,8939 | 158 |
 
 Validasi berlapis pada *Gradient Boosting Improved* memastikan ketangguhan model: *5-Fold
-Stratified CV* meraih **ROC-AUC 0,9872 +/- 0,0007** dan **PR-AUC 0,9640 +/- 0,0024**, serta
-*Bootstrap 95% CI* pada Test Set berada pada rentang sempit `0,9835 - 0,9880` untuk ROC-AUC
-dan `0,8712 - 0,8960` untuk F1-Score, tanpa gejala *overfitting* pada *Learning Curve*.
-Pemeringkatan *Feature Importance* agregat pada 35 fitur asli menegaskan 26 fitur dominan
-(`Age` 14,81%, `Blood_Pressure_Systolic` 13,30%, `Blood_Glucose` 9,00%, `Previous_TIA` 6,67%,
-`HbA1c` 6,46%) serta 9 fitur berkontribusi < 0,5% (`Country`, `Work_Type`, `Gender`,
-`Heart_Rate`, dll.). Pengujian seleksi fitur 26 atribut menyusutkan dimensi OHE dari 88 ke
-48 kolom (`ROC-AUC 0,9845`, `Recall 90,79%`, `F1 0,8771` pada `t = 0,35`), sedangkan pemakaian
-seluruh 35 fitur tetap meraih `ROC-AUC` (0,9859) dan `F1-Score` (0,8845) terbaik.
+Stratified CV* out-of-fold pada ambang optimal (`t = 0,41`) meraih **ROC-AUC 0,9951 +/- 0,0005**,
+**PR-AUC 0,9855 +/- 0,0016**, **Recall 93,18% +/- 0,79%**, dan **F1-Score 0,9317 +/- 0,0044**,
+serta *Bootstrap 95% CI* pada Test Set berada pada rentang sempit `0,9936 - 0,9957` untuk ROC-AUC
+dan `0,9187 - 0,9382` untuk F1-Score, tanpa gejala *overfitting* pada *Learning Curve*.
+Pemeringkatan *Feature Importance* agregat pada 35 fitur asli menegaskan 27 fitur >= 0,5%
+(`Age` 13,86%, `Blood_Pressure_Systolic` 12,24%, `Blood_Glucose` 8,65%, `HbA1c` 6,33%,
+`Previous_TIA` 6,03%) serta 8 fitur berkontribusi < 0,5% (`Residence_Type`,
+`Exercise_Hours_Per_Week`, `Weight_kg`, `Height_cm`, `Country`, `Heart_Rate`, `Work_Type`,
+`Gender`). Pengujian seleksi fitur 27 atribut menyusutkan dimensi OHE dari 88 ke 49 kolom
+(`ROC-AUC 0,9928`, `Recall 91,44%`, `F1 0,9168` pada `t = 0,42`), sedangkan pemakaian seluruh
+35 fitur tetap meraih `ROC-AUC` (0,9947) dan `F1-Score` (0,9292) terbaik.
 
 ---
 
@@ -773,7 +775,7 @@ terlihat, bukan menyembunyikannya di dalam kode.
 | `12_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
 | `13_uji_kombinasi_atribut` | Uji kombinasi atribut terhadap confidence level (precision dan average precision) | - | tambahan |
 | `14_optimalisasi_dataset_biomarker_klinis` | Optimalisasi dataset biomarker klinis lengkap, penanganan severe imbalance, Soft Voting Ensemble, dan pencapaian ROC-AUC 0,962 | - | tambahan |
-| `15_presentasi_uas_full_dataset` | Presentasi UAS Colab: korpus penuh 37.940 baris (`dropna` & `drop_duplicates`), preprocessing spesifik 3 model, Baseline vs Improvement + CM, validasi berlapis (ROC-AUC 0,9859) | UAS | tambahan |
+| `15_presentasi_uas_full_dataset` | Presentasi UAS Colab: korpus penuh 37.940 baris (`dropna` & `drop_duplicates`), preprocessing spesifik 3 model, Baseline vs Improvement + CM, validasi berlapis + seleksi fitur (ROC-AUC 0,9947, F1 0,9292) | UAS | tambahan |
 
 Seluruh Bab 2 sampai 9 buku acuan terpakai, ditambah Explainable AI dan validasi
 eksternal sebagai materi di luar buku.

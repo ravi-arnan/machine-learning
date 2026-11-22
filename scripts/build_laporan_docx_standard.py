@@ -1120,16 +1120,16 @@ def create_laporan():
             ("Logistic Regression", "Baseline", "0,50", "0,9571", "0,8916", "89,95%", "76,07%", "81,25%", "0,7858"),
             ("Logistic Regression", "Improved", "0,42", "0,9571", "0,8916", "90,02%", "81,15%", "78,42%", "0,7976"),
             ("Random Forest", "Baseline", "0,50", "0,9503", "0,8663", "87,61%", "54,17%", "91,10%", "0,6794"),
-            ("Random Forest", "Improved", "0,47", "0,9533", "0,8772", "89,77%", "78,83%", "78,94%", "0,7888"),
+            ("Random Forest", "Improved", "0,40", "0,9562", "0,8833", "90,07%", "79,41%", "79,58%", "0,7949"),
             ("Gradient Boosting", "Baseline", "0,50", "0,9795", "0,9456", "91,14%", "65,63%", "96,79%", "0,7822"),
-            ("Gradient Boosting", "Improved", "0,38", "0,9859", "0,9623", "94,43%", "88,03%", "88,87%", "0,8845"),
-            ("Ensemble Soft Voting", "Improved", "0,42", "0,9807", "0,9490", "93,39%", "86,87%", "86,00%", "0,8644")
+            ("Gradient Boosting", "Improved", "0,41", "0,9947", "0,9850", "96,57%", "92,75%", "93,09%", "0,9292"),
+            ("Ensemble Soft Voting", "Improved", "0,42", "0,9872", "0,9655", "94,90%", "88,54%", "90,24%", "0,8939")
         ],
         [1.30, 0.58, 0.35, 0.56, 0.56, 0.56, 0.54, 0.54, 0.52],
         bold_last_row=False
     )
 
-    add_body_p("Grafik Confusion Matrix untuk setiap model pada tahap Baseline (Gambar 4.13) dan setelah Improvement (Gambar 4.14) membuktikan penurunan drastis kasus risiko tinggi yang terlewat (False Negative): Logistic Regression turun dari 330 menjadi 260 kasus, Random Forest turun dari 632 menjadi 292 kasus, dan Gradient Boosting turun dari 474 menjadi 165 kasus. Model Gradient Boosting Improved (n_estimators=200, learning_rate=0,05, max_depth=4, subsample=0,8, t=0,38) meraih performa puncak dengan ROC-AUC 0,9859, PR-AUC 0,9623, Akurasi 94,43%, Recall 88,03%, Presisi 88,87%, dan F1-Score 0,8845 (Gambar 4.15).")
+    add_body_p("Grafik Confusion Matrix untuk setiap model pada tahap Baseline (Gambar 4.13) dan setelah Improvement (Gambar 4.14) membuktikan penurunan drastis kasus risiko tinggi yang terlewat (False Negative): Logistic Regression turun dari 330 menjadi 260 kasus, Random Forest turun dari 632 menjadi 284 kasus, dan Gradient Boosting turun dari 474 menjadi 100 kasus. Model Gradient Boosting Improved (n_estimators=400, learning_rate=0,08, max_depth=4, subsample=0,8, t=0,41) meraih performa puncak dengan ROC-AUC 0,9947, PR-AUC 0,9850, Akurasi 96,57%, Recall 92,75%, Presisi 93,09%, dan F1-Score 0,9292 (Gambar 4.15).")
 
     add_image_box(
         "assets/evaluasi_15/fig_03_cm_baseline.png",
@@ -1149,16 +1149,16 @@ def create_laporan():
         width_inch=5.3
     )
 
-    add_body_p("Untuk membuktikan kestabilan hasil dan mencegah ketergantungan pada satu partisi acak, diterapkan validasi silang 5-Fold Stratified Cross-Validation pada 32.249 baris pengembangan serta uji Bootstrap 1.000 iterasi pada Test Set (Tabel 4.10). Hasil Learning Curve (Gambar 4.16) dan pemeringkatan Feature Importance agregat seluruh 35 fitur asli (Gambar 4.17) memastikan tidak terjadi overfitting serta menegaskan dominasi faktor klinis medis (Age 14,81%, Blood_Pressure_Systolic 13,30%, Blood_Glucose 9,00%, Previous_TIA 6,67%, HbA1c 6,46%, Blood_Pressure_Diastolic 4,84%, Total_Cholesterol 4,53%, dan LDL 4,29%), sementara 9 fitur lain seperti Country, Work_Type, Gender, dan Heart_Rate berkontribusi di bawah 0,5%. Uji seleksi fitur dengan 26 atribut terpilih (>= 0,5%) meringkas dimensi One-Hot Encoding dari 88 ke 48 kolom dengan ROC-AUC 0,9845 dan Recall 90,79% (F1 0,8771 pada t=0,35), sedangkan pemakaian penuh 35 fitur tetap memberikan ROC-AUC (0,9859) dan F1-Score (0,8845) puncak.")
+    add_body_p("Untuk membuktikan kestabilan hasil dan mencegah ketergantungan pada satu partisi acak, diterapkan validasi silang 5-Fold Stratified Cross-Validation out-of-fold pada 32.249 baris pengembangan (menggunakan ambang optimal masing-masing model) serta uji Bootstrap 1.000 iterasi pada Test Set (Tabel 4.10). Hasil Learning Curve (Gambar 4.16) dan pemeringkatan Feature Importance agregat seluruh 35 fitur asli (Gambar 4.17) memastikan tidak terjadi overfitting serta menegaskan dominasi faktor klinis medis (Age 13,86%, Blood_Pressure_Systolic 12,24%, Blood_Glucose 8,65%, HbA1c 6,33%, Previous_TIA 6,03%, Blood_Pressure_Diastolic 4,83%, Total_Cholesterol 4,58%, dan LDL 4,29%), sementara 8 fitur lain seperti Residence_Type, Exercise_Hours_Per_Week, Weight_kg, Height_cm, Country, Heart_Rate, Work_Type, dan Gender berkontribusi di bawah 0,5%. Uji seleksi fitur dengan 27 atribut terpilih (>= 0,5%) meringkas dimensi One-Hot Encoding dari 88 ke 49 kolom dengan ROC-AUC 0,9928, Recall 91,44%, dan F1 0,9168 pada t=0,42, sedangkan pemakaian penuh 35 fitur tetap memberikan ROC-AUC (0,9947) dan F1-Score (0,9292) puncak.")
 
     add_styled_table(
         "Tabel 4.10 Validasi 5-Fold Stratified CV dan Bootstrap 95% CI (37.940 Pasien)",
-        ["Uji Validasi / Model", "ROC-AUC", "PR-AUC", "Akurasi", "F1-Score"],
+        ["Uji Validasi / Model", "ROC-AUC", "PR-AUC", "Recall", "F1-Score"],
         [
-            ("5-Fold CV: Logistic Regression", "0,9607 +/- 0,0021", "0,8977 +/- 0,0055", "0,9051 +/- 0,0028", "0,7957 +/- 0,0068"),
-            ("5-Fold CV: Random Forest", "0,9517 +/- 0,0029", "0,8702 +/- 0,0074", "0,8922 +/- 0,0042", "0,7603 +/- 0,0107"),
-            ("5-Fold CV: Gradient Boosting", "0,9872 +/- 0,0007", "0,9640 +/- 0,0024", "0,9275 +/- 0,0045", "0,8286 +/- 0,0119"),
-            ("Bootstrap 95% CI (GB Improved, Test)", "0,9835 - 0,9880", "-", "-", "0,8712 - 0,8960")
+            ("5-Fold CV: Logistic Regression (t=0,42)", "0,9607 +/- 0,0021", "0,8977 +/- 0,0055", "0,8083 +/- 0,0106", "0,8017 +/- 0,0082"),
+            ("5-Fold CV: Random Forest (t=0,40)", "0,9548 +/- 0,0025", "0,8784 +/- 0,0059", "0,7773 +/- 0,0105", "0,7857 +/- 0,0074"),
+            ("5-Fold CV: Gradient Boosting (t=0,41)", "0,9951 +/- 0,0005", "0,9855 +/- 0,0016", "0,9318 +/- 0,0079", "0,9317 +/- 0,0044"),
+            ("Bootstrap 95% CI (GB Improved, Test)", "0,9936 - 0,9957", "-", "0,9139 - 0,9403", "0,9187 - 0,9382")
         ],
         [1.95, 0.92, 0.90, 0.87, 0.87],
         bold_last_row=False
@@ -1189,7 +1189,7 @@ def create_laporan():
     add_body_p("3. Logistic Regression sebagai Model Optimal: Logistic Regression dengan ambang probabilitas disetel (tau = 0,053) menjadi model terbaik dengan capaian Recall 81,58% (SK 95%: 68,7% sampai 92,6%) dan ROC-AUC 0,840 pada data uji independen. Model ini berhasil mendeteksi 31 dari 38 pasien stroke aktual dengan efisiensi waktu komputasi 0,18 detik, mengungguli model ensemble yang lebih rumit.", indent=False)
     add_body_p("4. Transparansi Keputusan Selaras Medis: Analisis Explainable AI (SHAP) dan Feature Importance memverifikasi bahwa faktor prediktor utama yang dipelajari model adalah usia, kadar glukosa rata-rata, riwayat hipertensi, penyakit jantung, merokok, serta biomarker klinis seperti tekanan darah sistolik/diastolik, HbA1c, riwayat TIA, LDL, dan fibrilasi atrium.", indent=False)
     add_body_p("5. Portabilitas Tinggi pada Validasi Eksternal: Model menunjukkan ketangguhan lintas populasi dengan membukukan ROC-AUC 0,802 pada 253.680 responden survei independen CDC BRFSS 2015. Hal ini membuktikan bahwa enam parameter klinis non-invasif sudah memadai untuk penapisan awal tanpa kewajiban tes darah laboratorium.", indent=False)
-    add_body_p("6. Optimalisasi Dataset dan Lonjakan ROC-AUC ke 0,9859 pada Korpus Penuh: Penyeimbangan dataset 3.000 pasien asli menaikkan ROC-AUC fitur dasar ke 0,875, sedangkan pengayaan 35 biomarker klinis pada 3.000 sampel (Notebook 14) mencapai ROC-AUC 0,962. Lebih lanjut, pada evaluasi korpus penuh tanpa pemotongan sampel (37.940 pasien bersih setelah eliminasi 12.060 baris kosong dan verifikasi 0 duplikasi, Notebook 15) dengan perlakuan preprocessing spesifik tiap model serta improvement hyperparameter dan threshold tuning, Gradient Boosting meraih kinerja puncak ROC-AUC 0,9859, PR-AUC 0,9623, Akurasi 94,43%, Recall 88,03%, Presisi 88,87%, dan F1-Score 0,8845 yang tervalidasi stabil oleh 5-Fold Stratified CV dan Bootstrap 95% CI.", indent=False)
+    add_body_p("6. Optimalisasi Dataset dan Lonjakan ROC-AUC ke 0,9947 pada Korpus Penuh: Penyeimbangan dataset 3.000 pasien asli menaikkan ROC-AUC fitur dasar ke 0,875, sedangkan pengayaan 35 biomarker klinis pada 3.000 sampel (Notebook 14) mencapai ROC-AUC 0,962. Lebih lanjut, pada evaluasi korpus penuh tanpa pemotongan sampel (37.940 pasien bersih setelah eliminasi 12.060 baris kosong dan verifikasi 0 duplikasi, Notebook 15) dengan perlakuan preprocessing spesifik tiap model serta improvement hyperparameter dan threshold tuning, Gradient Boosting meraih kinerja puncak ROC-AUC 0,9947, PR-AUC 0,9850, Akurasi 96,57%, Recall 92,75%, Presisi 93,09%, dan F1-Score 0,9292 yang tervalidasi stabil oleh 5-Fold Stratified CV (F1 0,9317 +/- 0,0044) dan Bootstrap 95% CI.", indent=False)
 
     add_heading_subbab("5.2 Saran Pengembangan")
     add_body_p("Guna menyempurnakan implementasi sistem pada penelitian lanjutan, disarankan langkah-langkah berikut:")
