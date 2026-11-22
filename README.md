@@ -47,6 +47,7 @@ CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis n
 | `12_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
 | `13_uji_kombinasi_atribut` | Uji kombinasi atribut terhadap confidence level (precision dan average precision), cari atribut paling berpengaruh | - | tambahan |
 | `14_optimalisasi_dataset_biomarker_klinis` | Optimalisasi dataset biomarker klinis lengkap, penanganan severe imbalance, Soft Voting Ensemble, dan pencapaian ROC-AUC 0,962 | - | tambahan |
+| `15_presentasi_uas_full_dataset` | Presentasi UAS Colab: korpus penuh 37.940 baris (`dropna` & `drop_duplicates`), preprocessing spesifik 3 model, Baseline vs Improvement + CM, validasi berlapis (ROC-AUC 0,9859) | UAS | tambahan |
 
 Notebook `03a`, `03b`, dan `04` adalah jalur belajar: algoritma dibedah dulu secara manual,
 baru kemudian dipakai lewat library. Nomor `01` sampai `14` mengikuti alur belajar dan alur

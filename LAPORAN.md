@@ -611,6 +611,37 @@ Pada test set independen (450 pasien, 109 positif), Ensemble Soft Voting mencapa
 `Blood_Pressure_Systolic` (0,1639), `Age` (0,1406), `Blood_Glucose` (0,1146),
 `Previous_TIA_Yes` (0,0767), dan `LDL` (0,0594).
 
+### 4.9 Evaluasi Penuh Korpus Biomarker Klinis (37.940 Pasien Bersih) — Notebook 15
+
+Menindaklanjuti masukan evaluasi UAS untuk memproses seluruh baris dataset biomarker klinis
+tanpa pemotongan sampel, `notebooks/15_presentasi_uas_full_dataset.ipynb` mengaudit seluruh
+50.000 baris mentah: ditemukan 12.060 baris mengandung *missing values* (13.522 sel kosong di
+13 kolom) dan 0 baris duplikasi. Penghapusan baris kosong (`dropna`) dan verifikasi bebas
+duplikasi (`drop_duplicates`) menghasilkan **37.940 pasien bersih** dengan 35 fitur bebas
+*target leakage* (prevalensi High Risk 24,23%; 9.193 positif vs 28.747 non-high).
+
+Ketiga model utama diberi perlakuan *preprocessing* berbeda sesuai sifatnya
+(`Logistic Regression`: `StandardScaler` + `OneHotEncoder(drop='first')`;
+`Random Forest`: skala asli + `OrdinalEncoder`; `Gradient Boosting`: skala asli +
+`OneHotEncoder`), serta dibandingkan tahap **Baseline** (`t = 0,50`) melawan **Improvement**
+(*hyperparameter tuning*, `class_weight='balanced_subsample'` pada RF, *threshold tuning* pada
+Validation Set, dan *Ensemble Soft Voting*):
+
+| Model | Tahap | Threshold | ROC-AUC | PR-AUC | Akurasi | Recall | Presisi | F1-Score | FN |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | Baseline | 0,50 | 0,9571 | 0,8916 | 89,95% | 76,07% | 81,25% | 0,7858 | 330 |
+| Logistic Regression | Improved | 0,42 | 0,9571 | 0,8916 | 90,02% | 81,15% | 78,42% | 0,7976 | 260 |
+| Random Forest | Baseline | 0,50 | 0,9503 | 0,8663 | 87,61% | 54,17% | 91,10% | 0,6794 | 632 |
+| Random Forest | Improved | 0,44 | 0,9524 | 0,8768 | 89,07% | 83,10% | 74,66% | 0,7865 | 233 |
+| Gradient Boosting | Baseline | 0,50 | 0,9795 | 0,9456 | 91,14% | 65,63% | 96,79% | 0,7822 | 474 |
+| **Gradient Boosting** | **Improved** | **0,38** | **0,9859** | **0,9623** | **94,43%** | **88,03%** | **88,87%** | **0,8845** | **165** |
+| Ensemble Soft Voting | Improved | 0,43 | 0,9805 | 0,9484 | 93,38% | 85,21% | 87,17% | 0,8618 | 204 |
+
+Validasi berlapis pada *Gradient Boosting Improved* memastikan ketangguhan model: *5-Fold
+Stratified CV* meraih **ROC-AUC 0,9872 +/- 0,0007** dan **PR-AUC 0,9640 +/- 0,0024**, serta
+*Bootstrap 95% CI* pada Test Set berada pada rentang sempit `0,9835 - 0,9880` untuk ROC-AUC
+dan `0,8712 - 0,8960` untuk F1-Score, tanpa gejala *overfitting* pada *Learning Curve*.
+
 ---
 
 # BAB V PENUTUP
@@ -736,6 +767,7 @@ terlihat, bukan menyembunyikannya di dalam kode.
 | `12_pemeriksaan_ulang` | Kesimpulan diuji dengan alat lebih ketat | G | tambahan |
 | `13_uji_kombinasi_atribut` | Uji kombinasi atribut terhadap confidence level (precision dan average precision) | - | tambahan |
 | `14_optimalisasi_dataset_biomarker_klinis` | Optimalisasi dataset biomarker klinis lengkap, penanganan severe imbalance, Soft Voting Ensemble, dan pencapaian ROC-AUC 0,962 | - | tambahan |
+| `15_presentasi_uas_full_dataset` | Presentasi UAS Colab: korpus penuh 37.940 baris (`dropna` & `drop_duplicates`), preprocessing spesifik 3 model, Baseline vs Improvement + CM, validasi berlapis (ROC-AUC 0,9859) | UAS | tambahan |
 
 Seluruh Bab 2 sampai 9 buku acuan terpakai, ditambah Explainable AI dan validasi
 eksternal sebagai materi di luar buku.

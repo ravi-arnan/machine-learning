@@ -398,6 +398,26 @@ Pada evaluasi **Test Set Independen (450 pasien, 109 kasus positif)**, Ensemble 
 
 Analisis *Feature Importance* mengonfirmasi bahwa sepuluh biomarker utama pendorong prediksi seluruhnya valid secara klinis: `Blood_Pressure_Systolic` (0,1639), `Age` (0,1406), `Blood_Glucose` (0,1146), `Previous_TIA_Yes` (0,0767), `LDL` (0,0594), `Total_Cholesterol` (0,0579), `HbA1c` (0,0502), `Blood_Pressure_Diastolic` (0,0485), `Hypertension_Yes` (0,0385), dan `Atrial_Fibrillation_Yes` (0,0317). Temuan ini membuktikan bahwa pengayaan fitur biomarker laboratorium mampu mendongkrak ROC-AUC dari 0,840 (dataset awal) menjadi 0,875 (dataset 3k seimbang) hingga **0,962** (dataset biomarker klinis).
 
+## 4.9 Evaluasi Penuh Korpus Biomarker Klinis (37.940 Pasien Bersih) dan Validasi Berlapis UAS
+
+Menindaklanjuti masukan evaluasi untuk menggunakan keseluruhan baris dataset biomarker klinis tanpa pemotongan sampel (*subsampling*), Notebook `15_presentasi_uas_full_dataset.ipynb` melakukan audit kualitas menyeluruh terhadap seluruh 50.000 baris dan 40 kolom. Ditemukan 13.522 sel kosong pada 13 kolom yang memengaruhi 12.060 baris (24,12%) serta 0 baris duplikasi (baik duplikat penuh, `Patient_ID`, maupun kombinasi fitur tanpa ID). Setelah menghapus baris kosong (`dropna`) dan memastikan bebas duplikasi (`drop_duplicates`), diperoleh **37.940 pasien bersih** dengan 35 fitur prediktor bebas *target leakage* dan prevalensi risiko tinggi 24,23% (9.193 positif berbanding 28.747 non-high risk).
+
+Data dibagi secara *stratified* menjadi 70% latih (26.558), 15% validasi (5.691), dan 15% uji independen (5.691). Tiga algoritma dilatih dengan perlakuan *preprocessing* berbeda sesuai sifat matematisnya: **Logistic Regression** (`StandardScaler` + `OneHotEncoder(drop='first')`), **Random Forest** (skala numerik asli `passthrough` + `OrdinalEncoder`), dan **Gradient Boosting** (skala numerik asli `passthrough` + `OneHotEncoder` penuh), serta digabungkan ke dalam **Ensemble Soft Voting**.
+
+**Tabel 4.9 Perbandingan Model Baseline vs Improvement pada Test Set Korpus Penuh (5.691 Pasien)**
+
+| Model | Tahap | Threshold | ROC-AUC | PR-AUC | Akurasi | Recall | Presisi | F1-Score | FN |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | Baseline | 0,50 | 0,9571 | 0,8916 | 89,95% | 76,07% | 81,25% | 0,7858 | 330 |
+| Logistic Regression | Improved | 0,42 | 0,9571 | 0,8916 | 90,02% | 81,15% | 78,42% | 0,7976 | 260 |
+| Random Forest | Baseline | 0,50 | 0,9503 | 0,8663 | 87,61% | 54,17% | 91,10% | 0,6794 | 632 |
+| Random Forest | Improved | 0,44 | 0,9524 | 0,8768 | 89,07% | 83,10% | 74,66% | 0,7865 | 233 |
+| Gradient Boosting | Baseline | 0,50 | 0,9795 | 0,9456 | 91,14% | 65,63% | 96,79% | 0,7822 | 474 |
+| **Gradient Boosting** | **Improved** | **0,38** | **0,9859** | **0,9623** | **94,43%** | **88,03%** | **88,87%** | **0,8845** | **165** |
+| Ensemble Soft Voting | Improved | 0,43 | 0,9805 | 0,9484 | 93,38% | 85,21% | 87,17% | 0,8618 | 204 |
+
+Seluruh model menunjukkan penurunan signifikan jumlah kasus berisiko tinggi yang terlewat (*False Negative*) setelah *hyperparameter tuning* dan *threshold tuning*: Logistic Regression turun dari 330 menjadi 260 kasus, Random Forest turun dari 632 menjadi 233 kasus, dan Gradient Boosting turun dari 474 menjadi 165 kasus. **Gradient Boosting Improved** (`n_estimators=200`, `learning_rate=0,05`, `max_depth=4`, `subsample=0,8`, `t = 0,38`) meraih capaian tertinggi dengan **ROC-AUC 0,9859**, **PR-AUC 0,9623**, **Akurasi 94,43%**, dan **F1-Score 0,8845**. Validasi berlapis menggunakan *5-Fold Stratified Cross-Validation* (`ROC-AUC 0,9872 +/- 0,0007`), *Bootstrap 95% Confidence Interval* (`0,9835 - 0,9880`), *Learning Curve*, dan pemeringkatan *Feature Importance* (`Age` 14,8%, `Blood_Pressure_Systolic` 13,3%, `Blood_Glucose` 9,0%, `HbA1c` 6,5%, `Blood_Pressure_Diastolic` 4,8%, `Total_Cholesterol` 4,5%, `LDL` 4,3%, `Previous_TIA_Yes` 3,9%) memastikan stabilitas generalisasi serta validitas klinis penuh.
+
 ---
 
 # BAB V KESIMPULAN DAN SARAN
@@ -411,7 +431,7 @@ Berdasarkan perancangan, eksperimen, dan evaluasi komprehensif yang telah dilaku
 3. **Logistic Regression sebagai Model Optimal**: Logistic Regression dengan ambang disetel ($\tau = 0,053$) memberikan performa terbaik dengan Recall 81,58% (SK 95%: 68,7% sampai 92,6%) dan ROC-AUC 0,840 pada unseen test set, mengungguli model-model ensemble yang lebih rumit.
 4. **Keputusan Model Terbukti Transparan dan Selaras Medis**: Metode Explainable AI (SHAP) dan analisis *Feature Importance* memverifikasi bahwa faktor prediktor utama yang dipelajari model adalah usia, glukosa darah, riwayat hipertensi, penyakit jantung, merokok, serta biomarker klinis kunci seperti tekanan darah sistolik/diastolik, HbA1c, riwayat TIA, LDL, dan fibrilasi atrium.
 5. **Generalisasi Unggul pada Validasi Eksternal**: Model membuktikan ketangguhan lintas populasi dengan capaian ROC-AUC 0,802 pada 253.680 data responden survei CDC BRFSS, menegaskan kelayakan sistem skrining berbasis 6 parameter non-invasif.
-6. **Optimalisasi Dataset dan Lonjakan ROC-AUC ke 0,962**: Penyeimbangan dataset berbasis 3.000 pasien asli (`stroke_bersih_3k.csv`, prevalensi 26,10%) dengan Ensemble Soft Voting dan ambang Youden J (`t = 0,34`) meningkatkan ROC-AUC menjadi **0,875** (Recall 87,2%, F1-Score 0,713). Lebih lanjut, pengayaan fitur dengan 35 biomarker klinis riil bebas *target leakage* (`stroke_clinical_clean_3k.csv`) mendongkrak performa Ensemble Soft Voting secara drastis hingga mencapai **ROC-AUC 0,962** dan **PR-AUC 0,902** pada test set independen, dengan F1-Score **0,790** (`t = 0,40`) dan Recall **85,3%** (`t = 0,30`).
+6. **Optimalisasi Dataset dan Lonjakan ROC-AUC ke 0,9859 pada Korpus Penuh**: Penyeimbangan dataset berbasis 3.000 pasien asli (`stroke_bersih_3k.csv`, prevalensi 26,10%) meningkatkan ROC-AUC menjadi **0,875**, sementara pengayaan 35 biomarker klinis pada 3.000 sampel (Notebook 14) meraih **ROC-AUC 0,962**. Selanjutnya, pada evaluasi korpus penuh tanpa pemotongan sampel (**37.940 pasien bersih** setelah menghapus 12.060 baris kosong dan verifikasi 0 duplikasi, Notebook 15) dengan perlakuan preprocessing spesifik tiap model serta *hyperparameter* dan *threshold tuning*, **Gradient Boosting Improved** meraih performa puncak **ROC-AUC 0,9859**, **PR-AUC 0,9623**, **Akurasi 94,43%**, **Recall 88,03%**, **Presisi 88,87%**, dan **F1-Score 0,8845** yang tervalidasi oleh 5-Fold Stratified CV dan Bootstrap 95% CI.
 
 ## 5.2 Saran Pengembangan
 
@@ -458,3 +478,4 @@ Keterpaduan modul kode pada direktori `notebooks/` disajikan pada tabel pemetaan
 | `12` | `12_pemeriksaan_ulang.ipynb` | Uji statistik Nadeau-Bengio, Learning Curve, dan Net Benefit Analysis | Tugas G |
 | `13` | `13_uji_kombinasi_atribut.ipynb` | Eksplorasi 8 kombinasi atribut terhadap confidence level | - |
 | `14` | `14_optimalisasi_dataset_biomarker_klinis.ipynb` | Optimalisasi dataset biomarker klinis lengkap, penanganan severe imbalance, Soft Voting Ensemble, dan pencapaian ROC-AUC 0,962 | - |
+| `15` | `15_presentasi_uas_full_dataset.ipynb` | Presentasi UAS Colab: korpus penuh 37.940 baris (`dropna` & `drop_duplicates`), preprocessing spesifik 3 model, Baseline vs Improvement + CM, validasi berlapis (ROC-AUC 0,9859) | UAS |

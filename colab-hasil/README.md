@@ -26,6 +26,8 @@ Folder ini berisi hasil menjalankan seluruh notebook proyek di VM Google Colab,
 | `11_eksperimen_hasil.ipynb` | `notebooks/11_eksperimen.ipynb` |
 | `12_pemeriksaan_ulang_hasil.ipynb` | `notebooks/12_pemeriksaan_ulang.ipynb` |
 | `13_uji_kombinasi_atribut_hasil.ipynb` | `notebooks/13_uji_kombinasi_atribut.ipynb` |
+| `14_optimalisasi_dataset_biomarker_klinis_hasil.ipynb` | `notebooks/14_optimalisasi_dataset_biomarker_klinis.ipynb` |
+| `15_presentasi_uas_full_dataset_hasil.ipynb` | `notebooks/15_presentasi_uas_full_dataset.ipynb` |
 | `pertemuan3_pengkodisian_perulangan_hasil.ipynb` | `notebooks/pertemuan3_pengkodisian_perulangan.ipynb` |
 
 Catatan: notebook di `../notebooks/` sengaja disimpan **tanpa output** agar diff git-nya

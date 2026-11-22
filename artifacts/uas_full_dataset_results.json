@@ -1,0 +1,245 @@
+{
+  "dataset_raw_rows": 50000,
+  "dataset_raw_cols": 40,
+  "rows_with_missing": 12060,
+  "missing_cells_total": 13522,
+  "duplicates_exact": 0,
+  "duplicates_without_id": 0,
+  "dataset_clean_rows": 37940,
+  "num_features_valid": 35,
+  "num_numeric_features": 16,
+  "num_categorical_features": 19,
+  "target_high_count": 9193,
+  "target_non_high_count": 28747,
+  "target_prevalence_pct": 24.23,
+  "split": {
+    "train": 26558,
+    "val": 5691,
+    "test": 5691
+  },
+  "best_lr_c": 0.5,
+  "optimal_thresholds": {
+    "Logistic Regression": 0.42,
+    "Random Forest": 0.44,
+    "Gradient Boosting": 0.38,
+    "Ensemble Soft Voting": 0.43
+  },
+  "baseline_test": [
+    {
+      "Threshold": 0.5,
+      "ROC_AUC": 0.9570976521665426,
+      "PR_AUC": 0.8915590762488386,
+      "Akurasi": 0.8994904234756633,
+      "Recall": 0.7606961566352429,
+      "Presisi": 0.8125484120836561,
+      "Spesifisitas": 0.9438775510204082,
+      "F1_Score": 0.7857677902621722,
+      "TP": 1049,
+      "FP": 242,
+      "FN": 330,
+      "TN": 4070,
+      "Model": "Logistic Regression",
+      "Stage": "Baseline",
+      "Train_Time_s": 0.86
+    },
+    {
+      "Threshold": 0.5,
+      "ROC_AUC": 0.9502710785019394,
+      "PR_AUC": 0.8663073377290392,
+      "Akurasi": 0.8761201897733263,
+      "Recall": 0.5416968817984047,
+      "Presisi": 0.9109756097560976,
+      "Spesifisitas": 0.9830705009276438,
+      "F1_Score": 0.679399727148704,
+      "TP": 747,
+      "FP": 73,
+      "FN": 632,
+      "TN": 4239,
+      "Model": "Random Forest",
+      "Stage": "Baseline",
+      "Train_Time_s": 1.29
+    },
+    {
+      "Threshold": 0.5,
+      "ROC_AUC": 0.9794810105464825,
+      "PR_AUC": 0.9456335565219308,
+      "Akurasi": 0.9114391143911439,
+      "Recall": 0.6562726613488035,
+      "Presisi": 0.9679144385026738,
+      "Spesifisitas": 0.9930426716141002,
+      "F1_Score": 0.7821953327571305,
+      "TP": 905,
+      "FP": 30,
+      "FN": 474,
+      "TN": 4282,
+      "Model": "Gradient Boosting",
+      "Stage": "Baseline",
+      "Train_Time_s": 17.72
+    }
+  ],
+  "improved_test": [
+    {
+      "Threshold": 0.42,
+      "ROC_AUC": 0.9571131241078407,
+      "PR_AUC": 0.8915935222353943,
+      "Akurasi": 0.9001932876471622,
+      "Recall": 0.8114575779550399,
+      "Presisi": 0.7841625788367204,
+      "Spesifisitas": 0.9285714285714286,
+      "F1_Score": 0.797576621525303,
+      "TP": 1119,
+      "FP": 308,
+      "FN": 260,
+      "TN": 4004,
+      "Model": "Logistic Regression",
+      "Stage": "Improved",
+      "Train_Time_s": 0.89
+    },
+    {
+      "Threshold": 0.44,
+      "ROC_AUC": 0.9524229396419389,
+      "PR_AUC": 0.8768037081316866,
+      "Akurasi": 0.8907046213319276,
+      "Recall": 0.8310369833212473,
+      "Presisi": 0.7465798045602606,
+      "Spesifisitas": 0.9097866419294991,
+      "F1_Score": 0.7865477007549759,
+      "TP": 1146,
+      "FP": 389,
+      "FN": 233,
+      "TN": 3923,
+      "Model": "Random Forest",
+      "Stage": "Improved",
+      "Train_Time_s": 2.44
+    },
+    {
+      "Threshold": 0.38,
+      "ROC_AUC": 0.9858630181586776,
+      "PR_AUC": 0.962269040879635,
+      "Akurasi": 0.9442980144087155,
+      "Recall": 0.8803480783176215,
+      "Presisi": 0.8887262079062958,
+      "Spesifisitas": 0.9647495361781077,
+      "F1_Score": 0.8845173041894353,
+      "TP": 1214,
+      "FP": 152,
+      "FN": 165,
+      "TN": 4160,
+      "Model": "Gradient Boosting",
+      "Stage": "Improved",
+      "Train_Time_s": 35.4
+    },
+    {
+      "Threshold": 0.43,
+      "ROC_AUC": 0.9804575927542882,
+      "PR_AUC": 0.9484063879162841,
+      "Akurasi": 0.9337550518362326,
+      "Recall": 0.8520667150108775,
+      "Presisi": 0.8716617210682492,
+      "Spesifisitas": 0.9598794063079777,
+      "F1_Score": 0.8617528419508618,
+      "TP": 1175,
+      "FP": 173,
+      "FN": 204,
+      "TN": 4139,
+      "Model": "Ensemble Soft Voting",
+      "Stage": "Improved",
+      "Train_Time_s": 38.95
+    }
+  ],
+  "cv5_summary": [
+    {
+      "Model": "Logistic Regression",
+      "ROC_AUC": "0.9607 +/- 0.0021",
+      "PR_AUC": "0.8977 +/- 0.0055",
+      "Akurasi": "0.9051 +/- 0.0028",
+      "Recall_t0.50": "0.7632 +/- 0.0103",
+      "F1_t0.50": "0.7957 +/- 0.0068"
+    },
+    {
+      "Model": "Random Forest",
+      "ROC_AUC": "0.9515 +/- 0.0030",
+      "PR_AUC": "0.8699 +/- 0.0084",
+      "Akurasi": "0.8922 +/- 0.0048",
+      "Recall_t0.50": "0.7041 +/- 0.0169",
+      "F1_t0.50": "0.7599 +/- 0.0125"
+    },
+    {
+      "Model": "Gradient Boosting",
+      "ROC_AUC": "0.9872 +/- 0.0007",
+      "PR_AUC": "0.9640 +/- 0.0024",
+      "Akurasi": "0.9275 +/- 0.0045",
+      "Recall_t0.50": "0.7232 +/- 0.0160",
+      "F1_t0.50": "0.8286 +/- 0.0119"
+    }
+  ],
+  "bootstrap_best_model": "Gradient Boosting",
+  "bootstrap_ci": [
+    {
+      "Metrik": "ROC-AUC",
+      "Titik_Estimasi": 0.9859,
+      "CI_95_Bawah": 0.9835,
+      "CI_95_Atas": 0.988
+    },
+    {
+      "Metrik": "Recall",
+      "Titik_Estimasi": 0.8803,
+      "CI_95_Bawah": 0.8624,
+      "CI_95_Atas": 0.8976
+    },
+    {
+      "Metrik": "Presisi",
+      "Titik_Estimasi": 0.8887,
+      "CI_95_Bawah": 0.8718,
+      "CI_95_Atas": 0.9051
+    },
+    {
+      "Metrik": "F1-Score",
+      "Titik_Estimasi": 0.8845,
+      "CI_95_Bawah": 0.8712,
+      "CI_95_Atas": 0.896
+    }
+  ],
+  "top10_features": [
+    {
+      "Fitur": "Age",
+      "Importance": 0.1481
+    },
+    {
+      "Fitur": "Blood_Pressure_Systolic",
+      "Importance": 0.133
+    },
+    {
+      "Fitur": "Blood_Glucose",
+      "Importance": 0.09
+    },
+    {
+      "Fitur": "HbA1c",
+      "Importance": 0.0646
+    },
+    {
+      "Fitur": "Blood_Pressure_Diastolic",
+      "Importance": 0.0484
+    },
+    {
+      "Fitur": "Total_Cholesterol",
+      "Importance": 0.0453
+    },
+    {
+      "Fitur": "LDL",
+      "Importance": 0.0429
+    },
+    {
+      "Fitur": "Previous_TIA_Yes",
+      "Importance": 0.0386
+    },
+    {
+      "Fitur": "Alcohol_Consumption_Frequently",
+      "Importance": 0.0302
+    },
+    {
+      "Fitur": "Medication_Adherence_Poor",
+      "Importance": 0.0297
+    }
+  ]
+}
