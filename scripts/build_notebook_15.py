@@ -4,10 +4,10 @@ notebooks/15_presentasi_uas_full_dataset.ipynb
 Alur Metodologis Runtut (End-to-End Colab Pipeline):
 1. Pemuatan seluruh dataset terbaru (50.000 baris, 40 kolom) langsung dari GitHub / lokal.
 2. Audit kualitas data (missing values & duplikasi) -> dropna() & drop_duplicates() -> 37.940 baris bersih + eliminasi 4 kolom target leakage.
-3. EDA klinis terarah (boxplot, proporsi riwayat klinis, matriks korelasi).
+3. EDA klinis terarah (matriks korelasi fitur numerik terkuat terhadap target).
 4. Stratified Split 70/15/15 (Train 26.558 / Val 5.691 / Test 5.691).
-5. Feature Importance (agregat 35 fitur asli pada Data Latih) & Seleksi Fitur (>= 0,5% -> 26 fitur terpilih; 9 fitur rendah dibuang).
-6. Preprocessing berbeda per model pada dataset 26 fitur terpilih (LR: StandardScaler + OHE drop='first' -> 27 kol; RF: Passthrough + Ordinal -> 26 kol; GB: Passthrough + OHE -> 42 kol).
+5. Feature Importance (agregat 35 fitur asli pada Data Latih) & Seleksi Fitur (>= 0,5% -> 26 fitur terpilih; 9 fitur rendah dibuang) + inspeksi keadaan dataset hasil seleksi.
+6. Preprocessing berbeda per model pada dataset 26 fitur terpilih (LR: StandardScaler + OHE drop='first' -> 33 kol; RF: Passthrough + Ordinal -> 26 kol; GB: Passthrough + OHE -> 48 kol).
 7. Evaluasi Baseline (default, t=0.50) + Confusion Matrix Baseline.
 8. Evaluasi Improvement (Tuning + Threshold Tuning + Ensemble Soft Voting) + Confusion Matrix After Improvement + Grafik Lonjakan Recall/F1 & FN + Kurva ROC & PR.
 9. Validasi Berlapis: 5-Fold Stratified CV (Out-of-Fold pada ambang optimal), Bootstrap 95% CI, Learning Curve.
@@ -57,13 +57,13 @@ def build_notebook():
 Notebook ini dirancang sebagai **kode presentasi utama UAS** yang berjalan runtut dari awal hingga akhir di Google Colab:
 1. **Pemuatan & Audit Data Mentah (50.000 baris, 40 kolom)**: Mengecek tipe data, statistik deskriptif, *missing values*, dan duplikasi.
 2. **Pembersihan Data & Eliminasi *Target Leakage***: Menghapus baris kosong (`dropna`) dan duplikasi (`drop_duplicates`) sehingga tersisa **37.940 pasien bersih**, serta membuang 4 kolom pasca-diagnosis.
-3. **EDA Terarah**: Menganalisis profil biomarker utama dan matriks korelasi terhadap target risiko stroke.
+3. **EDA Terarah**: Menganalisis matriks korelasi fitur biomarker numerik terkuat terhadap target risiko stroke.
 4. **Pembagian Data Stratified (70% Latih / 15% Validasi / 15% Uji)**: Memastikan proporsi kelas konsisten dan menjaga data validasi/uji tetap terisolasi.
-5. **Analisis *Feature Importance* & Seleksi Fitur (Sebelum Pemodelan)**: Mengukur kontribusi seluruh 35 fitur asli pada Data Latih (bebas kebocoran) dan menyaring **26 fitur berkontribusi tinggi (>= 0,5%)** sebagai dataset masukan model.
+5. **Analisis *Feature Importance*, Seleksi Fitur & Inspeksi Keadaan Dataset (Sebelum Pemodelan)**: Mengukur kontribusi seluruh 35 fitur asli pada Data Latih (bebas kebocoran), menyaring **26 fitur berkontribusi tinggi (>= 0,5%)**, serta memverifikasi bentuk dan daftar fitur dataset hasil seleksi.
 6. **Preprocessing Berbeda Tiap Model pada Fitur Terpilih**:
-   - **Logistic Regression**: `StandardScaler` + `OneHotEncoder(drop='first')` (`27` kolom)
+   - **Logistic Regression**: `StandardScaler` + `OneHotEncoder(drop='first')` (`33` kolom)
    - **Random Forest**: Skala asli (`passthrough`) + `OrdinalEncoder` (`26` kolom)
-   - **Gradient Boosting**: Skala asli (`passthrough`) + `OneHotEncoder` penuh (`42` kolom)
+   - **Gradient Boosting**: Skala asli (`passthrough`) + `OneHotEncoder` penuh (`48` kolom)
 7. **Baseline vs Improvement + Confusion Matrix Setiap Model**: Membandingkan performa parameter bawaan (`t = 0,50`) melawan model teroptimasi (*hyperparameter tuning*, pembobotan kelas RF, *threshold tuning* pada Validation Set, plus *Ensemble Soft Voting*), lengkap dengan Confusion Matrix masing-masing serta kurva ROC & PR.
 8. **Validasi Berlapis**: 5-Fold Stratified Cross-Validation (pada ambang optimal), Bootstrap 95% Confidence Interval, dan Learning Curve."""
         )
@@ -312,56 +312,15 @@ display(X.head(5))"""
     # 5. EDA Terarah
     cells.append(
         nbf.v4.new_markdown_cell(
-            """## 4. Eksplorasi Data Klinis Terarah (EDA Singkat Sebelum Pemodelan)
+            """## 4. Eksplorasi Data Klinis Terarah (Matriks Korelasi Fitur Numerik)
 
-Meninjau perbedaan pola biomarker klinis utama (Tekanan Darah Sistolik, Usia, riwayat TIA/Fibrilasi Atrium, dan korelasi numerik) antara pasien `High Risk` dan `Non-High Risk`."""
+Meninjau korelasi fitur biomarker numerik paling kuat terhadap target risiko stroke (`stroke_risk_high`) sebelum pembagian data."""
         )
     )
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.2))
-
-plot_df = X[["Age", "Blood_Pressure_Systolic", "Blood_Glucose", "Previous_TIA", "Atrial_Fibrillation"]].copy()
-plot_df["Risk_Label"] = np.where(y == 1, "High Risk (1)", "Non-High (0)")
-
-sns.boxplot(data=plot_df, x="Risk_Label", y="Blood_Pressure_Systolic", order=["Non-High (0)", "High Risk (1)"], palette=["#4c72b0", "#c44e52"], ax=axes[0])
-axes[0].set_title("TD Sistolik vs Risiko Stroke", fontweight="bold")
-axes[0].set_xlabel("")
-axes[0].set_ylabel("TD Sistolik (mmHg)")
-
-sns.boxplot(data=plot_df, x="Risk_Label", y="Age", order=["Non-High (0)", "High Risk (1)"], palette=["#4c72b0", "#c44e52"], ax=axes[1])
-axes[1].set_title("Usia Pasien vs Risiko Stroke", fontweight="bold")
-axes[1].set_xlabel("")
-axes[1].set_ylabel("Usia (Tahun)")
-
-risk_rates = pd.DataFrame({
-    "Faktor Klinis": ["Previous TIA = No", "Previous TIA = Yes", "Atrial Fib. = No", "Atrial Fib. = Yes"],
-    "Proporsi High Risk (%)": [
-        y[X["Previous_TIA"] == "No"].mean() * 100,
-        y[X["Previous_TIA"] == "Yes"].mean() * 100,
-        y[X["Atrial_Fibrillation"] == "No"].mean() * 100,
-        y[X["Atrial_Fibrillation"] == "Yes"].mean() * 100,
-    ],
-})
-colors_bar = ["#4c72b0", "#c44e52", "#4c72b0", "#c44e52"]
-bars = axes[2].barh(risk_rates["Faktor Klinis"], risk_rates["Proporsi High Risk (%)"], color=colors_bar)
-axes[2].set_title("Proporsi High Risk (Riwayat Klinis)", fontweight="bold")
-axes[2].set_xlabel("Persentase High Risk (%)")
-axes[2].set_xlim(0, 100)
-for b in bars:
-    w = b.get_width()
-    axes[2].text(w + 1.5, b.get_y() + b.get_height()/2, f"{w:.1f}%", va="center", fontsize=9)
-
-plt.tight_layout()
-plt.savefig(ASSET_DIR / "fig_02_eda_klinis.png", dpi=150, bbox_inches="tight")
-plt.show()"""
-        )
-    )
-
-    cells.append(
-        nbf.v4.new_code_cell(
-            r"""# Visualisasi EDA 2 (Terpisah): Matriks Korelasi Fitur Numerik Kunci vs Target
+            r"""# Visualisasi EDA: Matriks Korelasi Fitur Numerik Kunci vs Target
 corr_df = X[num_cols_all].copy()
 corr_df["stroke_risk_high"] = y
 corr_target = corr_df.corr(numeric_only=True)["stroke_risk_high"].drop("stroke_risk_high").sort_values()
@@ -481,10 +440,78 @@ X_test = X_test_all[selected_feats].copy()
 num_cols = [c for c in selected_feats if c in num_cols_all]
 cat_cols = [c for c in selected_feats if c in cat_cols_all]
 
-print(f"=== HASIL SELEKSI FITUR ===")
-print(f"Fitur dipilih (>= 0,5%) : {len(selected_feats)} fitur ({len(num_cols)} numerik, {len(cat_cols)} kategorikal)")
-print(f"Fitur dibuang (< 0,5%)  : {len(dropped_feats)} fitur -> {dropped_feats}")
-display(df_fs_imp)"""
+df_fs_imp["Tipe"] = np.where(df_fs_imp["Fitur"].isin(num_cols_all), "Numerik", "Kategorikal")
+df_fs_imp["Kontribusi (%)"] = (df_fs_imp["Importance"] * 100).round(2)
+df_fs_imp["Status"] = np.where(df_fs_imp["Importance"] >= 0.005, "Dipilih (>= 0,5%)", "Dibuang (< 0,5%)")
+
+print("=== TABEL KONTRIBUSI 35 FITUR KANDIDAT ===")
+display(df_fs_imp[["Fitur", "Tipe", "Kontribusi (%)", "Status"]])"""
+        )
+    )
+
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Inspeksi & Visualisasi Keadaan Dataset Setelah Seleksi Fitur
+dataset_state_df = pd.DataFrame([
+    {"Tahap Dataset": "1. Data Mentah Awal", "Total Baris": len(df_raw), "Jumlah Fitur/Kolom": f"{df_raw.shape[1]} kolom", "Rincian": "40 kolom asli (masih ada NA & 4 leakage)"},
+    {"Tahap Dataset": "2. Data Bersih (Sebelum Seleksi)", "Total Baris": len(X), "Jumlah Fitur/Kolom": f"{X.shape[1]} fitur + 1 target", "Rincian": f"{len(num_cols_all)} numerik, {len(cat_cols_all)} kategorikal (0 NA)"},
+    {"Tahap Dataset": "3. Setelah Feature Selection (Train)", "Total Baris": len(X_train), "Jumlah Fitur/Kolom": f"{X_train.shape[1]} fitur terpilih", "Rincian": f"{len(num_cols)} numerik, {len(cat_cols)} kategorikal ({len(dropped_feats)} fitur dibuang)"},
+    {"Tahap Dataset": "4. Setelah Feature Selection (Val)", "Total Baris": len(X_val), "Jumlah Fitur/Kolom": f"{X_val.shape[1]} fitur terpilih", "Rincian": f"{int(y_val.sum()):,} High Risk ({y_val.mean()*100:.2f}%), 0 NA"},
+    {"Tahap Dataset": "5. Setelah Feature Selection (Test)", "Total Baris": len(X_test), "Jumlah Fitur/Kolom": f"{X_test.shape[1]} fitur terpilih", "Rincian": f"{int(y_test.sum()):,} High Risk ({y_test.mean()*100:.2f}%), 0 NA"},
+])
+
+print("=== RINGKASAN KEADAAN DATASET SETELAH SELEKSI FITUR ===")
+print(f"Dimensi Train / Val / Test : {X_train.shape} / {X_val.shape} / {X_test.shape}")
+print(f"Total missing value tersisa: {int(X_train.isna().sum().sum() + X_val.isna().sum().sum() + X_test.isna().sum().sum())}")
+print(f"\nDaftar {len(num_cols)} Fitur Numerik Terpilih   : {num_cols}")
+print(f"Daftar {len(cat_cols)} Fitur Kategorikal Terpilih: {cat_cols}")
+print(f"Daftar {len(dropped_feats)} Fitur Dibuang (< 0,5%)     : {dropped_feats}")
+display(dataset_state_df)
+
+fig, axes = plt.subplots(1, 2, figsize=(13.2, 4.3))
+
+cat_labels = ["Sebelum Seleksi\n(35 Fitur Kandidat)", "Setelah Seleksi >= 0,5%\n(26 Fitur Terpilih)", "Dibuang < 0,5%\n(9 Fitur Noise)"]
+num_counts = [len(num_cols_all), len(num_cols), len([c for c in dropped_feats if c in num_cols_all])]
+cat_counts = [len(cat_cols_all), len(cat_cols), len([c for c in dropped_feats if c in cat_cols_all])]
+x_f = np.arange(len(cat_labels))
+
+b1 = axes[0].bar(x_f, num_counts, width=0.5, label="Fitur Numerik", color="#1f77b4")
+b2 = axes[0].bar(x_f, cat_counts, width=0.5, bottom=num_counts, label="Fitur Kategorikal", color="#ff7f0e")
+axes[0].set_xticks(x_f)
+axes[0].set_xticklabels(cat_labels, fontsize=9.5)
+axes[0].set_ylabel("Jumlah Kolom Fitur")
+axes[0].set_title("Perubahan Jumlah & Tipe Fitur Setelah Feature Importance", fontweight="bold")
+axes[0].legend(loc="upper right")
+axes[0].set_ylim(0, 44)
+for i in range(len(cat_labels)):
+    tot_f = num_counts[i] + cat_counts[i]
+    axes[0].text(i, tot_f + 0.9, f"{tot_f} fitur\n({num_counts[i]} num, {cat_counts[i]} kat)", ha="center", va="bottom", fontsize=8.8, fontweight="bold")
+
+part_labels = [f"Train\n({X_train.shape[0]:,} x {X_train.shape[1]})", f"Validation\n({X_val.shape[0]:,} x {X_val.shape[1]})", f"Test\n({X_test.shape[0]:,} x {X_test.shape[1]})"]
+non_high_p = [int((y_train == 0).sum()), int((y_val == 0).sum()), int((y_test == 0).sum())]
+high_p = [int((y_train == 1).sum()), int((y_val == 1).sum()), int((y_test == 1).sum())]
+x_p = np.arange(len(part_labels))
+
+axes[1].bar(x_p, non_high_p, width=0.48, label="Non-High Risk (0)", color="#4c72b0")
+axes[1].bar(x_p, high_p, width=0.48, bottom=non_high_p, label="High Risk (1)", color="#c44e52")
+axes[1].set_xticks(x_p)
+axes[1].set_xticklabels(part_labels, fontsize=9.5)
+axes[1].set_ylabel("Jumlah Pasien")
+axes[1].set_title("Keadaan Partisi Dataset Final (26 Fitur Terpilih)", fontweight="bold")
+axes[1].legend(loc="upper right")
+axes[1].set_ylim(0, 31500)
+for i in range(len(part_labels)):
+    tot_p = non_high_p[i] + high_p[i]
+    axes[1].text(i, tot_p + 550, f"{tot_p:,} baris\n(High: {high_p[i]:,})", ha="center", va="bottom", fontsize=8.8, fontweight="bold")
+
+plt.tight_layout()
+plt.savefig(ASSET_DIR / "fig_02f_keadaan_dataset_setelah_seleksi.png", dpi=150, bbox_inches="tight")
+plt.show()
+
+print("\nPreview 5 Baris Dataset Latih Setelah Seleksi (26 Fitur Terpilih):")
+display(X_train.head(5))
+print("\nStatistik Singkat 11 Fitur Numerik Terpilih (Data Latih):")
+display(X_train[num_cols].describe().T[["count", "mean", "std", "min", "50%", "max"]].round(2))"""
         )
     )
 
