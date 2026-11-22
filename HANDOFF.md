@@ -1,53 +1,23 @@
-# Handoff - 2026-11-09 14:35 WITA
+# Handoff - 2026-11-23 00:25 WITA
 
 - **Proyek**: Machine Learning (Kelas C) - Prediksi Risiko Stroke (Kelompok 3)
 - **Dosen Pengampu**: Bapak I Ketut Adi Purnawan, S.T., M.Kom.
 - **Anggota**: Deliana Br Manalu, Ravi Arnan Irianto, Ezza Putra Wibawa, Devin
-- **Berkas yang Diubah/Dibuat**:
-  - `notebooks/14_optimalisasi_dataset_biomarker_klinis.ipynb` (notebook lengkap pipeline biomarker klinis & visualisasi)
-  - `colab-hasil/14_optimalisasi_dataset_biomarker_klinis_hasil.ipynb` (salinan ter-render siap presentasi/Colab)
-  - `scripts/build_dataset_3k.py` (ekstraksi & balancing 3.000 data pasien asli dari superset Kaggle)
-  - `scripts/evaluate_models_3k.py` (benchmark komparasi 6 model pada dataset lama vs 3k baru)
-  - `scripts/train_ensemble_3k.py` (pelatihan model Ensemble Soft Voting dan tuning ambang pada dataset 3k)
-  - `scripts/build_clinical_dataset.py` (pembersihan dataset biomarker klinis & eliminasi target leakage)
-  - `scripts/train_clinical_model.py` (pelatihan model biomarker klinis dengan capaian ROC-AUC > 0,95)
-  - `scripts/build_notebook_14.py` (generator otomatis notebook 14)
-  - `artifacts/stroke_bersih_3k.csv` (dataset 3k bersih terimputasi)
-  - `artifacts/stroke_clinical_clean.csv` dan `artifacts/stroke_clinical_clean_3k.csv` (dataset biomarker klinis bersih)
-  - `artifacts/ensemble_metadata_3k.json` dan `artifacts/metadata_clinical_biomarkers.json` (metadata & metrik evaluasi)
-  - `artifacts/komparasi_model_3k.csv` (tabel perbandingan lengkap metrik model)
-  - `data/stroke_data_3k.csv` (dataset mentah 3k terstratifikasi)
-  - `README.md`, `LAPORAN.md`, dan `LAPORAN_PROYEK_MACHINE_LEARNING_KELOMPOK_3.md` (pembaruan dokumentasi & peta notebook 14)
-  - `PLAN.md` dan `HANDOFF.md` (catatan rencana & checkpoint progres)
+- **Berkas Utama Presentasi & Dokumentasi Terbaru (UAS Korpus Penuh)**:
+  - `scripts/build_notebook_15.py` (generator notebook presentasi UAS Colab end-to-end)
+  - `notebooks/15_presentasi_uas_full_dataset.ipynb` (notebook sumber, 36 sel)
+  - `colab-hasil/15_presentasi_uas_full_dataset_hasil.ipynb` (hasil eksekusi penuh 23/23 sel kode di Google Colab VM tanpa error)
+  - `assets/evaluasi_15/` (`fig_01_audit_dan_pembersihan.png`, `fig_01b_alur_proses.png`, `fig_02d_matriks_korelasi.png`, `fig_02e_feature_importance_selection.png`, `fig_02f_keadaan_dataset_setelah_seleksi.png`, `fig_02c_perbedaan_preprocessing.png`, `fig_03_cm_baseline.png`, `fig_03b_threshold_tuning_val.png`, `fig_04_cm_improved.png`, `fig_05a_lonjakan_performa_dan_fn.png`, `fig_05_komparasi_roc_pr.png`, `fig_06a_learning_curve.png`)
+  - `LAPORAN.md`, `LAPORAN_PROYEK_MACHINE_LEARNING_KELOMPOK_3.md`, `scripts/build_laporan_docx_standard.py`, `Laporan_Proyek_Machine_Learning_Kelompok_3.docx`
+  - `ARTIKEL_PROYEK_MACHINE_LEARNING_KELOMPOK_3.md`, `scripts/build_artikel_docx.py`, `Artikel_Proyek_Machine_Learning_Kelompok_3.docx`
+  - `README.md`, `SLIDE.md`, `HANDOFF.md`
 
-## Status Terakhir
-
-### 1. Optimalisasi Dataset & Penanganan Severe Imbalance
-- Dataset awal memiliki ketimpangan ekstrem (4,87% stroke), menyebabkan mayoritas model terjebak dalam *zero-recall trap* (Recall 0%).
-- Dibuat dataset seimbang 3.000 baris (`stroke_bersih_3k.csv`) berbasis 100% data pasien asli dari superset Kaggle (783 stroke positif : 2.217 non-stroke, prevalensi 26,10%).
-- Hasil evaluasi komparasi membuktikan Recall langsung melonjak dari 0% ke 53,1% dan F1-Score melonjak dari 0,000 ke 0,573 pada ambang default.
-
-### 2. Ensemble Soft Voting & Penyetelan Ambang Keputusan (Threshold Tuning)
-- Dibangun model Ensemble Soft Voting (Logistic Regression + Random Forest + Gradient Boosting).
-- Pada dataset 3k, penyetelan ambang optimal (Youden J Index `t = 0,34`) menghasilkan:
-  - ROC-AUC: **0,875**
-  - PR-AUC: **0,650**
-  - Recall: **87,2%** (102 dari 117 pasien stroke terdeteksi)
-  - F1-Score: **0,713**
-  - Akurasi: **81,8%**
-
-### 3. Penembusan Target ROC-AUC > 0,90 via Biomarker Klinis Lengkap (Jalur A)
-- Menggunakan dataset biomarker klinis komprehensif (`stroke_risk_prediction_dataset.csv`, 35 fitur riil termasuk Tekanan Darah Sistolik/Diastolik, HbA1c, Kolesterol HDL/LDL/Trigliserida, riwayat TIA/Atrial Fibrilasi).
-- Dilakukan eliminasi kebocoran target (*target leakage-free*).
-- Hasil evaluasi pada data uji independen membuktikan keberhasilan melampaui batas 0,90:
-  - ROC-AUC: **0,9616 (96,2%)**
-  - PR-AUC: **0,9018 (90,2%)**
-  - Presisi: **96,15%**
-  - Akurasi: **86,4% - 90,9%**
-  - Pada ambang `t = 0,30`: Recall mencapai **85,3%** dengan F1-Score **0,775**.
-
-### 4. Penyusunan Notebook Mandiri
-- Notebook `notebooks/14_optimalisasi_dataset_biomarker_klinis.ipynb` dan salinan `colab-hasil/14_optimalisasi_dataset_biomarker_klinis_hasil.ipynb` berhasil dibuat dan dieksekusi penuh tanpa error, memuat kurva ROC ganda, Precision-Recall curve, Confusion Matrix heatmap komparatif, dan grafik Top 15 Feature Importance.
+## Status Terakhir (Notebook 15 UAS)
+- **Audit & Pembersihan Korpus Penuh (`50.000 x 40`)**: 12.060 baris mengandung missing value (13.522 sel kosong di 13 kolom) dan 0 duplikasi -> setelah `dropna()` & `drop_duplicates()` tersisa **37.940 pasien bersih** (prevalensi High Risk 24,23%; 9.193 positif vs 28.747 non-high).
+- **Bukti Target Leakage (4 Kolom Dibuang)**: `Stroke_Risk_Score` terpisah mutlak tanpa tumpang tindih (`Low`: 2 - 34, `Moderate`: 35 - 64, `High`: 65 - 100), dan `AI_Health_Recommendation` / `Doctor_Consultation_Needed` merupakan keluaran pasca-diagnosis.
+- **Seleksi Fitur Sebelum Preprocessing (`Train only`, 26.558 baris)**: Dari 35 fitur kandidat, disaring **26 fitur berkontribusi >= 0,5%** (`11` numerik, `15` kategorikal) dan 9 fitur dibuang (`Daily_Walking_Minutes`, `Residence_Type`, `Exercise_Hours_Per_Week`, `Weight_kg`, `Height_cm`, `Country`, `Heart_Rate`, `Gender`, `Work_Type`).
+- **Preprocessing Spesifik Model pada 26 Fitur**: Logistic Regression (`33` kolom), Random Forest (`26` kolom), Gradient Boosting (`48` kolom).
+- **Hasil Terbaik Test Set (`5.691` pasien)**: **Gradient Boosting Improved (`n_estimators=400, lr=0.08, max_depth=4, subsample=0.8, t=0.46`)** -> `ROC-AUC = 0.9906`, `PR-AUC = 0.9741`, `Akurasi = 95.36%`, `Recall = 88.47%`, `Presisi = 92.08%`, `F1-Score = 0.9024`, `FN = 159`. Validasi 5-Fold Stratified CV (`t = 0.46`): `ROC-AUC 0.9917 +/- 0.0005`, `F1 0.9060 +/- 0.0030`; Bootstrap 95% CI: `ROC-AUC 0.9888 - 0.9922`.
 
 ## Next Action
-Perbarui materi laporan akhir dan slide presentasi untuk menyertakan pembahasan komparasi optimalisasi dataset dan pencapaian diagnostik ROC-AUC 0,962.
+Gunakan `colab-hasil/15_presentasi_uas_full_dataset_hasil.ipynb` sebagai media presentasi UAS (30 November 2026) beserta laporan dan artikel `.docx` yang sudah disinkronkan.

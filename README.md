@@ -9,9 +9,9 @@ berguna sama sekali. Proyek ini tidak mengejar akurasi tertinggi, melainkan memb
 empat strategi penanganan ketidakseimbangan kelas pada enam algoritma, menjelaskan
 keputusan model dengan SHAP, dan mengujinya pada populasi dari sumber data yang berbeda.
 
-Hasil akhir: recall **0,82** (SK 95%: 0,69 sampai 0,93) dan ROC-AUC **0,84** (0,78 sampai
-0,89) pada data uji, bertahan pada validasi eksternal terhadap 253.680 responden survei
-CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis net benefit.
+Hasil akhir:
+- **Dataset survei dasar (5.110 baris, Notebook `01`-`12`)**: recall **0,82** (SK 95%: 0,69 sampai 0,93) dan ROC-AUC **0,84** (0,78 sampai 0,89) pada data uji, bertahan pada validasi eksternal terhadap 253.680 responden survei CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis net benefit.
+- **Korpus biomarker klinis penuh (50.000 mentah -> 37.940 pasien bersih, Notebook `15`)**: setelah eliminasi bukti *target leakage* dan seleksi **26 fitur (>= 0,5%)** berbasis *Feature Importance* di Data Latih, **Gradient Boosting Improved (`t = 0,46`)** meraih **ROC-AUC 0,9906**, **PR-AUC 0,9741**, **Akurasi 95,36%**, **Recall 88,47%**, **Presisi 92,08%**, dan **F1-Score 0,9024** pada Test Set (5.691 pasien), tervalidasi stabil di 5-Fold Stratified CV (`F1 0,9060 +/- 0,0030`) dan Bootstrap 95% CI (`0,9888 - 0,9922`).
 
 > Ini alat bantu **skrining**, bukan alat diagnosis. Kedua dataset berasal dari populasi
 > non-Indonesia dan model tidak boleh diklaim berlaku untuk pasien Indonesia tanpa
@@ -22,11 +22,14 @@ CDC, dan tetap unggul atas strategi "periksa lanjut semua orang" pada analisis n
 | Berkas | Isi |
 |---|---|
 | `LAPORAN.md` | Laporan akhir lima bab, lengkap dengan daftar pustaka |
-| `SLIDE.md` | Slide presentasi, 26 halaman, format Marp |
+| `LAPORAN_PROYEK_MACHINE_LEARNING_KELOMPOK_3.md` | Laporan lengkap versi pengumpulan proyek Kelompok 3 (beserta generator `.docx`) |
+| `ARTIKEL_PROYEK_MACHINE_LEARNING_KELOMPOK_3.md` | Draf artikel ilmiah hasil eksperimen korpus penuh Notebook `15` (beserta generator `.docx`) |
+| `SLIDE.md` | Slide presentasi format Marp |
 | `PLAN.md` | Rencana proyek, pembagian tugas, batasan penelitian |
 | `PAPERS.md` | Lima artikel acuan berbahasa Inggris beserta DOI dan PMID |
-| `notebooks/` | Lima belas notebook berisi seluruh kode (tanpa output) |
+| `notebooks/` | Lima belas notebook utama berisi seluruh kode (tanpa output) |
 | `colab-hasil/` | Keluaran menjalankan seluruh notebook di Colab, satu berkas beroutput per notebook |
+| `assets/evaluasi_15/` | Grafik resolusi tinggi hasil eksekusi Colab untuk Notebook `15` |
 
 ## Peta notebook
 
@@ -110,8 +113,9 @@ Barisnya **tidak pernah digabungkan**: dataset kedua berperan sebagai penguji in
 
 | Dataset | Peran | Ukuran | Tautan |
 |---|---|---|---|
-| Stroke Prediction Dataset (fedesoriano) | data utama | 5.110 baris | https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset |
+| Stroke Prediction Dataset (fedesoriano) | data utama fase awal | 5.110 baris | https://www.kaggle.com/datasets/fedesoriano/stroke-prediction-dataset |
 | CDC Diabetes Health Indicators, BRFSS 2015 | penguji eksternal | 253.680 baris | https://archive.ics.uci.edu/dataset/891/cdc+diabetes+health+indicators |
+| Clinical Stroke Risk Prediction Dataset (`datasets/stroke_risk_prediction_dataset.csv`) | korpus biomarker klinis penuh (Notebook `14` & `15`) | 50.000 baris mentah (37.940 bersih, 26 fitur terpilih) | `datasets/stroke_risk_prediction_dataset.csv` |
 
 ## Mengekspor laporan dan slide
 

@@ -423,6 +423,22 @@ Dataset `stroke_clinical_clean_3k.csv` (3.000 pasien, **35 fitur riil bebas targ
 
 ---
 
+## Korpus penuh 37.940 pasien & seleksi 26 fitur (Notebook `15` UAS)
+
+Audit penuh **50.000 baris x 40 kolom** (`dropna` 12.060 NA, 0 duplikasi, eliminasi 4 kolom *target leakage* dengan bukti `Stroke_Risk_Score >= 65` -> `High`), split 70/15/15, dan seleksi **26 fitur (>= 0,5%)** di Data Latih:
+
+| Model (26 Fitur, Test Set 5.691) | Threshold | ROC-AUC | PR-AUC | Recall | Presisi | F1-Score | FN |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Logistic Regression Improved | 0,42 | 0,9537 | 0,8845 | 80,13% | 78,20% | 0,7915 | 274 |
+| Random Forest Improved | 0,41 | 0,9525 | 0,8753 | 79,70% | 78,39% | 0,7904 | 280 |
+| **Gradient Boosting Improved** | **0,46** | **0,9906** | **0,9741** | **88,47%** | **92,08%** | **0,9024** | **159** |
+| Ensemble Soft Voting | 0,44 | 0,9833 | 0,9565 | 85,64% | 89,40% | 0,8748 | 198 |
+
+- Preprocessing berbeda tiap model: **LR** (33 kolom), **RF** (26 kolom), **GB** (48 kolom)
+- 5-Fold Stratified CV GB Improved (`t = 0,46`): **ROC-AUC 0,9917 +/- 0,0005** | **F1 0,9060 +/- 0,0030**
+
+---
+
 ## Kesimpulan
 
 1. Strategi penanganan ketidakseimbangan **tidak membuat model lebih pintar**,
@@ -433,8 +449,7 @@ Dataset `stroke_clinical_clean_3k.csv` (3.000 pasien, **35 fitur riil bebas targ
 4. Model **bertahan** pada sumber data berbeda, dan cukup dengan 6 fitur
    tanpa laboratorium.
 5. Akurasi bukan metrik yang tepat, dan itu terbukti pada model kami sendiri.
-6. **Pengayaan biomarker klinis** mendobrak batas atas performa hingga **ROC-AUC 0,962**
-   (PR-AUC 0,902) dengan Ensemble Soft Voting.
+6. **Korpus penuh & seleksi 26 fitur** membawa **Gradient Boosting Improved (`t = 0,46`)** ke puncak **ROC-AUC 0,9906**, **Recall 88,47%**, dan **F1-Score 0,9024**.
 
 > Yang paling menentukan hasil bukan pilihan algoritma, melainkan **pilihan ambang**,
 > dan itu persoalan kebijakan klinis, bukan persoalan teknis.
@@ -467,6 +482,7 @@ Lima belas notebook, seluruhnya dapat dijalankan ulang di Google Colab
 `05` uji algoritma - `06` uji validasi silang - `07` klasifikasi - `08` clustering dan PCA
 `09` explainable AI - `10` validasi eksternal - `11` eksperimen - `12` pemeriksaan ulang
 `13` kombinasi atribut dan confidence level - `14` optimalisasi dataset & biomarker klinis (ROC 0,962)
+`15` presentasi UAS korpus penuh 37.940 pasien & seleksi 26 fitur (ROC-AUC 0,9906, F1 0,9024)
 
 </span>
 

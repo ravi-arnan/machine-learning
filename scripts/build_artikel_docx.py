@@ -216,7 +216,8 @@ def build_artikel_docx():
     add_p(
         "Dataset mentah memuat 50.000 baris dan 40 kolom. Audit kualitas mendeteksi 13.522 sel kosong pada 13 kolom yang memengaruhi 12.060 baris (24,12%) serta memastikan 0 duplikat penuh, 0 duplikat Patient_ID, dan 0 duplikat kombinasi fitur tanpa ID. "
         "Seluruh baris kosong dihapus (dropna) dan dipastikan bebas duplikasi (drop_duplicates), menghasilkan 37.940 pasien bersih. "
-        "Empat kolom administratif dan pasca-diagnosis dibuang untuk mencegah target leakage (Patient_ID, Stroke_Risk_Score, AI_Health_Recommendation, Doctor_Consultation_Needed), menyisakan 35 fitur prediktor awal dan target biner stroke_risk_high (9.193 High Risk = 24,23%; 28.747 Non-High = 75,77%)."
+        "Empat kolom administratif dan pasca-diagnosis dibuang untuk mencegah target leakage (Patient_ID, Stroke_Risk_Score, AI_Health_Recommendation, Doctor_Consultation_Needed), menyisakan 35 fitur prediktor awal dan target biner stroke_risk_high (9.193 High Risk = 24,23%; 28.747 Non-High = 75,77%). "
+        "Audit langsung atas kolom yang dibuang mengonfirmasi bukti target leakage mutlak: Stroke_Risk_Score terpisah tanpa tumpang tindih terhadap label target (Low: 2 - 34 pada 2.662 pasien; Moderate: 35 - 64 pada 26.085 pasien; High: 65 - 100 pada 9.193 pasien)."
     )
 
     add_fig(
@@ -298,7 +299,8 @@ def build_artikel_docx():
 
     add_subsec("3.2 Hasil Validasi Berlapis")
     add_p(
-        "Hasil validasi silang out-of-fold 5-Fold Stratified CV pada 32.249 baris pengembangan dan uji Bootstrap 95% CI pada Test Set dirangkum pada Tabel 2, sedangkan Learning Curve ditampilkan pada Gambar 6."
+        "Hasil validasi silang out-of-fold 5-Fold Stratified CV pada 32.249 baris pengembangan dan uji Bootstrap 95% CI pada Test Set dirangkum pada Tabel 2, sedangkan Learning Curve ditampilkan pada Gambar 6. "
+        "Simulasi prediksi individual pada lima pasien Test Set oleh Gradient Boosting Improved (t = 0,46) memperlihatkan pemisahan probabilitas yang tajam antara pasien berisiko tinggi (0,9824 dan 0,9847), pasien risiko rendah (0,0341 dan 0,0146), dan satu kasus borderline (0,4222)."
     )
 
     add_table(
