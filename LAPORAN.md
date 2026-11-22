@@ -641,6 +641,12 @@ Validasi berlapis pada *Gradient Boosting Improved* memastikan ketangguhan model
 Stratified CV* meraih **ROC-AUC 0,9872 +/- 0,0007** dan **PR-AUC 0,9640 +/- 0,0024**, serta
 *Bootstrap 95% CI* pada Test Set berada pada rentang sempit `0,9835 - 0,9880` untuk ROC-AUC
 dan `0,8712 - 0,8960` untuk F1-Score, tanpa gejala *overfitting* pada *Learning Curve*.
+Pemeringkatan *Feature Importance* agregat pada 35 fitur asli menegaskan 26 fitur dominan
+(`Age` 14,81%, `Blood_Pressure_Systolic` 13,30%, `Blood_Glucose` 9,00%, `Previous_TIA` 6,67%,
+`HbA1c` 6,46%) serta 9 fitur berkontribusi < 0,5% (`Country`, `Work_Type`, `Gender`,
+`Heart_Rate`, dll.). Pengujian seleksi fitur 26 atribut menyusutkan dimensi OHE dari 88 ke
+48 kolom (`ROC-AUC 0,9845`, `Recall 90,79%`, `F1 0,8771` pada `t = 0,35`), sedangkan pemakaian
+seluruh 35 fitur tetap meraih `ROC-AUC` (0,9859) dan `F1-Score` (0,8845) terbaik.
 
 ---
 

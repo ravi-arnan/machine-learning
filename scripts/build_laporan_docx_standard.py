@@ -535,7 +535,7 @@ def create_laporan():
         ("Gambar 4.14 Matriks Kebingungan Semua Model: Tahap After Improvement", "34"),
         ("Gambar 4.15 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)", "35"),
         ("Gambar 4.16 Kurva Belajar (Learning Curve) Korpus Penuh", "36"),
-        ("Gambar 4.17 Pemeringkatan Top 15 Biomarker Klinis (Korpus Penuh)", "36")
+        ("Gambar 4.17 Pemeringkatan Feature Importance Agregat Seluruh 35 Fitur Asli", "36")
     ]
     for g_tit, g_hlm in daftar_gambar_items:
         add_toc_line(g_tit, g_hlm, is_bold=False, indent_inch=0.0)
@@ -1149,7 +1149,7 @@ def create_laporan():
         width_inch=5.3
     )
 
-    add_body_p("Untuk membuktikan kestabilan hasil dan mencegah ketergantungan pada satu partisi acak, diterapkan validasi silang 5-Fold Stratified Cross-Validation pada 32.249 baris pengembangan serta uji Bootstrap 1.000 iterasi pada Test Set (Tabel 4.10). Hasil Learning Curve (Gambar 4.16) dan pemeringkatan Feature Importance (Gambar 4.17) memastikan tidak terjadi overfitting serta menegaskan dominasi faktor klinis medis (Age 14,8%, Blood_Pressure_Systolic 13,3%, Blood_Glucose 9,0%, HbA1c 6,5%, Blood_Pressure_Diastolic 4,8%, Total_Cholesterol 4,5%, LDL 4,3%, dan Previous_TIA_Yes 3,5%).")
+    add_body_p("Untuk membuktikan kestabilan hasil dan mencegah ketergantungan pada satu partisi acak, diterapkan validasi silang 5-Fold Stratified Cross-Validation pada 32.249 baris pengembangan serta uji Bootstrap 1.000 iterasi pada Test Set (Tabel 4.10). Hasil Learning Curve (Gambar 4.16) dan pemeringkatan Feature Importance agregat seluruh 35 fitur asli (Gambar 4.17) memastikan tidak terjadi overfitting serta menegaskan dominasi faktor klinis medis (Age 14,81%, Blood_Pressure_Systolic 13,30%, Blood_Glucose 9,00%, Previous_TIA 6,67%, HbA1c 6,46%, Blood_Pressure_Diastolic 4,84%, Total_Cholesterol 4,53%, dan LDL 4,29%), sementara 9 fitur lain seperti Country, Work_Type, Gender, dan Heart_Rate berkontribusi di bawah 0,5%. Uji seleksi fitur dengan 26 atribut terpilih (>= 0,5%) meringkas dimensi One-Hot Encoding dari 88 ke 48 kolom dengan ROC-AUC 0,9845 dan Recall 90,79% (F1 0,8771 pada t=0,35), sedangkan pemakaian penuh 35 fitur tetap memberikan ROC-AUC (0,9859) dan F1-Score (0,8845) puncak.")
 
     add_styled_table(
         "Tabel 4.10 Validasi 5-Fold Stratified CV dan Bootstrap 95% CI (37.940 Pasien)",
@@ -1172,7 +1172,7 @@ def create_laporan():
 
     add_image_box(
         "assets/evaluasi_15/fig_06b_feature_importance.png",
-        "Gambar 4.17 Pemeringkatan Top 15 Biomarker Klinis (Korpus Penuh)",
+        "Gambar 4.17 Pemeringkatan Feature Importance Agregat Seluruh 35 Fitur Asli",
         width_inch=4.9
     )
 

@@ -306,10 +306,8 @@ plt.show()"""
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""# Visualisasi Alur Proses Pembersihan Data & Peta Pola Missing Values
-fig, axes = plt.subplots(1, 2, figsize=(13.5, 4.6))
-
-# Panel Kiri: Diagram Alur Proses Data (50.000 -> 37.940 -> Split)
+            r"""# Visualisasi Alur Proses Pembersihan Data (50.000 -> 37.940 -> Split)
+plt.figure(figsize=(9.5, 4.2))
 steps_label = [
     "1. Data Mentah\n(50.000 baris x 40 kol)",
     "2. Cek Duplikasi\n(0 duplikat ditemukan)",
@@ -320,27 +318,16 @@ steps_label = [
 steps_vals = [50000, 50000, 37940, 37940, 26558]
 step_colors = ["#6baed6", "#4292c6", "#2171b5", "#08519c", "#2ca02c"]
 y_pos_s = np.arange(len(steps_label))[::-1]
-bars_s = axes[0].barh(y_pos_s, steps_vals, color=step_colors, height=0.55)
-axes[0].set_yticks(y_pos_s)
-axes[0].set_yticklabels(steps_label, fontsize=9)
-axes[0].set_xlabel("Jumlah Baris Data")
-axes[0].set_title("Alur Proses Audit, Pembersihan & Pembagian Dataset", fontweight="bold")
-axes[0].set_xlim(0, 62000)
+bars_s = plt.barh(y_pos_s, steps_vals, color=step_colors, height=0.55)
+plt.yticks(y_pos_s, steps_label, fontsize=9.5)
+plt.xlabel("Jumlah Baris Data")
+plt.title("Alur Proses Audit, Pembersihan & Pembagian Dataset", fontweight="bold")
+plt.xlim(0, 62000)
 for b, v in zip(bars_s, steps_vals):
-    axes[0].text(v + 800, b.get_y() + b.get_height()/2, f"{v:,} baris", va="center", fontsize=9, fontweight="bold")
-
-# Panel Kanan: Heatmap Pola Missing Value pada 400 Sampel Baris Mentah
-na_cols_list = na_nonzero["Kolom"].tolist()
-sample_na = df_raw[na_cols_list].sample(n=400, random_state=SEED).isna().astype(int).T
-sns.heatmap(
-    sample_na, cmap=["#e8f1f5", "#d95f02"], cbar=False, ax=axes[1],
-    xticklabels=False, yticklabels=na_cols_list
-)
-axes[1].set_title("Peta Pola Missing Values (Sampel 400 Pasien x 13 Kolom)\nOranye = Kosong (Dihapus), Terang = Terisi Lengkap", fontweight="bold", fontsize=10)
-axes[1].set_xlabel("Sampel Baris Pasien (n = 400)")
-
+    plt.text(v + 800, b.get_y() + b.get_height()/2, f"{v:,} baris", va="center", fontsize=9.5, fontweight="bold")
+plt.grid(axis="x", linestyle=":", alpha=0.6)
 plt.tight_layout()
-plt.savefig(ASSET_DIR / "fig_01b_alur_proses_dan_missing_map.png", dpi=150, bbox_inches="tight")
+plt.savefig(ASSET_DIR / "fig_01b_alur_proses.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 print("Contoh 5 Baris Data Bersih (35 Fitur Prediktor Siap Preprocessing):")
@@ -403,32 +390,7 @@ plt.show()"""
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""# Visualisasi EDA 2 (Terpisah): Histogram Distribusi 4 Biomarker Klinis Utama
-fig, axes = plt.subplots(2, 2, figsize=(11.5, 6.8))
-
-dist_feats = [
-    ("Age", "Distribusi Usia Pasien (Tahun)"),
-    ("Blood_Pressure_Systolic", "Distribusi Tekanan Darah Sistolik (mmHg)"),
-    ("Blood_Glucose", "Distribusi Kadar Glukosa Darah (mg/dL)"),
-    ("HbA1c", "Distribusi Kadar HbA1c (%)"),
-]
-for idx_f, (col_f, ttl_f) in enumerate(dist_feats):
-    ax_d = axes[idx_f // 2, idx_f % 2]
-    ax_d.hist(X.loc[y == 0, col_f], bins=25, density=True, alpha=0.55, color="#4c72b0", label="Non-High (0)")
-    ax_d.hist(X.loc[y == 1, col_f], bins=25, density=True, alpha=0.55, color="#c44e52", label="High Risk (1)")
-    ax_d.set_title(ttl_f, fontweight="bold", fontsize=10.5)
-    ax_d.set_ylabel("Densitas")
-    ax_d.legend(fontsize=8.5, loc="upper left")
-
-plt.tight_layout()
-plt.savefig(ASSET_DIR / "fig_02b_distribusi_biomarker.png", dpi=150, bbox_inches="tight")
-plt.show()"""
-        )
-    )
-
-    cells.append(
-        nbf.v4.new_code_cell(
-            r"""# Visualisasi EDA 3 (Terpisah): Matriks Korelasi Fitur Numerik Kunci vs Target
+            r"""# Visualisasi EDA 2 (Terpisah): Matriks Korelasi Fitur Numerik Kunci vs Target
 corr_df = X[num_cols].copy()
 corr_df["stroke_risk_high"] = y
 corr_target = corr_df.corr(numeric_only=True)["stroke_risk_high"].drop("stroke_risk_high").sort_values()
@@ -1034,30 +996,85 @@ plt.show()"""
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""# Validasi 4: Feature Importance Klinis (Terpisah)
+            r"""# Validasi 4: Feature Importance Agregat Seluruh 35 Fitur Asli (Gradient Boosting)
 ohe_names = pipe_gb_imp.named_steps["prep"].transformers_[1][1].get_feature_names_out(cat_cols).tolist()
-all_gb_features = num_cols + ohe_names
-gb_imp = pd.DataFrame({
-    "Fitur": all_gb_features,
-    "Importance": pipe_gb_imp.named_steps["clf"].feature_importances_,
-}).sort_values("Importance", ascending=False)
+imps_raw = pipe_gb_imp.named_steps["clf"].feature_importances_
 
-top15 = gb_imp.head(15).sort_values("Importance", ascending=True)
-plt.figure(figsize=(9.5, 5.8))
-bars = plt.barh(top15["Fitur"], top15["Importance"], color="#1f77b4", alpha=0.88)
-plt.title("Top 15 Biomarker Pendorong Risiko Stroke (Gradient Boosting)", fontweight="bold")
-plt.xlabel("Relative Feature Importance")
+# Agregasikan kembali kolom OHE ke 35 nama fitur asli
+agg_imp = {col: 0.0 for col in num_cols + cat_cols}
+for col, val in zip(num_cols, imps_raw[:len(num_cols)]):
+    agg_imp[col] += float(val)
+for name_ohe, val in zip(ohe_names, imps_raw[len(num_cols):]):
+    for col in sorted(cat_cols, key=len, reverse=True):
+        if name_ohe.startswith(col + "_"):
+            agg_imp[col] += float(val)
+            break
+
+gb_imp = pd.DataFrame(
+    list(agg_imp.items()), columns=["Fitur", "Importance"]
+).sort_values("Importance", ascending=False).reset_index(drop=True)
+
+plot_imp = gb_imp.sort_values("Importance", ascending=True)
+colors_imp = ["#1f77b4" if v >= 0.005 else "#b0bec5" for v in plot_imp["Importance"]]
+
+plt.figure(figsize=(10, 9.2))
+bars = plt.barh(plot_imp["Fitur"], plot_imp["Importance"], color=colors_imp, alpha=0.92)
+plt.axvline(0.005, color="#d62728", linestyle="--", lw=1.2, label="Batas Seleksi Kontribusi (0,5%)")
+plt.title("Feature Importance Agregat Seluruh 35 Fitur Asli (Biru >= 0,5% | Abu < 0,5%)", fontweight="bold")
+plt.xlabel("Total Kontribusi Relatif (Relative Importance)")
 for b in bars:
     w_bar = b.get_width()
-    plt.text(w_bar + 0.002, b.get_y() + b.get_height()/2, f"{w_bar*100:.1f}%", va="center", fontsize=8.8)
-plt.xlim(0, top15["Importance"].max() * 1.18)
+    plt.text(w_bar + 0.002, b.get_y() + b.get_height()/2, f"{w_bar*100:.2f}%", va="center", fontsize=8)
+plt.xlim(0, plot_imp["Importance"].max() * 1.16)
+plt.legend(loc="lower right")
 plt.grid(axis="x", linestyle=":", alpha=0.6)
 plt.tight_layout()
 plt.savefig(ASSET_DIR / "fig_06b_feature_importance.png", dpi=150, bbox_inches="tight")
 plt.show()
 
-print("Top 10 Fitur Terpenting:")
-display(gb_imp.head(10).reset_index(drop=True))"""
+selected_feats = gb_imp[gb_imp["Importance"] >= 0.005]["Fitur"].tolist()
+dropped_feats = gb_imp[gb_imp["Importance"] < 0.005]["Fitur"].tolist()
+print(f"Fitur kontribusi tinggi (>= 0,5%): {len(selected_feats)} fitur")
+print(f"Fitur kontribusi sangat kecil (< 0,5%): {len(dropped_feats)} fitur -> {dropped_feats}")
+display(gb_imp)"""
+        )
+    )
+
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Validasi 5: Uji Seleksi Fitur (Semua 35 Fitur vs 26 Fitur Kontribusi >= 0,5%)
+num_sel = [c for c in selected_feats if c in num_cols]
+cat_sel = [c for c in selected_feats if c in cat_cols]
+
+prep_gb_sel = ColumnTransformer([
+    ("num", "passthrough", num_sel),
+    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_sel),
+])
+pipe_gb_sel = Pipeline([
+    ("prep", prep_gb_sel),
+    ("clf", GradientBoostingClassifier(
+        n_estimators=200, learning_rate=0.05, max_depth=4, subsample=0.8, random_state=SEED
+    )),
+])
+
+pipe_gb_sel.fit(X_train[selected_feats], y_train)
+p_val_sel = pipe_gb_sel.predict_proba(X_val[selected_feats])[:, 1]
+p_test_sel = pipe_gb_sel.predict_proba(X_test[selected_feats])[:, 1]
+
+best_t_sel = max(threshold_grid, key=lambda t: f1_score(y_val, (p_val_sel >= t).astype(int)))
+best_t_sel = float(round(best_t_sel, 2))
+
+res_full_35 = evaluate_predictions(y_test, improved_probs_test["Gradient Boosting"], threshold=optimal_thresholds["Gradient Boosting"])
+res_full_35["Skenario"] = f"Semua {X.shape[1]} Fitur (OHE: {prep_gb.transform(X_train[:1]).shape[1]} kol)"
+
+res_sel_26 = evaluate_predictions(y_test, p_test_sel, threshold=best_t_sel)
+res_sel_26["Skenario"] = f"Filtered >= 0.5% ({len(selected_feats)} Fitur, OHE: {prep_gb_sel.transform(X_train[selected_feats][:1]).shape[1]} kol)"
+
+df_fs = pd.DataFrame([res_full_35, res_sel_26])[[
+    "Skenario", "Threshold", "ROC_AUC", "PR_AUC", "Akurasi", "Recall", "Presisi", "F1_Score", "TP", "FN"
+]]
+print("=== PERBANDINGAN FEATURE SELECTION: SEMUA FITUR VS FITUR KONTRIBUSI TINGGI ===")
+display(df_fs.round(4))"""
         )
     )
 
@@ -1087,6 +1104,9 @@ summary_export = {
     "bootstrap_best_model": best_model_name,
     "bootstrap_ci": boot_table.round(4).to_dict(orient="records"),
     "top10_features": gb_imp.head(10).round(4).to_dict(orient="records"),
+    "selected_features_count": len(selected_feats),
+    "dropped_features": dropped_feats,
+    "feature_selection_comparison": df_fs.round(4).to_dict(orient="records"),
 }
 
 out_json = ARTIFACT_DIR / "uas_full_dataset_results.json"

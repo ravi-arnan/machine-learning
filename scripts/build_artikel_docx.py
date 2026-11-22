@@ -328,14 +328,16 @@ def build_artikel_docx():
 
     add_fig(
         "assets/evaluasi_15/fig_06b_feature_importance.png",
-        "Gambar 6. Pemeringkatan Top 15 Biomarker Klinis Terpenting (Gradient Boosting).",
+        "Gambar 6. Pemeringkatan Feature Importance Agregat Seluruh 35 Fitur Asli (Gradient Boosting).",
         width_in=5.6
     )
 
     add_p(
         "Kurva belajar pada Gambar 5 memperlihatkan konvergensi stabil tanpa overfitting seiring bertambahnya ukuran data latih. "
-        "Pemeringkatan fitur pada Gambar 6 menempatkan Age (14,8%), Blood_Pressure_Systolic (13,3%), Blood_Glucose (9,0%), HbA1c (6,5%), Blood_Pressure_Diastolic (4,8%), Total_Cholesterol (4,5%), LDL (4,3%), dan Previous_TIA_Yes (3,5%) sebagai kontributor utama, "
-        "seluruhnya selaras dengan konsensus etiologi stroke klinis (Tang et al., 2025)."
+        "Pemeringkatan fitur agregat pada Gambar 6 menempatkan Age (14,81%), Blood_Pressure_Systolic (13,30%), Blood_Glucose (9,00%), Previous_TIA (6,67%), HbA1c (6,46%), Blood_Pressure_Diastolic (4,84%), Total_Cholesterol (4,53%), dan LDL (4,29%) sebagai kontributor utama, "
+        "seluruhnya selaras dengan konsensus etiologi stroke klinis (Tang et al., 2025). "
+        "Sebaliknya, sembilan fitur memiliki kontribusi di bawah 0,5% (termasuk Country, Work_Type, Gender, dan Heart_Rate). "
+        "Uji seleksi fitur dengan mempertahankan 26 fitur berkontribusi >= 0,5% memangkas dimensi One-Hot Encoding dari 88 menjadi 48 kolom dengan ROC-AUC 0,9845 dan Recall 90,79% (F1 0,8771 pada t=0,35), sementara mempertahankan seluruh 35 fitur tetap memberikan ROC-AUC (0,9859) dan F1-Score (0,8845) tertinggi."
     )
 
     # === 4. KESIMPULAN ===
