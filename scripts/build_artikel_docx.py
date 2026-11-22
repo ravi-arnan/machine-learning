@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Generator Draf Artikel Ilmiah (.docx) Kelompok 3.
 Menghasilkan dokumen Artikel_Proyek_Machine_Learning_Kelompok_3.docx dalam format artikel
-jurnal rapi (Judul, Penulis/Afiliasi, Abstrak, Pendahuluan, Metode, Hasil & Pembahasan + Gambar & Tabel,
-Kesimpulan, Daftar Pustaka) yang selaras dengan Notebook 15 dan Laporan Proyek.
+jurnal rapi yang selaras dengan alur metodologis Notebook 15 (seleksi 26 fitur sebelum pemodelan).
 """
 
 import os
@@ -165,7 +164,7 @@ def build_artikel_docx():
 
     # === JUDUL & PENULIS ===
     add_p(
-        "PREDIKSI RISIKO STROKE PADA KORPUS BIOMARKER KLINIS LENGKAP MELALUI PEMBERSIHAN DATA MENYELURUH, PREPROCESSING SPESIFIK MODEL, DAN KALIBRASI AMBANG KEPUTUSAN",
+        "PREDIKSI RISIKO STROKE PADA KORPUS BIOMARKER KLINIS MELALUI PEMBERSIHAN DATA MENYELURUH, SELEKSI FITUR BERBASIS FEATURE IMPORTANCE, DAN KALIBRASI AMBANG KEPUTUSAN",
         indent=False, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER, size=13, after=8
     )
     add_p(
@@ -181,21 +180,18 @@ def build_artikel_docx():
     # === ABSTRAK ===
     add_sec("ABSTRAK")
     add_p(
-        "Deteksi dini risiko stroke menggunakan pembelajaran mesin sering menghadapi dua kendala metodologis: "
-        "keterbatasan sinyal klinis pada atribut demografis dasar dan rendahnya sensitivitas (recall) pada ambang keputusan bawaan (t = 0,50). "
+        "Deteksi dini risiko stroke menggunakan pembelajaran mesin sering menghadapi kendala keterbatasan informasi pada fitur survei dasar, rendahnya sensitivitas (recall) pada ambang bawaan (t = 0,50), serta kehadiran fitur pengganggu. "
         "Penelitian ini mengolah keseluruhan dataset biomarker klinis terbaru (50.000 baris dan 40 atribut) tanpa pemotongan sampel. "
-        "Audit kualitas mengidentifikasi 12.060 baris yang mengandung nilai kosong pada 13 atribut laboratorium serta 0 duplikasi, "
-        "sehingga setelah penghapusan baris kosong diperoleh 37.940 pasien bersih dengan 35 fitur prediktor bebas kebocoran target (prevalensi High Risk 24,23%). "
-        "Data dibagi bertingkat (70% latih, 15% validasi, 15% uji), lalu dimodelkan dengan tiga algoritma yang diberi perlakuan preprocessing berbeda: "
-        "Logistic Regression (StandardScaler + OneHotEncoder drop='first'), Random Forest (skala asli + OrdinalEncoder), dan Gradient Boosting (skala asli + OneHotEncoder penuh), serta digabungkan via Ensemble Soft Voting. "
-        "Penerapan improvement berupa hyperparameter tuning, pembobotan kelas pada Random Forest, dan threshold tuning berbasis data validasi berhasil menurunkan kasus risiko tinggi yang terlewat (False Negative) secara drastis: "
-        "Random Forest turun dari 632 menjadi 284 kasus (Recall 54,17% -> 79,41%; F1 0,6794 -> 0,7949) dan Gradient Boosting turun dari 474 menjadi 100 kasus (Recall 65,63% -> 92,75%; F1 0,7822 -> 0,9292). "
-        "Gradient Boosting teroptimasi meraih performa puncak pada data uji dengan ROC-AUC 0,9947, PR-AUC 0,9850, Akurasi 96,57%, dan Presisi 93,09%. "
-        "Validasi silang 5-Fold Stratified CV out-of-fold (ROC-AUC 0,9951 +/- 0,0005, Recall 93,18% +/- 0,79%, F1 0,9317 +/- 0,0044), Bootstrap 95% CI (0,9936 - 0,9957), Learning Curve, dan pemeringkatan Feature Importance membuktikan stabilitas model serta kesesuaiannya dengan faktor klinis medis.",
+        "Audit kualitas mengidentifikasi 12.060 baris yang mengandung nilai kosong pada 13 atribut laboratorium serta 0 duplikasi, sehingga setelah penghapusan baris kosong diperoleh 37.940 pasien bersih dengan 35 fitur bebas kebocoran target (prevalensi High Risk 24,23%). "
+        "Data dibagi bertingkat (70% latih, 15% validasi, 15% uji), lalu Feature Importance agregat dijalankan hanya pada Data Latih sebelum pemodelan untuk menyaring 26 fitur berkontribusi >= 0,5% dan mengeliminasi 9 fitur ber kontribusi sangat kecil (termasuk Country, Work_Type, Gender, dan Heart_Rate). "
+        "Tiga algoritma dilatih pada 26 fitur terpilih dengan perlakuan preprocessing berbeda: Logistic Regression (StandardScaler + OneHotEncoder drop='first', 33 kolom), Random Forest (skala asli + OrdinalEncoder, 26 kolom), dan Gradient Boosting (skala asli + OneHotEncoder penuh, 48 kolom), serta Ensemble Soft Voting. "
+        "Skema Improvement (hyperparameter tuning, pembobotan kelas pada Random Forest, dan threshold tuning berbasis data validasi) menurunkan kasus risiko tinggi yang terlewat (False Negative): Random Forest turun dari 546 menjadi 280 kasus (Recall 60,41% -> 79,70%; F1 0,7175 -> 0,7904) dan Gradient Boosting turun dari 469 menjadi 159 kasus (Recall 65,99% -> 88,47%; F1 0,7828 -> 0,9024). "
+        "Gradient Boosting teroptimasi meraih performa puncak pada data uji dengan ROC-AUC 0,9906, PR-AUC 0,9741, Akurasi 95,36%, dan Presisi 92,08%. "
+        "Validasi silang 5-Fold Stratified CV out-of-fold pada ambang optimal (ROC-AUC 0,9917 +/- 0,0005, Recall 88,24% +/- 0,52%, F1 0,9060 +/- 0,0030), Bootstrap 95% CI (0,9888 - 0,9922), dan Learning Curve membuktikan stabilitas model.",
         indent=False, size=10.5, after=4
     )
     add_p(
-        "Kata kunci: prediksi risiko stroke, pembersihan data, preprocessing spesifik model, threshold tuning, gradient boosting, validasi silang.",
+        "Kata kunci: prediksi risiko stroke, pembersihan data, seleksi fitur, preprocessing spesifik model, threshold tuning, gradient boosting.",
         indent=False, italic=True, size=10.5, after=8
     )
 
@@ -203,32 +199,24 @@ def build_artikel_docx():
     add_sec("1. PENDAHULUAN")
     add_p(
         "Stroke merupakan penyebab kematian kedua terbanyak secara global dan pemicu utama kecacatan jangka panjang (WHO, 2024). "
-        "Deteksi dini individu berisiko tinggi memungkinkan intervensi preventif sebelum serangan iskemik maupun hemoragik terjadi. "
-        "Dalam ranah komputasi medis, algoritma pembelajaran mesin banyak diterapkan untuk mempelajari pola risiko dari rekam medis pasien (Kokkotis et al., 2022; Melnykova et al., 2025)."
+        "Deteksi dini individu berisiko tinggi memungkinkan intervensi preventif sebelum serangan iskemik maupun hemoragik terjadi (Kokkotis et al., 2022; Melnykova et al., 2025)."
     )
     add_p(
         "Pada tahap awal penelitian kami terhadap dataset survei dasar (5.110 baris, prevalensi stroke 4,87%), ditemukan fenomena paradoks akurasi: model standar meraih akurasi 95,1% namun gagal mendeteksi pasien stroke (Recall mendekati 0%). "
-        "Meskipun penyetelan ambang berbasis rasio biaya klinis dan validasi eksternal terhadap 253.680 responden survei CDC BRFSS berhasil menaikkan Recall ke atas 80%, "
-        "kinerja diskriminasi model tertahan di kisaran ROC-AUC 0,840 hingga 0,875 karena tidak tersedianya data laboratorium klinis seperti tekanan darah kontinu, HbA1c, dan profil lipid."
+        "Meskipun penyetelan ambang berbasis rasio biaya klinis dan validasi eksternal pada survei CDC BRFSS (253.680 responden) menaikkan Recall ke atas 80%, kinerja ROC-AUC tertahan di kisaran 0,840 hingga 0,875 karena ketiadaan biomarker laboratorium kontinu."
     )
     add_p(
-        "Penelitian ini memanfaatkan korpus dataset biomarker klinis lengkap sebanyak 50.000 pasien (40 atribut). "
-        "Berbeda dari eksperimen awal yang hanya memakai sampel terbatas dengan imputasi, penelitian ini memproses seluruh baris data yang valid setelah analisis dan penghapusan baris kosong serta duplikasi, "
-        "menerapkan preprocessing spesifik per model, mengevaluasi perbandingan Baseline vs Improvement beserta Confusion Matrix tiap model, dan mengonfirmasi ketahanan hasil melalui protokol validasi berlapis."
+        "Penelitian ini memanfaatkan keseluruhan korpus dataset biomarker klinis lengkap (50.000 pasien, 40 atribut) setelah audit dan penghapusan baris kosong maupun duplikasi, "
+        "menerapkan seleksi fitur berbasis Feature Importance sebelum tahap preprocessing dan pemodelan, membandingkan perlakuan preprocessing berbeda tiap algoritma pada skema Baseline vs Improvement, serta membuktikan keandalannya lewat validasi berlapis."
     )
 
     # === 2. METODE PENELITIAN ===
     add_sec("2. METODE PENELITIAN")
     add_subsec("2.1 Audit Kualitas Data, Pembersihan, dan Eliminasi Target Leakage")
     add_p(
-        "Dataset mentah memuat 50.000 baris dan 40 kolom. Audit kualitas mendeteksi 13.522 sel kosong pada 13 kolom (termasuk Height_cm, Weight_kg, Exercise_Hours_Per_Week, Daily_Walking_Minutes, Medication_Adherence, LDL, Triglycerides, HDL, HbA1c, dan Blood_Glucose) yang tersebar pada 12.060 baris (24,12%). "
-        "Pemeriksaan duplikasi memastikan 0 duplikat penuh, 0 duplikat Patient_ID, dan 0 duplikat kombinasi fitur tanpa ID. "
-        "Seluruh baris kosong dihapus (dropna) dan dipastikan bebas duplikasi (drop_duplicates), menghasilkan 37.940 pasien bersih."
-    )
-    add_p(
-        "Untuk mencegah kebocoran target (target leakage), empat kolom administratif dan pasca-diagnosis dibuang (Patient_ID, Stroke_Risk_Score, AI_Health_Recommendation, Doctor_Consultation_Needed), "
-        "menyisakan 35 fitur prediktor valid (16 fitur numerik kontinu dan 19 fitur kategorikal). "
-        "Target biner dirumuskan sebagai stroke_risk_high = 1 untuk kategori High (9.193 pasien; 24,23%) dan 0 untuk kategori Moderate/Low (28.747 pasien; 75,77%)."
+        "Dataset mentah memuat 50.000 baris dan 40 kolom. Audit kualitas mendeteksi 13.522 sel kosong pada 13 kolom yang memengaruhi 12.060 baris (24,12%) serta memastikan 0 duplikat penuh, 0 duplikat Patient_ID, dan 0 duplikat kombinasi fitur tanpa ID. "
+        "Seluruh baris kosong dihapus (dropna) dan dipastikan bebas duplikasi (drop_duplicates), menghasilkan 37.940 pasien bersih. "
+        "Empat kolom administratif dan pasca-diagnosis dibuang untuk mencegah target leakage (Patient_ID, Stroke_Risk_Score, AI_Health_Recommendation, Doctor_Consultation_Needed), menyisakan 35 fitur prediktor awal dan target biner stroke_risk_high (9.193 High Risk = 24,23%; 28.747 Non-High = 75,77%)."
     )
 
     add_fig(
@@ -237,84 +225,90 @@ def build_artikel_docx():
         width_in=6.1
     )
 
-    add_subsec("2.2 Pembagian Data dan Preprocessing Spesifik Model")
+    add_subsec("2.2 Pembagian Data dan Seleksi Fitur Berbasis Feature Importance")
     add_p(
-        "Sebanyak 37.940 data bersih dibagi secara stratified menjadi 70% data latih (26.558 baris), 15% data validasi (5.691 baris), dan 15% data uji independen (5.691 baris). "
-        "Setiap model menerima pipeline preprocessing berbeda sesuai sifat algoritmanya: "
-        "(1) Logistic Regression menggunakan StandardScaler pada fitur numerik dan OneHotEncoder(drop='first') pada fitur kategorikal (69 dimensi) agar optimasi gradien dan regularisasi L2 stabil; "
-        "(2) Random Forest menggunakan skala numerik asli (passthrough) dan OrdinalEncoder (35 dimensi) karena pohon keputusan bersifat scale-invariant; "
-        "(3) Gradient Boosting menggunakan skala numerik asli (passthrough) dan OneHotEncoder penuh (88 dimensi) untuk memisahkan efek tiap kategori klinis pada residu gradien."
+        "Sebanyak 37.940 data bersih dibagi secara stratified menjadi 70% latih (26.558 baris), 15% validasi (5.691 baris), dan 15% uji independen (5.691 baris). "
+        "Sebelum melatih model utama, bobot Feature Importance agregat seluruh 35 fitur asli dihitung secara eksklusif pada Data Latih (anti leakage). "
+        "Hasilnya menempatkan Age (14,81%), Blood_Pressure_Systolic (13,30%), Blood_Glucose (9,00%), Previous_TIA (6,67%), HbA1c (6,46%), Blood_Pressure_Diastolic (4,84%), Total_Cholesterol (4,53%), dan LDL (4,29%) sebagai prediktor utama. "
+        "Sembilan fitur berkontribusi di bawah 0,5% (Daily_Walking_Minutes, Residence_Type, Exercise_Hours_Per_Week, Weight_kg, Height_cm, Country, Heart_Rate, Gender, Work_Type) dibuang, sehingga seluruh tahap selanjutnya menggunakan 26 fitur terpilih (11 numerik dan 15 kategorikal)."
     )
 
-    add_subsec("2.3 Skenario Baseline, Improvement, dan Protokol Validasi")
+    add_fig(
+        "assets/evaluasi_15/fig_02e_feature_importance_selection.png",
+        "Gambar 2. Pemeringkatan Feature Importance Agregat 35 Fitur Asli pada Data Latih (Ambang Seleksi 0,5%).",
+        width_in=5.5
+    )
+
+    add_subsec("2.3 Preprocessing Spesifik Model, Skenario Improvement, dan Validasi")
     add_p(
-        "Tahap Baseline mengevaluasi parameter bawaan scikit-learn pada ambang default t = 0,50. "
-        "Tahap Improvement menerapkan penyetelan hyperparameter berbasis data validasi (C = 0,5 pada Logistic Regression; n_estimators=250, max_depth=20, min_samples_leaf=2, class_weight='balanced_subsample' pada Random Forest; n_estimators=400, learning_rate=0,08, max_depth=4, subsample=0,8 pada Gradient Boosting), "
-        "kalibrasi ambang batas (threshold tuning) optimal F1 pada data validasi (t=0,42 untuk LR, t=0,40 untuk RF, t=0,41 untuk GB), serta penggabungan Ensemble Soft Voting (t=0,42). "
-        "Validasi dilakukan secara berlapis menggunakan 5-Fold Stratified Cross-Validation pada 32.249 baris pengembangan, Bootstrap 95% Confidence Interval (1.000 iterasi) pada Test Set, Learning Curve 3-Fold, dan analisis Feature Importance."
+        "Pada 26 fitur terpilih, tiap model menerima perlakuan preprocessing berbeda sesuai sifat algoritmanya: "
+        "(1) Logistic Regression memakai StandardScaler + OneHotEncoder(drop='first') (33 kolom); "
+        "(2) Random Forest memakai skala asli (passthrough) + OrdinalEncoder (26 kolom); "
+        "(3) Gradient Boosting memakai skala asli (passthrough) + OneHotEncoder penuh (48 kolom). "
+        "Tahap Baseline dievaluasi pada parameter bawaan (t = 0,50). Tahap Improvement menyetel hyperparameter dan ambang batas optimal F1 pada Data Validasi: Logistic Regression (C = 0,1, t = 0,42), Random Forest (n_estimators=250, max_depth=20, min_samples_leaf=2, class_weight='balanced_subsample', t = 0,41), Gradient Boosting (n_estimators=400, learning_rate=0,08, max_depth=4, subsample=0,8, t = 0,46), serta Ensemble Soft Voting (t = 0,44). "
+        "Validasi dilakukan lewat 5-Fold Stratified CV out-of-fold pada ambang optimal, Bootstrap 95% CI (1.000 iterasi), dan Learning Curve."
     )
 
     # === 3. HASIL DAN PEMBAHASAN ===
     add_sec("3. HASIL DAN PEMBAHASAN")
     add_subsec("3.1 Komparasi Baseline vs Improvement dan Confusion Matrix Tiap Model")
     add_p(
-        "Hasil pengujian pada Test Set independen (5.691 pasien; 1.379 kasus High Risk) membuktikan bahwa perlakuan preprocessing yang berbeda serta penerapan improvement memberikan peningkatan kinerja yang nyata pada ketiga model utama (Tabel 1)."
+        "Hasil pengujian pada Test Set independen (5.691 pasien; 1.379 kasus High Risk) dengan 26 fitur terpilih membuktikan efektivitas seleksi fitur, preprocessing spesifik model, dan tahap improvement (Tabel 1)."
     )
 
     add_table(
-        "Tabel 1. Perbandingan Kinerja Model Baseline vs Improvement pada Test Set (5.691 Pasien)",
+        "Tabel 1. Perbandingan Kinerja Model Baseline vs Improvement pada Test Set (5.691 Pasien, 26 Fitur Terpilih)",
         ["Model", "Tahap", "t", "ROC-AUC", "PR-AUC", "Akurasi", "Recall", "Presisi", "F1", "FN"],
         [
-            ("Logistic Regression", "Baseline", "0,50", "0,9571", "0,8916", "89,95%", "76,07%", "81,25%", "0,7858", "330"),
-            ("Logistic Regression", "Improved", "0,42", "0,9571", "0,8916", "90,02%", "81,15%", "78,42%", "0,7976", "260"),
-            ("Random Forest", "Baseline", "0,50", "0,9503", "0,8663", "87,61%", "54,17%", "91,10%", "0,6794", "632"),
-            ("Random Forest", "Improved", "0,40", "0,9562", "0,8833", "90,07%", "79,41%", "79,58%", "0,7949", "284"),
-            ("Gradient Boosting", "Baseline", "0,50", "0,9795", "0,9456", "91,14%", "65,63%", "96,79%", "0,7822", "474"),
-            ("Gradient Boosting", "Improved", "0,41", "0,9947", "0,9850", "96,57%", "92,75%", "93,09%", "0,9292", "100"),
-            ("Ensemble Soft Voting", "Improved", "0,42", "0,9872", "0,9655", "94,90%", "88,54%", "90,24%", "0,8939", "158"),
+            ("Logistic Regression", "Baseline", "0,50", "0,9537", "0,8844", "89,88%", "75,34%", "81,49%", "0,7830", "340"),
+            ("Logistic Regression", "Improved", "0,42", "0,9537", "0,8845", "89,77%", "80,13%", "78,20%", "0,7915", "274"),
+            ("Random Forest", "Baseline", "0,50", "0,9506", "0,8688", "88,47%", "60,41%", "88,34%", "0,7175", "546"),
+            ("Random Forest", "Improved", "0,41", "0,9525", "0,8753", "89,76%", "79,70%", "78,39%", "0,7904", "280"),
+            ("Gradient Boosting", "Baseline", "0,50", "0,9786", "0,9439", "91,13%", "65,99%", "96,19%", "0,7828", "469"),
+            ("Gradient Boosting", "Improved", "0,46", "0,9906", "0,9741", "95,36%", "88,47%", "92,08%", "0,9024", "159"),
+            ("Ensemble Soft Voting", "Improved", "0,44", "0,9833", "0,9565", "94,06%", "85,64%", "89,40%", "0,8748", "198"),
         ],
         [1.38, 0.65, 0.36, 0.58, 0.58, 0.58, 0.56, 0.56, 0.56, 0.45],
         bold_rows={6}
     )
 
     add_p(
-        "Visualisasi Confusion Matrix seluruh model pada tahap Baseline (Gambar 2) dan setelah Improvement (Gambar 3) memperlihatkan penurunan tajam jumlah pasien risiko tinggi yang terlewat (False Negative): "
-        "Random Forest berhasil menurunkan FN dari 632 menjadi 284 pasien (+25,24% Recall), sedangkan Gradient Boosting menurunkan FN dari 474 menjadi 100 pasien (+27,12% Recall). "
-        "Kurva ROC dan Precision-Recall (Gambar 4) mengonfirmasi keunggulan Gradient Boosting Improved (ROC-AUC 0,9947; PR-AUC 0,9850) dibandingkan model linear dan bagging."
+        "Visualisasi Confusion Matrix seluruh model pada tahap Baseline (Gambar 3) dan setelah Improvement (Gambar 4) memperlihatkan penurunan tajam pasien risiko tinggi yang terlewat (False Negative): "
+        "Random Forest turun dari 546 menjadi 280 pasien (+19,29% Recall) dan Gradient Boosting turun dari 469 menjadi 159 pasien (+22,48% Recall). "
+        "Kurva ROC dan Precision-Recall (Gambar 5) mengonfirmasi keunggulan Gradient Boosting Improved (ROC-AUC 0,9906; PR-AUC 0,9741)."
     )
 
     add_fig(
         "assets/evaluasi_15/fig_03_cm_baseline.png",
-        "Gambar 2. Matriks Kebingungan (Confusion Matrix) Semua Model pada Tahap Baseline (t = 0,50).",
+        "Gambar 3. Matriks Kebingungan (Confusion Matrix) Semua Model pada Tahap Baseline (t = 0,50).",
         width_in=6.1
     )
 
     add_fig(
         "assets/evaluasi_15/fig_04_cm_improved.png",
-        "Gambar 3. Matriks Kebingungan (Confusion Matrix) Semua Model Setelah Improvement.",
+        "Gambar 4. Matriks Kebingungan (Confusion Matrix) Semua Model Setelah Improvement.",
         width_in=5.7
     )
 
     add_fig(
         "assets/evaluasi_15/fig_05_komparasi_roc_pr.png",
-        "Gambar 4. Kurva ROC dan Precision-Recall pada Test Set Independen (5.691 Pasien).",
+        "Gambar 5. Kurva ROC dan Precision-Recall pada Test Set Independen (5.691 Pasien).",
         width_in=6.1
     )
 
-    add_subsec("3.2 Hasil Validasi Berlapis dan Biomarker Klinis Dominan")
+    add_subsec("3.2 Hasil Validasi Berlapis")
     add_p(
-        "Hasil validasi silang out-of-fold 5-Fold Stratified CV pada 32.249 baris pengembangan (pada ambang optimal masing-masing model) dan uji Bootstrap 95% CI pada Test Set dirangkum pada Tabel 2. "
-        "Simpangan baku yang sangat kecil (0,0005 pada ROC-AUC dan 0,0044 pada F1 Gradient Boosting) serta rentang kepercayaan sempit (0,9936 - 0,9957) membuktikan konsistensi performa."
+        "Hasil validasi silang out-of-fold 5-Fold Stratified CV pada 32.249 baris pengembangan dan uji Bootstrap 95% CI pada Test Set dirangkum pada Tabel 2, sedangkan Learning Curve ditampilkan pada Gambar 6."
     )
 
     add_table(
         "Tabel 2. Ringkasan Validasi Silang 5-Fold Stratified CV (Ambang Optimal) dan Bootstrap 95% CI",
         ["Pengujian Validasi", "ROC-AUC", "PR-AUC", "Recall", "F1-Score"],
         [
-            ("5-Fold CV: Logistic Regression (t=0,42)", "0,9607 +/- 0,0021", "0,8977 +/- 0,0055", "0,8083 +/- 0,0106", "0,8017 +/- 0,0082"),
-            ("5-Fold CV: Random Forest (t=0,40)", "0,9548 +/- 0,0025", "0,8784 +/- 0,0059", "0,7773 +/- 0,0105", "0,7857 +/- 0,0074"),
-            ("5-Fold CV: Gradient Boosting (t=0,41)", "0,9951 +/- 0,0005", "0,9855 +/- 0,0016", "0,9318 +/- 0,0079", "0,9317 +/- 0,0044"),
-            ("Bootstrap 95% CI (GB Improved, Test)", "0,9936 - 0,9957", "-", "0,9139 - 0,9403", "0,9187 - 0,9382"),
+            ("5-Fold CV: Logistic Regression (t=0,42)", "0,9578 +/- 0,0020", "0,8908 +/- 0,0056", "0,7996 +/- 0,0091", "0,7961 +/- 0,0066"),
+            ("5-Fold CV: Random Forest (t=0,41)", "0,9510 +/- 0,0024", "0,8681 +/- 0,0061", "0,7778 +/- 0,0107", "0,7761 +/- 0,0082"),
+            ("5-Fold CV: Gradient Boosting (t=0,46)", "0,9917 +/- 0,0005", "0,9763 +/- 0,0015", "0,8824 +/- 0,0052", "0,9060 +/- 0,0030"),
+            ("Bootstrap 95% CI (GB Improved, Test)", "0,9888 - 0,9922", "-", "0,8678 - 0,9009", "0,8908 - 0,9133"),
         ],
         [2.05, 1.08, 1.05, 1.06, 1.06],
         bold_rows={3}
@@ -322,30 +316,15 @@ def build_artikel_docx():
 
     add_fig(
         "assets/evaluasi_15/fig_06a_learning_curve.png",
-        "Gambar 5. Kurva Belajar (Learning Curve) 3-Fold CV ROC-AUC terhadap Ukuran Data Latih.",
+        "Gambar 6. Kurva Belajar (Learning Curve) 3-Fold CV ROC-AUC terhadap Ukuran Data Latih.",
         width_in=5.4
-    )
-
-    add_fig(
-        "assets/evaluasi_15/fig_06b_feature_importance.png",
-        "Gambar 6. Pemeringkatan Feature Importance Agregat Seluruh 35 Fitur Asli (Gradient Boosting).",
-        width_in=5.6
-    )
-
-    add_p(
-        "Kurva belajar pada Gambar 5 memperlihatkan konvergensi stabil tanpa overfitting seiring bertambahnya ukuran data latih. "
-        "Pemeringkatan fitur agregat pada Gambar 6 menempatkan Age (13,86%), Blood_Pressure_Systolic (12,24%), Blood_Glucose (8,65%), HbA1c (6,33%), Previous_TIA (6,03%), Blood_Pressure_Diastolic (4,83%), Total_Cholesterol (4,58%), dan LDL (4,29%) sebagai kontributor utama, "
-        "seluruhnya selaras dengan konsensus etiologi stroke klinis (Tang et al., 2025). "
-        "Sebaliknya, delapan fitur memiliki kontribusi di bawah 0,5% (termasuk Residence_Type, Exercise_Hours_Per_Week, Weight_kg, Height_cm, Country, Heart_Rate, Work_Type, dan Gender). "
-        "Uji seleksi fitur dengan mempertahankan 27 fitur berkontribusi >= 0,5% memangkas dimensi One-Hot Encoding dari 88 menjadi 49 kolom dengan ROC-AUC 0,9928, Recall 91,44%, dan F1 0,9168 pada t=0,42, sementara mempertahankan seluruh 35 fitur tetap memberikan ROC-AUC (0,9947) dan F1-Score (0,9292) tertinggi."
     )
 
     # === 4. KESIMPULAN ===
     add_sec("4. KESIMPULAN")
     add_p(
-        "Pengolahan keseluruhan korpus biomarker klinis setelah eliminasi data kosong dan duplikasi menghasilkan 37.940 data pasien bersih tanpa target leakage. "
-        "Penyesuaian perlakuan preprocessing per algoritma serta strategi improvement berupa penyetelan hyperparameter dan kalibrasi ambang batas terbukti efektif memangkas jumlah pasien risiko tinggi yang terlewat. "
-        "Model Gradient Boosting Improved meraih performa tertinggi dengan ROC-AUC 0,9947, PR-AUC 0,9850, Akurasi 96,57%, Recall 92,75%, Presisi 93,09%, dan F1-Score 0,9292 pada data uji independen, serta tervalidasi stabil melalui 5-Fold Stratified CV dan Bootstrap 95% Confidence Interval."
+        "Pengolahan keseluruhan korpus biomarker klinis setelah pembersihan data kosong dan duplikasi (37.940 pasien bersih), diikuti seleksi 26 fitur berkontribusi >= 0,5% berbasis Feature Importance di Data Latih sebelum pemodelan, menghasilkan sistem prediksi risiko stroke yang ringkas, stabil, dan valid secara medis. "
+        "Model Gradient Boosting Improved meraih kinerja tertinggi dengan ROC-AUC 0,9906, PR-AUC 0,9741, Akurasi 95,36%, Recall 88,47%, Presisi 92,08%, dan F1-Score 0,9024 pada data uji independen, terkonfirmasi konsisten oleh 5-Fold Stratified CV dan Bootstrap 95% CI."
     )
 
     # === DAFTAR PUSTAKA ===

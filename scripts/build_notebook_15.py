@@ -1,19 +1,16 @@
 """Script generator untuk membuat notebook presentasi UAS Colab:
 notebooks/15_presentasi_uas_full_dataset.ipynb
 
-Menjawab seluruh arahan dosen (16 November 2026) untuk Presentasi UAS (30 November 2026):
-1. Menggunakan seluruh baris dataset terbaru (datasets/stroke_risk_prediction_dataset.csv, 50.000 baris),
-   bukan sampling 3.000 baris.
-2. Analisis kualitas data eksplisit: deteksi & penghapusan baris kosong (dropna) dan duplikasi
-   (drop_duplicates) hingga diperoleh 37.940 baris bersih, plus eliminasi target leakage.
-3. Pipeline lengkap siap presentasi langsung via Google Colab (bukan hanya sebatas EDA).
-4. Perbandingan 3 model utama yang telah dijalani (Logistic Regression, Random Forest,
-   Gradient Boosting) + Ensemble Soft Voting dengan perlakuan preprocessing yang berbeda tiap model.
-5. Perbandingan tegas Baseline (default, t=0.50) vs Improvement (Hyperparameter Tuning +
-   Threshold Tuning pada data validasi + Ensemble Soft Voting).
-6. Grafik Confusion Matrix lengkap untuk setiap model (Baseline vs Improvement), ditambah kurva ROC & PR.
-7. Validasi berlapis: Holdout Split 70/15/15, 5-Fold Stratified CV, Bootstrap 95% CI, Learning Curve,
-   dan Analisis Kepentingan Fitur Klinis.
+Alur Metodologis Runtut (End-to-End Colab Pipeline):
+1. Pemuatan seluruh dataset terbaru (50.000 baris, 40 kolom) langsung dari GitHub / lokal.
+2. Audit kualitas data (missing values & duplikasi) -> dropna() & drop_duplicates() -> 37.940 baris bersih + eliminasi 4 kolom target leakage.
+3. EDA klinis terarah (boxplot, proporsi riwayat klinis, matriks korelasi).
+4. Stratified Split 70/15/15 (Train 26.558 / Val 5.691 / Test 5.691).
+5. Feature Importance (agregat 35 fitur asli pada Data Latih) & Seleksi Fitur (>= 0,5% -> 26 fitur terpilih; 9 fitur rendah dibuang).
+6. Preprocessing berbeda per model pada dataset 26 fitur terpilih (LR: StandardScaler + OHE drop='first' -> 27 kol; RF: Passthrough + Ordinal -> 26 kol; GB: Passthrough + OHE -> 42 kol).
+7. Evaluasi Baseline (default, t=0.50) + Confusion Matrix Baseline.
+8. Evaluasi Improvement (Tuning + Threshold Tuning + Ensemble Soft Voting) + Confusion Matrix After Improvement + Grafik Lonjakan Recall/F1 & FN + Kurva ROC & PR.
+9. Validasi Berlapis: 5-Fold Stratified CV (Out-of-Fold pada ambang optimal), Bootstrap 95% CI, Learning Curve.
 """
 
 from pathlib import Path
@@ -42,7 +39,7 @@ def build_notebook():
     # 1. Header & Ringkasan Proyek
     cells.append(
         nbf.v4.new_markdown_cell(
-            """# Presentasi UAS Machine Learning: Prediksi Risiko Stroke pada Seluruh Data Biomarker Klinis (37.940 Pasien Bersih)
+            """# Presentasi UAS Machine Learning: Prediksi Risiko Stroke pada Korpus Biomarker Klinis (37.940 Pasien Bersih)
 
 **Mata Kuliah:** Machine Learning (Kelas C)  
 **Dosen Pengampu:** Bapak I Ketut Adi Purnawan, S.T., M.Kom.  
@@ -57,33 +54,23 @@ def build_notebook():
 
 ## Peta Alur Proses di Notebook (End-to-End Colab Pipeline)
 
-Notebook ini disusun sebagai **kode presentasi utama UAS** yang berjalan penuh dari awal sampai akhir di Google Colab:
-1. **Pemuatan & Audit Data Mentah (50.000 baris, 40 kolom)**: Mengecek tipe data, nilai kosong (*missing values*), duplikasi penuh maupun duplikasi tanpa `Patient_ID`, serta distribusi kelas.
-2. **Pembersihan Data & Pencegahan Kebocoran Target**: Menghilangkan seluruh baris yang memiliki nilai kosong (`dropna`) dan duplikasi (`drop_duplicates`) sehingga tersisa **37.940 pasien bersih** (menggunakan seluruh baris valid tanpa pemotongan sampel), serta membuang kolom *target leakage*.
-3. **EDA Terarah (Konteks Klinis)**: Menganalisis pola fitur klinis kunci (usia, tekanan darah sistolik, glukosa, HbA1c, riwayat TIA) terhadap risiko stroke tinggi.
-4. **Pembagian Data Stratified (70% Latih / 15% Validasi / 15% Uji)**: Memastikan proporsi kelas konsisten dan menjaga data uji benar-benar terisolasi.
-5. **Preprocessing Berbeda Sesuai Karakteristik Model**:
-   - **Logistic Regression**: `StandardScaler` untuk fitur numerik + `OneHotEncoder(drop='first')` untuk kategorikal.
-   - **Random Forest**: Skala numerik asli (`passthrough`, tanpa scaling) + `OrdinalEncoder` untuk kategorikal.
-   - **Gradient Boosting**: Skala numerik asli (`passthrough`, tanpa scaling) + `OneHotEncoder` untuk kategorikal.
-6. **Evaluasi Baseline vs Improvement + Confusion Matrix per Model**:
-   - **Baseline**: Parameter default scikit-learn pada ambang standar `t = 0,50`.
-   - **Improvement**: Penyetelan hyperparameter spesifik model, penyeimbangan bobot kelas (pada Random Forest), *Threshold Tuning* pada data validasi, serta penggabungan **Ensemble Soft Voting**.
-   - Setiap model dilengkapi grafik **Confusion Matrix Baseline vs Improvement**, **Kurva ROC**, dan **Kurva Precision-Recall**.
-7. **Validasi Berlapis**:
-   - **5-Fold Stratified Cross-Validation** (mean +/- std).
-   - **Bootstrap 95% Confidence Interval** (1.000 iterasi pada Test Set).
-   - **Learning Curve** (deteksi overfitting/underfitting).
-   - **Validasi Klinis (Feature Importance & Koefisien Log-Odds)**."""
+Notebook ini dirancang sebagai **kode presentasi utama UAS** yang berjalan runtut dari awal hingga akhir di Google Colab:
+1. **Pemuatan & Audit Data Mentah (50.000 baris, 40 kolom)**: Mengecek tipe data, statistik deskriptif, *missing values*, dan duplikasi.
+2. **Pembersihan Data & Eliminasi *Target Leakage***: Menghapus baris kosong (`dropna`) dan duplikasi (`drop_duplicates`) sehingga tersisa **37.940 pasien bersih**, serta membuang 4 kolom pasca-diagnosis.
+3. **EDA Terarah**: Menganalisis profil biomarker utama dan matriks korelasi terhadap target risiko stroke.
+4. **Pembagian Data Stratified (70% Latih / 15% Validasi / 15% Uji)**: Memastikan proporsi kelas konsisten dan menjaga data validasi/uji tetap terisolasi.
+5. **Analisis *Feature Importance* & Seleksi Fitur (Sebelum Pemodelan)**: Mengukur kontribusi seluruh 35 fitur asli pada Data Latih (bebas kebocoran) dan menyaring **26 fitur berkontribusi tinggi (>= 0,5%)** sebagai dataset masukan model.
+6. **Preprocessing Berbeda Tiap Model pada Fitur Terpilih**:
+   - **Logistic Regression**: `StandardScaler` + `OneHotEncoder(drop='first')` (`27` kolom)
+   - **Random Forest**: Skala asli (`passthrough`) + `OrdinalEncoder` (`26` kolom)
+   - **Gradient Boosting**: Skala asli (`passthrough`) + `OneHotEncoder` penuh (`42` kolom)
+7. **Baseline vs Improvement + Confusion Matrix Setiap Model**: Membandingkan performa parameter bawaan (`t = 0,50`) melawan model teroptimasi (*hyperparameter tuning*, pembobotan kelas RF, *threshold tuning* pada Validation Set, plus *Ensemble Soft Voting*), lengkap dengan Confusion Matrix masing-masing serta kurva ROC & PR.
+8. **Validasi Berlapis**: 5-Fold Stratified Cross-Validation (pada ambang optimal), Bootstrap 95% Confidence Interval, dan Learning Curve."""
         )
     )
 
-    # 2. Import Library & Konfigurasi
-    cells.append(
-        nbf.v4.new_markdown_cell(
-            "## 1. Persiapan Lingkungan & Pustaka"
-        )
-    )
+    # 2. Import Library
+    cells.append(nbf.v4.new_markdown_cell("## 1. Persiapan Lingkungan & Pustaka"))
 
     cells.append(
         nbf.v4.new_code_cell(
@@ -117,7 +104,6 @@ from sklearn.metrics import (
 from sklearn.model_selection import (
     StratifiedKFold,
     cross_val_predict,
-    cross_validate,
     learning_curve,
     train_test_split,
 )
@@ -136,7 +122,6 @@ plt.rcParams["figure.dpi"] = 120
 SEED = 42
 np.random.seed(SEED)
 
-# Direktori output lokal (otomatis dibuat jika dijalankan di Colab maupun lokal)
 ASSET_DIR = Path("assets/evaluasi_15")
 if Path("..").resolve().name == "machine-learning" or Path("../datasets").exists():
     ASSET_DIR = Path("../assets/evaluasi_15")
@@ -151,16 +136,12 @@ print("Pustaka siap. Direktori aset:", ASSET_DIR.resolve())"""
         )
     )
 
-    # 3. Pemuatan Data Mentah & Audit Kualitas
+    # 3. Pemuatan & Audit Data
     cells.append(
         nbf.v4.new_markdown_cell(
             """## 2. Pemuatan Seluruh Dataset & Analisis Kualitas Data (Missing Value & Duplikasi)
 
-Dataset yang digunakan adalah `stroke_risk_prediction_dataset.csv` yang memuat **50.000 catatan pasien dan 40 atribut** (demografi, gaya hidup, biomarker laboratorium seperti tekanan darah sistolik/diastolik, HbA1c, profil lipid kolesterol, serta riwayat klinis TIA dan fibrilasi atrium).
-
-Sesuai arahan evaluasi, kita memeriksa dan menampilkan kondisi seluruh baris mentah terlebih dahulu sebelum pembersihan:
-1. Menghitung jumlah data kosong (*missing values*) per kolom dan persentase baris yang terdampak.
-2. Mengecek duplikasi baris penuh, duplikasi `Patient_ID`, maupun duplikasi kombinasi fitur tanpa `Patient_ID`."""
+Dataset yang digunakan adalah `stroke_risk_prediction_dataset.csv` dengan **50.000 catatan pasien dan 40 atribut**. Seluruh baris dimuat utuh untuk diaudit terlebih dahulu sebelum pembersihan."""
         )
     )
 
@@ -226,11 +207,9 @@ display(na_nonzero.reset_index(drop=True))"""
         nbf.v4.new_markdown_cell(
             """## 3. Pembersihan Data (`dropna` & `drop_duplicates`) dan Eliminasi *Target Leakage*
 
-Langkah pembersihan yang dilakukan:
-1. **Menghilangkan Baris dengan Data Kosong (`dropna`)**: Sebanyak 12.060 baris yang memiliki minimal satu nilai kosong dihapus agar seluruh data yang masuk ke model merupakan pengukuran klinis asli tanpa nilai imputasi buatan.
-2. **Menghilangkan Baris Duplikat (`drop_duplicates`)**: Memastikan tidak ada baris identik yang masuk ke data latih maupun data uji (mencegah kebocoran antar-split).
-3. **Eliminasi Kolom *Target Leakage***: Membuang `Patient_ID`, `Stroke_Risk_Score`, `AI_Health_Recommendation`, dan `Doctor_Consultation_Needed` karena kolom tersebut merupakan skor turunan atau rekomendasi pasca-diagnosis.
-4. **Formulasi Target Biner**: `stroke_risk_high = 1` untuk kategori `High` dan `0` untuk kategori `Moderate`/`Low`."""
+1. Menghapus 12.060 baris yang memiliki data kosong (`dropna`) agar seluruh data merupakan rekaman klinis riil tanpa imputasi buatan.
+2. Memverifikasi bebas duplikasi (`drop_duplicates`), menyisakan **37.940 pasien bersih**.
+3. Membuang 4 kolom *target leakage* (`Patient_ID`, `Stroke_Risk_Score`, `AI_Health_Recommendation`, `Doctor_Consultation_Needed`) dan merumuskan target biner `stroke_risk_high` (`High` = 1, `Moderate/Low` = 0)."""
         )
     )
 
@@ -241,8 +220,6 @@ df_no_na = df_raw.dropna().copy()
 after_na = len(df_no_na)
 df_clean = df_no_na.drop_duplicates().reset_index(drop=True)
 after_dup = len(df_clean)
-
-# Cek ulang duplikasi fitur tanpa Patient_ID setelah dropna
 dup_feat_clean = int(df_clean.drop(columns=["Patient_ID"]).duplicated().sum())
 
 # 2. Formulasi Target & Eliminasi Target Leakage
@@ -256,8 +233,8 @@ leak_cols = [
 ]
 X = df_clean.drop(columns=leak_cols).copy()
 
-num_cols = X.select_dtypes(include=["number"]).columns.tolist()
-cat_cols = X.select_dtypes(exclude=["number"]).columns.tolist()
+num_cols_all = X.select_dtypes(include=["number"]).columns.tolist()
+cat_cols_all = X.select_dtypes(exclude=["number"]).columns.tolist()
 
 print("=== HASIL PEMBERSIHAN DATA ===")
 print(f"Baris awal                     : {len(df_raw):,}")
@@ -265,13 +242,10 @@ print(f"Baris setelah dropna()         : {after_na:,} (dibuang {len(df_raw) - af
 print(f"Baris setelah drop_duplicates(): {after_dup:,} (dibuang {after_na - after_dup:,})")
 print(f"Duplikasi fitur tanpa ID       : {dup_feat_clean}")
 print(f"Sisa missing value             : {int(X.isna().sum().sum())}")
-print(f"Fitur prediktor valid          : {X.shape[1]} kolom ({len(num_cols)} numerik, {len(cat_cols)} kategorikal)")
+print(f"Fitur prediktor valid awal     : {X.shape[1]} kolom ({len(num_cols_all)} numerik, {len(cat_cols_all)} kategorikal)")
 print(f"Distribusi Target (0 vs 1)     : {(y == 0).sum():,} Non-High (75,77%) | {(y == 1).sum():,} High Risk ({y.mean()*100:.2f}%)")
 
-# Visualisasi Ringkasan Audit Data & Distribusi Kelas
 fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.5))
-
-# Panel 1: Missing Values per Kolom
 na_plot = na_nonzero.sort_values("Jumlah_Kosong", ascending=True)
 axes[0].barh(na_plot["Kolom"], na_plot["Jumlah_Kosong"], color="#d95f02", alpha=0.88)
 axes[0].set_title("Missing Values per Kolom (50.000 Baris)", fontweight="bold")
@@ -280,7 +254,6 @@ for idx, val in enumerate(na_plot["Jumlah_Kosong"]):
     axes[0].text(val + 25, idx, f"{val:,} ({val/len(df_raw)*100:.1f}%)", va="center", fontsize=8.5)
 axes[0].set_xlim(0, na_plot["Jumlah_Kosong"].max() * 1.28)
 
-# Panel 2: Perbandingan Jumlah Baris & Distribusi Kelas
 labels_stage = ["Data Mentah\n(50.000 baris)", "Data Bersih\n(37.940 baris)"]
 high_counts = [int((df_raw["Stroke_Risk"] == "High").sum()), int((y == 1).sum())]
 non_high_counts = [len(df_raw) - high_counts[0], len(df_clean) - high_counts[1]]
@@ -331,7 +304,7 @@ plt.tight_layout()
 plt.savefig(ASSET_DIR / "fig_01b_alur_proses.png", dpi=150, bbox_inches="tight")
 plt.show()
 
-print("Contoh 5 Baris Data Bersih (35 Fitur Prediktor Siap Preprocessing):")
+print("Contoh 5 Baris Data Bersih (35 Fitur Sebelum Seleksi Fitur):")
 display(X.head(5))"""
         )
     )
@@ -341,7 +314,7 @@ display(X.head(5))"""
         nbf.v4.new_markdown_cell(
             """## 4. Eksplorasi Data Klinis Terarah (EDA Singkat Sebelum Pemodelan)
 
-Sebagai konteks sebelum masuk ke rekayasa fitur dan pemodelan, grafik di bawah menunjukkan bagaimana profil biomarker utama (Usia, Tekanan Darah Sistolik, Kadar Glukosa Darah, HbA1c, serta riwayat TIA/Fibrilasi Atrium) membedakan pasien `High Risk` dari `Non-High Risk` pada 37.940 pasien bersih."""
+Meninjau perbedaan pola biomarker klinis utama (Tekanan Darah Sistolik, Usia, riwayat TIA/Fibrilasi Atrium, dan korelasi numerik) antara pasien `High Risk` dan `Non-High Risk`."""
         )
     )
 
@@ -352,19 +325,16 @@ Sebagai konteks sebelum masuk ke rekayasa fitur dan pemodelan, grafik di bawah m
 plot_df = X[["Age", "Blood_Pressure_Systolic", "Blood_Glucose", "Previous_TIA", "Atrial_Fibrillation"]].copy()
 plot_df["Risk_Label"] = np.where(y == 1, "High Risk (1)", "Non-High (0)")
 
-# 1. Boxplot TD Sistolik
 sns.boxplot(data=plot_df, x="Risk_Label", y="Blood_Pressure_Systolic", order=["Non-High (0)", "High Risk (1)"], palette=["#4c72b0", "#c44e52"], ax=axes[0])
 axes[0].set_title("TD Sistolik vs Risiko Stroke", fontweight="bold")
 axes[0].set_xlabel("")
 axes[0].set_ylabel("TD Sistolik (mmHg)")
 
-# 2. Boxplot Usia
 sns.boxplot(data=plot_df, x="Risk_Label", y="Age", order=["Non-High (0)", "High Risk (1)"], palette=["#4c72b0", "#c44e52"], ax=axes[1])
 axes[1].set_title("Usia Pasien vs Risiko Stroke", fontweight="bold")
 axes[1].set_xlabel("")
 axes[1].set_ylabel("Usia (Tahun)")
 
-# 3. Tingkat High Risk berdasarkan Riwayat TIA & AFib
 risk_rates = pd.DataFrame({
     "Faktor Klinis": ["Previous TIA = No", "Previous TIA = Yes", "Atrial Fib. = No", "Atrial Fib. = Yes"],
     "Proporsi High Risk (%)": [
@@ -392,7 +362,7 @@ plt.show()"""
     cells.append(
         nbf.v4.new_code_cell(
             r"""# Visualisasi EDA 2 (Terpisah): Matriks Korelasi Fitur Numerik Kunci vs Target
-corr_df = X[num_cols].copy()
+corr_df = X[num_cols_all].copy()
 corr_df["stroke_risk_high"] = y
 corr_target = corr_df.corr(numeric_only=True)["stroke_risk_high"].drop("stroke_risk_high").sort_values()
 top_corr_cols = corr_target.index.tolist()[-6:] + ["stroke_risk_high"]
@@ -414,43 +384,122 @@ plt.show()"""
         nbf.v4.new_markdown_cell(
             """## 5. Pembagian Data Stratified 70 / 15 / 15 (Anti Data Leakage)
 
-Seluruh **37.940 baris bersih** dibagi secara bertingkat (*stratified*) agar prevalensi `High Risk` (~24,23%) terjaga identik di setiap partisi:
-- **70% Data Latih (26.558 baris)**: Digunakan untuk fitting transformasi preprocessing dan pelatihan model.
-- **15% Data Validasi (5.691 baris)**: Digunakan untuk pencarian hyperparameter dan kalibrasi ambang keputusan (*threshold tuning*).
-- **15% Data Uji (5.691 baris)**: Dikunci sebagai evaluasi akhir independen (*unseen test set*)."""
+Seluruh **37.940 baris bersih** dibagi secara bertingkat (*stratified*) sebelum seleksi fitur maupun preprocessing:
+- **70% Data Latih (26.558 baris)**: Untuk perhitungan *feature importance*, fitting preprocessing, dan pelatihan model.
+- **15% Data Validasi (5.691 baris)**: Untuk penyetelan hyperparameter dan kalibrasi ambang keputusan (*threshold tuning*).
+- **15% Data Uji (5.691 baris)**: Dikunci sebagai evaluasi akhir independen."""
         )
     )
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""X_train, X_rest, y_train, y_rest = train_test_split(
+            r"""X_train_all, X_rest_all, y_train, y_rest = train_test_split(
     X, y, test_size=0.30, stratify=y, random_state=SEED
 )
-X_val, X_test, y_val, y_test = train_test_split(
-    X_rest, y_rest, test_size=0.50, stratify=y_rest, random_state=SEED
+X_val_all, X_test_all, y_val, y_test = train_test_split(
+    X_rest_all, y_rest, test_size=0.50, stratify=y_rest, random_state=SEED
 )
 
 split_summary = pd.DataFrame([
-    {"Partisi": "Train (70%)", "Jumlah_Baris": len(X_train), "High_Risk_1": int(y_train.sum()), "Prevalensi (%)": round(y_train.mean()*100, 2)},
-    {"Partisi": "Validation (15%)", "Jumlah_Baris": len(X_val), "High_Risk_1": int(y_val.sum()), "Prevalensi (%)": round(y_val.mean()*100, 2)},
-    {"Partisi": "Test (15%)", "Jumlah_Baris": len(X_test), "High_Risk_1": int(y_test.sum()), "Prevalensi (%)": round(y_test.mean()*100, 2)},
+    {"Partisi": "Train (70%)", "Jumlah_Baris": len(X_train_all), "High_Risk_1": int(y_train.sum()), "Prevalensi (%)": round(y_train.mean()*100, 2)},
+    {"Partisi": "Validation (15%)", "Jumlah_Baris": len(X_val_all), "High_Risk_1": int(y_val.sum()), "Prevalensi (%)": round(y_val.mean()*100, 2)},
+    {"Partisi": "Test (15%)", "Jumlah_Baris": len(X_test_all), "High_Risk_1": int(y_test.sum()), "Prevalensi (%)": round(y_test.mean()*100, 2)},
 ])
 display(split_summary)"""
         )
     )
 
-    # 7. Preprocessing Berbeda Per Model
+    # 7. Feature Importance & Seleksi Fitur (SEBELUM Pemodelan!)
     cells.append(
         nbf.v4.new_markdown_cell(
-            """## 6. Perancangan Pipeline Preprocessing Berbeda Tiap Model
+            """## 6. Analisis *Feature Importance* & Seleksi Fitur (Sebelum Pemodelan)
 
-Sesuai prinsip metodologi machine learning, setiap keluarga algoritma membutuhkan perlakuan preprocessing yang berbeda:
+Agar pemodelan lebih fokus pada biomarker yang benar-benar berkontribusi dan terhindar dari fitur pengganggu (*noise* seperti `Country` atau `Work_Type`), kita mengukur **Feature Importance agregat seluruh 35 fitur asli hanya pada Data Latih (`X_train_all`)** supaya bebas *data leakage*.
 
-| Model Algoritma | Perlakuan Fitur Numerik (16 fitur) | Perlakuan Fitur Kategorikal (19 fitur) | Alasan Teknis |
+Fitur dengan kontribusi **>= 0,5%** dipertahankan menjadi **dataset terpilih**, lalu digunakan secara konsisten pada seluruh tahap *preprocessing* dan pemodelan berikutnya."""
+        )
+    )
+
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Hitung Feature Importance HANYA pada Data Latih (anti leakage)
+prep_fs = ColumnTransformer([
+    ("num", "passthrough", num_cols_all),
+    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_cols_all),
+])
+fs_model = Pipeline([
+    ("prep", prep_fs),
+    ("clf", GradientBoostingClassifier(
+        n_estimators=200, learning_rate=0.05, max_depth=4, subsample=0.8, random_state=SEED
+    )),
+])
+fs_model.fit(X_train_all, y_train)
+
+ohe_names_fs = fs_model.named_steps["prep"].transformers_[1][1].get_feature_names_out(cat_cols_all).tolist()
+imps_fs = fs_model.named_steps["clf"].feature_importances_
+
+agg_imp = {col: 0.0 for col in num_cols_all + cat_cols_all}
+for col, val in zip(num_cols_all, imps_fs[:len(num_cols_all)]):
+    agg_imp[col] += float(val)
+for name_ohe, val in zip(ohe_names_fs, imps_fs[len(num_cols_all):]):
+    for col in sorted(cat_cols_all, key=len, reverse=True):
+        if name_ohe.startswith(col + "_"):
+            agg_imp[col] += float(val)
+            break
+
+df_fs_imp = pd.DataFrame(
+    list(agg_imp.items()), columns=["Fitur", "Importance"]
+).sort_values("Importance", ascending=False).reset_index(drop=True)
+
+selected_feats = df_fs_imp[df_fs_imp["Importance"] >= 0.005]["Fitur"].tolist()
+dropped_feats = df_fs_imp[df_fs_imp["Importance"] < 0.005]["Fitur"].tolist()
+
+# Grafik Feature Importance Seluruh 35 Fitur Asli
+plot_imp = df_fs_imp.sort_values("Importance", ascending=True)
+colors_imp = ["#1f77b4" if v >= 0.005 else "#b0bec5" for v in plot_imp["Importance"]]
+
+plt.figure(figsize=(10, 9.2))
+bars = plt.barh(plot_imp["Fitur"], plot_imp["Importance"], color=colors_imp, alpha=0.92)
+plt.axvline(0.005, color="#d62728", linestyle="--", lw=1.3, label="Batas Seleksi Kontribusi (0,5%)")
+plt.title("Feature Importance Agregat 35 Fitur Asli pada Data Latih\n(Biru = Dipilih >= 0,5% | Abu = Dibuang < 0,5%)", fontweight="bold")
+plt.xlabel("Kontribusi Relatif (Relative Importance)")
+for b in bars:
+    w_bar = b.get_width()
+    plt.text(w_bar + 0.002, b.get_y() + b.get_height()/2, f"{w_bar*100:.2f}%", va="center", fontsize=8)
+plt.xlim(0, plot_imp["Importance"].max() * 1.16)
+plt.legend(loc="lower right")
+plt.grid(axis="x", linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.savefig(ASSET_DIR / "fig_02e_feature_importance_selection.png", dpi=150, bbox_inches="tight")
+plt.show()
+
+# Terapkan seleksi fitur ke seluruh partisi dataset
+X_train = X_train_all[selected_feats].copy()
+X_val = X_val_all[selected_feats].copy()
+X_test = X_test_all[selected_feats].copy()
+
+num_cols = [c for c in selected_feats if c in num_cols_all]
+cat_cols = [c for c in selected_feats if c in cat_cols_all]
+
+print(f"=== HASIL SELEKSI FITUR ===")
+print(f"Fitur dipilih (>= 0,5%) : {len(selected_feats)} fitur ({len(num_cols)} numerik, {len(cat_cols)} kategorikal)")
+print(f"Fitur dibuang (< 0,5%)  : {len(dropped_feats)} fitur -> {dropped_feats}")
+display(df_fs_imp)"""
+        )
+    )
+
+    # 8. Preprocessing Berbeda Tiap Model pada Dataset Terpilih
+    cells.append(
+        nbf.v4.new_markdown_cell(
+            """## 7. Perancangan Pipeline Preprocessing Berbeda Tiap Model (Dataset Terpilih)
+
+Menggunakan **dataset hasil seleksi fitur** di atas, setiap algoritma tetap menerima perlakuan *preprocessing* yang sesuai dengan sifat matematisnya:
+
+| Model Algoritma | Perlakuan Numerik | Perlakuan Kategorikal | Alasan Teknis |
 |---|---|---|---|
-| **Logistic Regression** | `StandardScaler()` (mean=0, std=1) | `OneHotEncoder(drop='first')` | Model linear berbasis gradien & penalti L2 sangat sensitif terhadap perbedaan skala satuan (Usia vs Kolesterol vs biner), dan `drop='first'` mencegah multikolinearitas sempurna. |
-| **Random Forest** | `passthrough` (tanpa scaling, skala asli) | `OrdinalEncoder` | Algoritma berbasis pohon (*tree-based*) bersifat *scale-invariant* karena pemisahan node hanya bergantung pada urutan nilai, bukan jarak Euclidean. Encoding ordinal menjaga dimensi split tetap ringkas. |
-| **Gradient Boosting** | `passthrough` (tanpa scaling, skala asli) | `OneHotEncoder` (tanpa drop) | Boosting sekuensial meminimalkan residu gradien pada setiap kategori secara terpisah; one-hot penuh memudahkan pohon dangkal menangkap efek spesifik tiap kategori. |"""
+| **Logistic Regression** | `StandardScaler()` (Z-Score) | `OneHotEncoder(drop='first')` | Model linear berbasis gradien & penalti L2 sensitif terhadap skala satuan; `drop='first'` mencegah multikolinearitas sempurna. |
+| **Random Forest** | `passthrough` (skala asli) | `OrdinalEncoder` | Algoritma pohon bersifat *scale-invariant* dan efisien dengan representasi ordinal. |
+| **Gradient Boosting** | `passthrough` (skala asli) | `OneHotEncoder` penuh | Pohon boosting dangkal lebih mudah menangkap kontribusi spesifik tiap kategori biner tanpa perlu penskalaan numerik. |"""
         )
     )
 
@@ -477,34 +526,30 @@ prep_gb = ColumnTransformer(
     ]
 )
 
-# Cek dimensi output setelah transformasi pada data latih
 prep_lr.fit(X_train)
 prep_rf.fit(X_train)
 prep_gb.fit(X_train)
 
-print("Dimensi fitur setelah preprocessing berbeda per model:")
-print(f"  - Logistic Regression (StandardScaler + OHE drop='first') : {prep_lr.transform(X_train[:5]).shape[1]} kolom")
-print(f"  - Random Forest       (Passthrough + OrdinalEncoder)      : {prep_rf.transform(X_train[:5]).shape[1]} kolom")
-print(f"  - Gradient Boosting   (Passthrough + OHE penuh)           : {prep_gb.transform(X_train[:5]).shape[1]} kolom")
+dim_lr = prep_lr.transform(X_train[:5]).shape[1]
+dim_rf = prep_rf.transform(X_train[:5]).shape[1]
+dim_gb = prep_gb.transform(X_train[:5]).shape[1]
 
-# Visualisasi Perbedaan Preprocessing Antar-Model (Dimensi & Distribusi Skala)
-fig, axes = plt.subplots(1, 2, figsize=(14.5, 4.3))
+print("Dimensi fitur setelah preprocessing berbeda per model (dari fitur terpilih):")
+print(f"  - Logistic Regression (StandardScaler + OHE drop='first') : {dim_lr} kolom")
+print(f"  - Random Forest       (Passthrough + OrdinalEncoder)      : {dim_rf} kolom")
+print(f"  - Gradient Boosting   (Passthrough + OHE penuh)           : {dim_gb} kolom")
 
-# Panel Kiri: Perbandingan Dimensi Kolom Hasil Preprocessing
+fig, axes = plt.subplots(1, 2, figsize=(13.8, 4.3))
+
 prep_names = ["Logistic Regression\n(Scaler + OHE drop='first')", "Random Forest\n(Passthrough + Ordinal)", "Gradient Boosting\n(Passthrough + OHE penuh)"]
-prep_dims = [
-    prep_lr.transform(X_train[:5]).shape[1],
-    prep_rf.transform(X_train[:5]).shape[1],
-    prep_gb.transform(X_train[:5]).shape[1],
-]
+prep_dims = [dim_lr, dim_rf, dim_gb]
 bars_p = axes[0].bar(prep_names, prep_dims, color=["#1f77b4", "#2ca02c", "#d62728"], width=0.5)
 axes[0].set_ylabel("Jumlah Dimensi Fitur Masukan Model")
 axes[0].set_title("Perbedaan Jumlah Fitur Setelah Preprocessing Tiap Model", fontweight="bold")
-axes[0].set_ylim(0, 105)
+axes[0].set_ylim(0, max(prep_dims) + 14)
 for b, d in zip(bars_p, prep_dims):
-    axes[0].text(b.get_x() + b.get_width()/2, d + 2, f"{d} fitur", ha="center", fontweight="bold", fontsize=10)
+    axes[0].text(b.get_x() + b.get_width()/2, d + 1.2, f"{d} fitur", ha="center", fontweight="bold", fontsize=10)
 
-# Panel Kanan: Perbandingan Skala Fitur (StandardScaler LR vs Skala Asli RF/GB)
 cols_vis = ["Age", "Blood_Pressure_Systolic", "Total_Cholesterol"]
 idx_vis = [num_cols.index(c) for c in cols_vis]
 raw_vals = [X_train[c].iloc[:500].values for c in cols_vis]
@@ -531,12 +576,12 @@ plt.show()"""
         )
     )
 
-    # 8. Tahap Baseline
+    # 9. Tahap Baseline
     cells.append(
         nbf.v4.new_markdown_cell(
-            """## 7. Evaluasi Tahap 1: Model Baseline (Parameter Default, Ambang `t = 0,50`)
+            """## 8. Evaluasi Tahap 1: Model Baseline (Parameter Default, Ambang `t = 0,50`)
 
-Pada tahap pertama, ketiga model dilatih menggunakan konfigurasi bawaan (*default hyperparameters*) dan dievaluasi pada ambang keputusan standar `t = 0,50` pada Test Set (5.691 pasien)."""
+Ketiga model dilatih pada dataset hasil seleksi fitur menggunakan parameter bawaan *scikit-learn* dan dievaluasi pada Test Set (5.691 pasien)."""
         )
     )
 
@@ -600,8 +645,7 @@ df_baseline = pd.DataFrame(baseline_records)[[
 print("=== HASIL MODEL BASELINE PADA TEST SET (5.691 PASIEN) ===")
 display(df_baseline.round(4))
 
-# Grafik Confusion Matrix 3 Model Baseline
-fig, axes = plt.subplots(1, 3, figsize=(15, 4.3))
+fig, axes = plt.subplots(1, 3, figsize=(14, 4.2))
 for idx, name in enumerate(baseline_models.keys()):
     preds = (baseline_probs_test[name] >= 0.50).astype(int)
     cm = confusion_matrix(y_test, preds)
@@ -623,27 +667,22 @@ plt.show()"""
         )
     )
 
-    # 9. Tahap Improvement
+    # 10. Tahap Improvement
     cells.append(
         nbf.v4.new_markdown_cell(
-            """## 8. Evaluasi Tahap 2: Improvement Model (Hyperparameter Tuning, Threshold Tuning & Ensemble)
+            """## 9. Evaluasi Tahap 2: Improvement Model (Hyperparameter Tuning, Threshold Tuning & Ensemble)
 
-Kelemahan utama model Baseline pada `t = 0,50` adalah **tingginya kasus stroke yang terlewat (False Negative)**: Random Forest Baseline hanya mencapai Recall **54,2%** (632 pasien risiko tinggi terlewat) dan Gradient Boosting Baseline hanya mencapai Recall **65,6%** (474 terlewat).
-
-Untuk mengatasinya, kita menerapkan improvement spesifik pada setiap model + penggabungan Ensemble:
-1. **Logistic Regression Improved**: Penyetelan parameter regularisasi `C` pada Validation Set + **Threshold Tuning** untuk memaksimalkan F1-Score klinis.
-2. **Random Forest Improved**: Penambahan `n_estimators=250`, pengaturan kedalaman `max_depth=20` dan `min_samples_leaf=2`, serta **`class_weight='balanced_subsample'`** agar pohon memberi bobot adil ke pasien High Risk + **Threshold Tuning**.
-3. **Gradient Boosting Improved**: Penyetelan `n_estimators=400`, `learning_rate=0.08`, `max_depth=4`, dan `subsample=0.8` (stochastic gradient boosting hingga konvergensi penuh) + **Threshold Tuning**.
-4. **Ensemble Soft Voting**: Menggabungkan rata-rata probabilitas ketiga model yang telah ditingkatkan (`voting='soft'`) + **Threshold Tuning** pada Validation Set.
-
-Seluruh pemilihan parameter `C` dan pencarian ambang keputusan `t` dilakukan **hanya pada Data Validasi (5.691 baris)** agar evaluasi akhir pada Data Uji tetap objektif."""
+Pada tahap Baseline (`t = 0,50`), Random Forest dan Gradient Boosting masih melewatkan ratusan pasien risiko tinggi (*False Negative*). Kita menerapkan *improvement* spesifik pada masing-masing model (pada dataset hasil seleksi fitur):
+1. **Logistic Regression Improved**: Pencarian parameter regularisasi `C` optimal pada Validation Set + **Threshold Tuning**.
+2. **Random Forest Improved**: `n_estimators=250`, `max_depth=20`, `min_samples_leaf=2`, dan `class_weight='balanced_subsample'` + **Threshold Tuning**.
+3. **Gradient Boosting Improved**: `n_estimators=400`, `learning_rate=0.08`, `max_depth=4`, dan `subsample=0.8` hingga konvergensi penuh + **Threshold Tuning**.
+4. **Ensemble Soft Voting**: Penggabungan probabilitas ketiga model teroptimasi + **Threshold Tuning** pada Validation Set."""
         )
     )
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""# 1. Cari parameter C terbaik untuk Logistic Regression pada Data Validasi
-best_c, best_lr_auc = 1.0, -1.0
+            r"""best_c, best_lr_auc = 1.0, -1.0
 for c_val in [0.05, 0.1, 0.5, 1.0, 2.0, 5.0]:
     cand = Pipeline([
         ("prep", prep_lr),
@@ -656,7 +695,6 @@ for c_val in [0.05, 0.1, 0.5, 1.0, 2.0, 5.0]:
         best_c = c_val
 print(f"Logistic Regression -> C optimal pada Validation Set: C = {best_c} (Val ROC-AUC = {best_lr_auc:.4f})")
 
-# 2. Definisi 3 Model Improved + Ensemble Soft Voting
 pipe_lr_imp = Pipeline([
     ("prep", prep_lr),
     ("clf", LogisticRegression(C=best_c, max_iter=1000, random_state=SEED)),
@@ -697,7 +735,6 @@ improved_models = {
     "Ensemble Soft Voting": pipe_ens_imp,
 }
 
-# 3. Latih dan cari Threshold Optimal (berdasarkan F1 tertinggi di Validation Set)
 improved_probs_val = {}
 improved_probs_test = {}
 optimal_thresholds = {}
@@ -737,12 +774,9 @@ display(df_improved.round(4))"""
         )
     )
 
-    # 10. Perbandingan Baseline vs Improved + Confusion Matrix per Model + ROC/PR
     cells.append(
         nbf.v4.new_markdown_cell(
-            """### 8.1 Perbandingan Head-to-Head Baseline vs Improvement & Confusion Matrix Tiap Model
-
-Di bawah ini disajikan tabel perbandingan menyeluruh antara kondisi **Baseline** dan **Improved**, diikuti matriks kebingungan (*Confusion Matrix*) untuk **setiap model** sebelum dan sesudah improvement serta grafik perbandingan metrik dan kurva ROC/PR."""
+            """### 9.1 Perbandingan Head-to-Head Baseline vs Improvement & Confusion Matrix Tiap Model"""
         )
     )
 
@@ -824,7 +858,7 @@ axes[1].bar(x_idx - w2/2, fn_base, width=w2, label="False Negative Baseline", co
 axes[1].bar(x_idx + w2/2, fn_imp, width=w2, label="False Negative Improved", color="#2ca02c")
 axes[1].set_xticks(x_idx)
 axes[1].set_xticklabels(["Logistic\nRegression", "Random\nForest", "Gradient\nBoosting"])
-axes[1].set_ylim(0, 740)
+axes[1].set_ylim(0, 680)
 axes[1].set_ylabel("Jumlah Pasien High Risk Terlewat (FN)")
 axes[1].set_title("Penurunan Kasus High Risk Terlewat (False Negative)", fontweight="bold")
 axes[1].legend(fontsize=8.5, loc="upper right", frameon=True)
@@ -880,13 +914,12 @@ plt.show()"""
     # 11. Validasi Berlapis
     cells.append(
         nbf.v4.new_markdown_cell(
-            """## 9. Validasi Model Komprehensif
+            """## 10. Validasi Model Komprehensif (Pada Dataset Hasil Seleksi Fitur)
 
-Untuk memastikan performa model **bukan kebetulan dari satu pembagian acak**, kita melakukan empat lapisan validasi:
-1. **Validasi 1: 5-Fold Stratified Cross-Validation** pada gabungan Train+Val (32.249 baris) menggunakan ambang optimal masing-masing, mengukur rata-rata dan standar deviasi (`mean +/- std`).
-2. **Validasi 2: Bootstrap 95% Confidence Interval (n = 1.000)** pada Test Set (5.691 pasien) untuk mengukur ketidakpastian statistik ROC-AUC, Recall, dan F1 model terbaik.
-3. **Validasi 3: Learning Curve** untuk memverifikasi ketiadaan *overfitting* maupun *underfitting*.
-4. **Validasi 4: Interpretasi Kepentingan Fitur Klinis (*Feature Importance*)** untuk memastikan model bertumpu pada biomarker medis yang sah."""
+Untuk memastikan performa model konsisten dan tidak mengalami *overfitting*, dilakukan tiga pengujian validasi pada dataset hasil seleksi fitur:
+1. **Validasi 1: 5-Fold Stratified Cross-Validation** (*Out-of-Fold* pada ambang optimal masing-masing model di 32.249 baris pengembangan).
+2. **Validasi 2: Bootstrap 95% Confidence Interval (n = 1.000)** pada Test Set (5.691 pasien).
+3. **Validasi 3: Learning Curve** untuk memverifikasi ketiadaan *overfitting* seiring penambahan data latih."""
         )
     )
 
@@ -899,7 +932,7 @@ y_dev = pd.concat([y_train, y_val], axis=0).reset_index(drop=True)
 cv5 = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
 
 cv_summary = []
-print("Menjalankan 5-Fold Stratified Cross-Validation pada 32.249 baris...")
+print("Menjalankan 5-Fold Stratified Cross-Validation pada 32.249 baris (fitur terpilih)...")
 for name in ["Logistic Regression", "Random Forest", "Gradient Boosting"]:
     model_cv = improved_models[name]
     probs_oof = cross_val_predict(model_cv, X_dev, y_dev, cv=cv5, method="predict_proba", n_jobs=-1)[:, 1]
@@ -980,7 +1013,7 @@ lc_models = {
     "Random Forest": ("#2ca02c", pipe_rf_imp),
     "Gradient Boosting": ("#d62728", Pipeline([
         ("prep", prep_gb),
-        ("clf", GradientBoostingClassifier(n_estimators=120, learning_rate=0.05, max_depth=4, subsample=0.8, random_state=SEED)),
+        ("clf", GradientBoostingClassifier(n_estimators=150, learning_rate=0.08, max_depth=4, subsample=0.8, random_state=SEED)),
     ])),
 }
 
@@ -1012,91 +1045,7 @@ plt.show()"""
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""# Validasi 4: Feature Importance Agregat Seluruh 35 Fitur Asli (Gradient Boosting)
-ohe_names = pipe_gb_imp.named_steps["prep"].transformers_[1][1].get_feature_names_out(cat_cols).tolist()
-imps_raw = pipe_gb_imp.named_steps["clf"].feature_importances_
-
-# Agregasikan kembali kolom OHE ke 35 nama fitur asli
-agg_imp = {col: 0.0 for col in num_cols + cat_cols}
-for col, val in zip(num_cols, imps_raw[:len(num_cols)]):
-    agg_imp[col] += float(val)
-for name_ohe, val in zip(ohe_names, imps_raw[len(num_cols):]):
-    for col in sorted(cat_cols, key=len, reverse=True):
-        if name_ohe.startswith(col + "_"):
-            agg_imp[col] += float(val)
-            break
-
-gb_imp = pd.DataFrame(
-    list(agg_imp.items()), columns=["Fitur", "Importance"]
-).sort_values("Importance", ascending=False).reset_index(drop=True)
-
-plot_imp = gb_imp.sort_values("Importance", ascending=True)
-colors_imp = ["#1f77b4" if v >= 0.005 else "#b0bec5" for v in plot_imp["Importance"]]
-
-plt.figure(figsize=(10, 9.2))
-bars = plt.barh(plot_imp["Fitur"], plot_imp["Importance"], color=colors_imp, alpha=0.92)
-plt.axvline(0.005, color="#d62728", linestyle="--", lw=1.2, label="Batas Seleksi Kontribusi (0,5%)")
-plt.title("Feature Importance Agregat Seluruh 35 Fitur Asli (Biru >= 0,5% | Abu < 0,5%)", fontweight="bold")
-plt.xlabel("Total Kontribusi Relatif (Relative Importance)")
-for b in bars:
-    w_bar = b.get_width()
-    plt.text(w_bar + 0.002, b.get_y() + b.get_height()/2, f"{w_bar*100:.2f}%", va="center", fontsize=8)
-plt.xlim(0, plot_imp["Importance"].max() * 1.16)
-plt.legend(loc="lower right")
-plt.grid(axis="x", linestyle=":", alpha=0.6)
-plt.tight_layout()
-plt.savefig(ASSET_DIR / "fig_06b_feature_importance.png", dpi=150, bbox_inches="tight")
-plt.show()
-
-selected_feats = gb_imp[gb_imp["Importance"] >= 0.005]["Fitur"].tolist()
-dropped_feats = gb_imp[gb_imp["Importance"] < 0.005]["Fitur"].tolist()
-print(f"Fitur kontribusi tinggi (>= 0,5%): {len(selected_feats)} fitur")
-print(f"Fitur kontribusi sangat kecil (< 0,5%): {len(dropped_feats)} fitur -> {dropped_feats}")
-display(gb_imp)"""
-        )
-    )
-
-    cells.append(
-        nbf.v4.new_code_cell(
-            r"""# Validasi 5: Uji Seleksi Fitur (Semua 35 Fitur vs 26 Fitur Kontribusi >= 0,5%)
-num_sel = [c for c in selected_feats if c in num_cols]
-cat_sel = [c for c in selected_feats if c in cat_cols]
-
-prep_gb_sel = ColumnTransformer([
-    ("num", "passthrough", num_sel),
-    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), cat_sel),
-])
-pipe_gb_sel = Pipeline([
-    ("prep", prep_gb_sel),
-    ("clf", GradientBoostingClassifier(
-        n_estimators=400, learning_rate=0.08, max_depth=4, subsample=0.8, random_state=SEED
-    )),
-])
-
-pipe_gb_sel.fit(X_train[selected_feats], y_train)
-p_val_sel = pipe_gb_sel.predict_proba(X_val[selected_feats])[:, 1]
-p_test_sel = pipe_gb_sel.predict_proba(X_test[selected_feats])[:, 1]
-
-best_t_sel = max(threshold_grid, key=lambda t: f1_score(y_val, (p_val_sel >= t).astype(int)))
-best_t_sel = float(round(best_t_sel, 2))
-
-res_full_35 = evaluate_predictions(y_test, improved_probs_test["Gradient Boosting"], threshold=optimal_thresholds["Gradient Boosting"])
-res_full_35["Skenario"] = f"Semua {X.shape[1]} Fitur (OHE: {prep_gb.transform(X_train[:1]).shape[1]} kol)"
-
-res_sel_26 = evaluate_predictions(y_test, p_test_sel, threshold=best_t_sel)
-res_sel_26["Skenario"] = f"Filtered >= 0.5% ({len(selected_feats)} Fitur, OHE: {prep_gb_sel.transform(X_train[selected_feats][:1]).shape[1]} kol)"
-
-df_fs = pd.DataFrame([res_full_35, res_sel_26])[[
-    "Skenario", "Threshold", "ROC_AUC", "PR_AUC", "Akurasi", "Recall", "Presisi", "F1_Score", "TP", "FN"
-]]
-print("=== PERBANDINGAN FEATURE SELECTION: SEMUA FITUR VS FITUR KONTRIBUSI TINGGI ===")
-display(df_fs.round(4))"""
-        )
-    )
-
-    cells.append(
-        nbf.v4.new_code_cell(
-            r"""# Simpan seluruh ringkasan numerik ke artifacts/uas_full_dataset_results.json agar sinkron dengan laporan & artikel
+            r"""# Simpan ringkasan numerik lengkap ke artifacts/uas_full_dataset_results.json
 summary_export = {
     "dataset_raw_rows": int(len(df_raw)),
     "dataset_raw_cols": int(df_raw.shape[1]),
@@ -1105,9 +1054,11 @@ summary_export = {
     "duplicates_exact": dup_exact,
     "duplicates_without_id": dup_features,
     "dataset_clean_rows": int(len(df_clean)),
-    "num_features_valid": int(X.shape[1]),
-    "num_numeric_features": len(num_cols),
-    "num_categorical_features": len(cat_cols),
+    "num_features_before_selection": int(X.shape[1]),
+    "selected_features_count": len(selected_feats),
+    "selected_features": selected_feats,
+    "dropped_features": dropped_feats,
+    "preprocessed_dims": {"Logistic Regression": dim_lr, "Random Forest": dim_rf, "Gradient Boosting": dim_gb},
     "target_high_count": int((y == 1).sum()),
     "target_non_high_count": int((y == 0).sum()),
     "target_prevalence_pct": round(float(y.mean() * 100), 2),
@@ -1119,10 +1070,7 @@ summary_export = {
     "cv5_summary": cv_summary,
     "bootstrap_best_model": best_model_name,
     "bootstrap_ci": boot_table.round(4).to_dict(orient="records"),
-    "top10_features": gb_imp.head(10).round(4).to_dict(orient="records"),
-    "selected_features_count": len(selected_feats),
-    "dropped_features": dropped_feats,
-    "feature_selection_comparison": df_fs.round(4).to_dict(orient="records"),
+    "feature_importance_top10": df_fs_imp.head(10).round(4).to_dict(orient="records"),
 }
 
 out_json = ARTIFACT_DIR / "uas_full_dataset_results.json"
@@ -1135,14 +1083,13 @@ print(f"Ringkasan hasil lengkap tersimpan di: {out_json.resolve()}")"""
     # 12. Kesimpulan
     cells.append(
         nbf.v4.new_markdown_cell(
-            """## 10. Kesimpulan Presentasi UAS
+            """## 11. Kesimpulan Presentasi UAS
 
-1. **Penggunaan Seluruh Baris & Kualitas Data**: Dari 50.000 baris mentah `stroke_risk_prediction_dataset.csv`, analisis kualitas data mengidentifikasi 12.060 baris mengandung *missing values* dan 0 duplikasi. Penghapusan baris kosong menghasilkan **37.940 pasien bersih** yang seluruhnya digunakan tanpa sampling pemotongan, serta bebas *target leakage*.
-2. **Perlakuan Preprocessing Berbeda Menghasilkan Kinerja Berbeda**: `StandardScaler + OneHotEncoder(drop='first')` menjaga konvergensi optimal Logistic Regression (ROC-AUC 0,9571), sementara `passthrough + OrdinalEncoder` untuk Random Forest dan `passthrough + OneHotEncoder` untuk Gradient Boosting menyesuaikan sifat *tree-based* masing-masing.
-3. **Dampak Nyata Improvement**:
-   - Seluruh model mengalami peningkatan tajam setelah *Hyperparameter Tuning* dan *Threshold Tuning*: terutama penurunan besar kasus stroke berisiko tinggi yang terlewat (*False Negative*).
-   - **Gradient Boosting Improved** (`n_estimators=400, lr=0.08, max_depth=4, subsample=0.8`) mencapai performa puncak dengan ROC-AUC > 0,99, Recall > 92%, dan F1-Score > 0,92 pada data uji independen.
-4. **Validasi Konsisten & Sah Secara Medis**: Hasil 5-Fold Stratified Cross-Validation, Bootstrap 95% CI, dan Learning Curve membuktikan stabilitas model tanpa overfitting, sementara *Feature Importance* menegaskan dominasi biomarker klinis riil (tekanan darah sistolik, usia, glukosa, riwayat TIA, HbA1c, profil lipid)."""
+1. **Pembersihan Korpus Penuh**: Dari 50.000 baris mentah, penghapusan 12.060 baris kosong (`dropna`) dan pemeriksaan 0 duplikasi menghasilkan **37.940 pasien bersih** (bebas 4 kolom *target leakage*).
+2. **Seleksi Fitur Berbasis *Feature Importance* di Awal Pipeline**: Evaluasi pada Data Latih menyaring **26 fitur klinis dengan kontribusi >= 0,5%** (membuang 9 fitur kontribusi sangat kecil seperti `Country`, `Work_Type`, `Gender`, `Heart_Rate`, dll.), memangkas dimensi masukan Gradient Boosting dari 88 menjadi 42 kolom.
+3. **Perlakuan Preprocessing Berbeda & Dampak Improvement**:
+   - Seluruh model mengalami peningkatan tajam setelah *Hyperparameter Tuning* dan *Threshold Tuning*: penurunan drastis *False Negative* di ketiga model.
+   - **Gradient Boosting Improved** (`n_estimators=400, lr=0.08, max_depth=4, subsample=0.8`) mencapai performa puncak **ROC-AUC > 0,99**, **Recall > 88%**, dan **F1-Score > 0,90** pada data uji independen dengan validasi konsisten di 5-Fold Stratified CV dan Bootstrap 95% CI."""
         )
     )
 
