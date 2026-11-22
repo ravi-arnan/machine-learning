@@ -618,7 +618,12 @@ tanpa pemotongan sampel, `notebooks/15_presentasi_uas_full_dataset.ipynb` mengau
 50.000 baris mentah: ditemukan 12.060 baris mengandung *missing values* (13.522 sel kosong di
 13 kolom) dan 0 baris duplikasi. Penghapusan baris kosong (`dropna`) dan verifikasi bebas
 duplikasi (`drop_duplicates`) menghasilkan **37.940 pasien bersih** dengan 35 fitur bebas
-*target leakage* (prevalensi High Risk 24,23%; 9.193 positif vs 28.747 non-high).
+*target leakage* (prevalensi High Risk 24,23%; 9.193 positif vs 28.747 non-high). Audit
+langsung terhadap 4 kolom pasca-diagnosis yang dibuang membuktikan adanya *target leakage*
+mutlak: `Stroke_Risk_Score` terpisah tanpa tumpang tindih terhadap target (`Low`: 2 - 34 pada
+2.662 pasien; `Moderate`: 35 - 64 pada 26.085 pasien; `High`: 65 - 100 pada 9.193 pasien),
+sementara `AI_Health_Recommendation` dan `Doctor_Consultation_Needed` merupakan keluaran
+tindak lanjut pasca-diagnosis.
 
 Data dibagi secara *stratified* (70% latih: 26.558, 15% validasi: 5.691, 15% uji: 5.691),
 lalu analisis *Feature Importance* agregat dijalankan **hanya pada Data Latih sebelum
@@ -626,14 +631,18 @@ pemodelan** untuk menyaring **26 fitur berkontribusi >= 0,5%** (`Age` 14,81%,
 `Blood_Pressure_Systolic` 13,30%, `Blood_Glucose` 9,00%, `Previous_TIA` 6,67%, `HbA1c` 6,46%,
 dll.) dan membuang 9 fitur kontribusi rendah (`Daily_Walking_Minutes`, `Residence_Type`,
 `Exercise_Hours_Per_Week`, `Weight_kg`, `Height_cm`, `Country`, `Heart_Rate`, `Gender`,
-`Work_Type`).
+`Work_Type`). Seleksi tersebut menghasilkan keadaan dataset final **26 fitur (11 numerik dan
+15 kategorikal)** dengan 0 *missing value* pada seluruh partisi (`Train: 26.558 x 26`,
+`Validation: 5.691 x 26`, `Test: 5.691 x 26`).
 
 Pada dataset hasil seleksi 26 fitur tersebut, ketiga model menerima perlakuan *preprocessing*
 berbeda (`Logistic Regression`: `StandardScaler` + `OneHotEncoder(drop='first')` -> 33 kolom;
 `Random Forest`: skala asli + `OrdinalEncoder` -> 26 kolom; `Gradient Boosting`: skala asli +
 `OneHotEncoder` -> 48 kolom), lalu dibandingkan **Baseline** (`t = 0,50`) melawan
 **Improvement** (*hyperparameter tuning*, `class_weight='balanced_subsample'` pada RF,
-*threshold tuning* pada Validation Set, dan *Ensemble Soft Voting*):
+pencarian *threshold* optimal berbasis puncak F1-Score Validation Set pada rentang `0,20 - 0,70`
+sehingga diperoleh `LR = 0,42`, `RF = 0,41`, `GB = 0,46`, `Ensemble = 0,44`, serta
+*Ensemble Soft Voting*):
 
 | Model | Tahap | Threshold | ROC-AUC | PR-AUC | Akurasi | Recall | Presisi | F1-Score | FN |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
@@ -650,6 +659,17 @@ Stratified CV* out-of-fold pada ambang optimal (`t = 0,46`) meraih **ROC-AUC 0,9
 **PR-AUC 0,9763 +/- 0,0015**, **Recall 88,24% +/- 0,52%**, dan **F1-Score 0,9060 +/- 0,0030**,
 serta *Bootstrap 95% CI* pada Test Set berada pada rentang sempit `0,9888 - 0,9922` untuk ROC-AUC
 dan `0,8908 - 0,9133` untuk F1-Score, tanpa gejala *overfitting* pada *Learning Curve*.
+
+Simulasi prediksi individual pada 5 sampel pasien Test Set dengan **Gradient Boosting Improved**
+(`t = 0,46`) memperlihatkan perilaku klinis yang terkalibrasi sekaligus batas kasus *borderline*:
+
+| Usia | TD Sistolik | Glukosa | HbA1c | Previous TIA | Atrial Fib. | Prob. High Risk | Prediksi (`t=0,46`) | Status Aktual | Cek |
+|---:|---:|---:|---:|---|---|---:|---|---|---|
+| 69 | 158 | 218,3 | 4,7 | No | No | 0,9824 | High Risk (1) | High Risk (1) | Tepat |
+| 29 | 160 | 209,8 | 8,8 | Yes | No | 0,9847 | High Risk (1) | High Risk (1) | Tepat |
+| 80 | 168 | 102,6 | 8,3 | No | No | 0,4222 | Non-High (0) | High Risk (1) | Meleset |
+| 26 | 136 | 199,5 | 8,1 | No | No | 0,0341 | Non-High (0) | Non-High (0) | Tepat |
+| 65 | 102 | 120,5 | 8,5 | No | No | 0,0146 | Non-High (0) | Non-High (0) | Tepat |
 
 ---
 
@@ -680,10 +700,15 @@ dan `0,8908 - 0,9133` untuk F1-Score, tanpa gejala *overfitting* pada *Learning 
 5. **Akurasi bukan metrik yang tepat untuk kasus ini,** dan itu terbukti pada model kami
    sendiri, bukan hanya pada baseline: model dengan ROC-AUC 0,84 tetap punya recall nol
    selama ambangnya dibiarkan 0,50.
-6. **Penambahan biomarker klinis menembus batas atas performa (ROC-AUC 0,962).**
+6. **Optimalisasi dataset, seleksi 26 fitur, dan lonjakan ROC-AUC ke 0,9906 pada korpus penuh.**
    Menyeimbangkan dataset 3.000 pasien asli menaikkan ROC-AUC ke 0,875 (Ensemble Soft Voting,
-   `t = 0,34`), sedangkan pengayaan 35 fitur biomarker laboratorium riil bebas *target leakage*
-   melipatgandakan daya pisah hingga ROC-AUC 0,962 dan PR-AUC 0,902 pada data uji independen.
+   `t = 0,34`), sementara pengayaan 35 biomarker klinis pada 3.000 sampel (Notebook `14`) meraih
+   ROC-AUC 0,962. Pada evaluasi korpus penuh **37.940 pasien bersih** (Notebook `15`) dengan
+   eliminasi 4 kolom *target leakage*, seleksi **26 fitur (>= 0,5%)** di awal pipeline,
+   preprocessing berbeda tiap model, dan improvement hyperparameter serta threshold tuning
+   (`t = 0,46`), **Gradient Boosting Improved** meraih **ROC-AUC 0,9906**, **PR-AUC 0,9741**,
+   **Akurasi 95,36%**, **Recall 88,47%**, **Presisi 92,08%**, dan **F1-Score 0,9024** yang
+   tervalidasi konsisten oleh 5-Fold Stratified CV dan Bootstrap 95% CI.
 
 Pelajaran yang paling ingin kami tekankan: **yang paling menentukan hasil bukan pilihan
 algoritma, melainkan pilihan ambang keputusan, dan pilihan itu adalah persoalan kebijakan

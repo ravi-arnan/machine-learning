@@ -500,7 +500,8 @@ def create_laporan():
         ("Tabel 4.7 Penyetelan Ambang Ensemble Soft Voting Test Set Biomarker Klinis", "30"),
         ("Tabel 4.8 Sepuluh Biomarker Klinis Terpenting pada Model Terbaik", "31"),
         ("Tabel 4.9 Komparasi Model Baseline vs Improvement pada 37.940 Pasien Bersih", "33"),
-        ("Tabel 4.10 Validasi 5-Fold Stratified CV dan Bootstrap 95% CI (37.940 Pasien)", "35")
+        ("Tabel 4.10 Validasi 5-Fold Stratified CV dan Bootstrap 95% CI (37.940 Pasien)", "35"),
+        ("Tabel 4.11 Simulasi Prediksi Individual pada 5 Pasien Test Set (GB Improved)", "36")
     ]
     for t_tit, t_hlm in daftar_tabel_items:
         add_toc_line(t_tit, t_hlm, is_bold=False, indent_inch=0.0)
@@ -532,10 +533,12 @@ def create_laporan():
         ("Gambar 4.11 Pemeringkatan Top 15 Biomarker Klinis Terpenting", "32"),
         ("Gambar 4.12 Audit Missing Values dan Dampak Pembersihan Data (50.000 -> 37.940 Baris)", "33"),
         ("Gambar 4.13 Pemeringkatan Feature Importance dan Seleksi 26 Fitur (Sebelum Pemodelan)", "34"),
-        ("Gambar 4.14 Matriks Kebingungan Semua Model: Tahap Baseline (t = 0,50)", "34"),
-        ("Gambar 4.15 Matriks Kebingungan Semua Model: Tahap After Improvement", "35"),
-        ("Gambar 4.16 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)", "35"),
-        ("Gambar 4.17 Kurva Belajar (Learning Curve) Korpus Penuh", "36")
+        ("Gambar 4.14 Perubahan Komposisi Fitur (35 -> 26) dan Partisi Dataset Final", "34"),
+        ("Gambar 4.15 Matriks Kebingungan Semua Model: Tahap Baseline (t = 0,50)", "34"),
+        ("Gambar 4.16 Kurva Pencarian Threshold Optimal pada Validation Set", "35"),
+        ("Gambar 4.17 Matriks Kebingungan Semua Model: Tahap After Improvement", "35"),
+        ("Gambar 4.18 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)", "36"),
+        ("Gambar 4.19 Kurva Belajar (Learning Curve) Korpus Penuh", "36")
     ]
     for g_tit, g_hlm in daftar_gambar_items:
         add_toc_line(g_tit, g_hlm, is_bold=False, indent_inch=0.0)
@@ -1103,7 +1106,7 @@ def create_laporan():
     )
 
     add_heading_subbab("4.9 Evaluasi Penuh Korpus Biomarker Klinis (37.940 Pasien Bersih) dan Validasi Berlapis UAS")
-    add_body_p("Menindaklanjuti arahan dosen pengampu untuk memanfaatkan keseluruhan baris pada dataset biomarker klinis terbaru tanpa pemotongan sampel (subsampling), Notebook 15 (15_presentasi_uas_full_dataset.ipynb) melakukan audit kualitas menyeluruh terhadap seluruh 50.000 baris dan 40 kolom. Ditemukan 13.522 sel kosong pada 13 kolom yang memengaruhi 12.060 baris (24,12%) serta 0 baris duplikasi (baik duplikat penuh, duplikat Patient_ID, maupun duplikat fitur tanpa ID). Setelah menghapus baris kosong (dropna) dan memverifikasi bebas duplikasi (drop_duplicates), diperoleh korpus bersih sebanyak 37.940 pasien dengan 35 fitur prediktor bebas target leakage dan prevalensi risiko tinggi sebesar 24,23% (9.193 kasus positif berbanding 28.747 non-high risk), sebagaimana divisualisasikan pada Gambar 4.12.")
+    add_body_p("Menindaklanjuti arahan dosen pengampu untuk memanfaatkan keseluruhan baris pada dataset biomarker klinis terbaru tanpa pemotongan sampel (subsampling), Notebook 15 (15_presentasi_uas_full_dataset.ipynb) melakukan audit kualitas menyeluruh terhadap seluruh 50.000 baris dan 40 kolom. Ditemukan 13.522 sel kosong pada 13 kolom yang memengaruhi 12.060 baris (24,12%) serta 0 baris duplikasi (baik duplikat penuh, duplikat Patient_ID, maupun duplikat fitur tanpa ID). Setelah menghapus baris kosong (dropna) dan memverifikasi bebas duplikasi (drop_duplicates), diperoleh korpus bersih sebanyak 37.940 pasien dengan 35 fitur prediktor bebas target leakage dan prevalensi risiko tinggi sebesar 24,23% (9.193 kasus positif berbanding 28.747 non-high risk), sebagaimana divisualisasikan pada Gambar 4.12. Pemeriksaan langsung terhadap 4 kolom pasca-diagnosis yang dibuang membuktikan target leakage mutlak: Stroke_Risk_Score terpisah tanpa tumpang tindih terhadap label target (Low: 2 - 34 pada 2.662 pasien; Moderate: 35 - 64 pada 26.085 pasien; High: 65 - 100 pada 9.193 pasien), sedangkan AI_Health_Recommendation dan Doctor_Consultation_Needed merupakan keluaran tindak lanjut sesudah risiko ditetapkan.")
 
     add_image_box(
         "assets/evaluasi_15/fig_01_audit_dan_pembersihan.png",
@@ -1111,12 +1114,18 @@ def create_laporan():
         width_inch=5.3
     )
 
-    add_body_p("Data bersih dibagi secara stratified menjadi 70% latih (26.558 baris), 15% validasi (5.691 baris), dan 15% uji independen (5.691 baris). Sebelum memasuki tahap preprocessing dan pemodelan, analisis Feature Importance agregat dijalankan hanya pada Data Latih (anti data leakage) untuk menyaring 26 fitur berkontribusi >= 0,5% (Age 14,81%, Blood_Pressure_Systolic 13,30%, Blood_Glucose 9,00%, Previous_TIA 6,67%, HbA1c 6,46%, Blood_Pressure_Diastolic 4,84%, Total_Cholesterol 4,53%, LDL 4,29%, dst.) serta membuang 9 fitur kontribusi sangat rendah (Daily_Walking_Minutes, Residence_Type, Exercise_Hours_Per_Week, Weight_kg, Height_cm, Country, Heart_Rate, Gender, Work_Type), sebagaimana terlihat pada Gambar 4.13. Pada dataset hasil seleksi 26 fitur tersebut, tiap algoritma menerima perlakuan preprocessing berbeda: Logistic Regression memakai StandardScaler dan OneHotEncoder(drop='first') (33 kolom), Random Forest memakai skala numerik asli (passthrough) dan OrdinalEncoder (26 kolom), sedangkan Gradient Boosting memakai skala numerik asli dan OneHotEncoder penuh (48 kolom). Perbandingan Baseline (t = 0,50) melawan Improvement dirangkum pada Tabel 4.9.")
+    add_body_p("Data bersih dibagi secara stratified menjadi 70% latih (26.558 baris), 15% validasi (5.691 baris), dan 15% uji independen (5.691 baris). Sebelum memasuki tahap preprocessing dan pemodelan, analisis Feature Importance agregat dijalankan hanya pada Data Latih (anti data leakage) untuk menyaring 26 fitur berkontribusi >= 0,5% (Age 14,81%, Blood_Pressure_Systolic 13,30%, Blood_Glucose 9,00%, Previous_TIA 6,67%, HbA1c 6,46%, Blood_Pressure_Diastolic 4,84%, Total_Cholesterol 4,53%, LDL 4,29%, dst.) serta membuang 9 fitur kontribusi sangat rendah (Daily_Walking_Minutes, Residence_Type, Exercise_Hours_Per_Week, Weight_kg, Height_cm, Country, Heart_Rate, Gender, Work_Type), sebagaimana terlihat pada Gambar 4.13. Keadaan dataset akhir setelah seleksi tersebut terdiri atas 26 fitur terpilih (11 fitur numerik dan 15 fitur kategorikal) dengan 0 missing value pada ketiga partisi (Train 26.558 x 26, Validation 5.691 x 26, Test 5.691 x 26), seperti tergambar pada Gambar 4.14. Pada dataset hasil seleksi 26 fitur itu, tiap algoritma menerima perlakuan preprocessing berbeda: Logistic Regression memakai StandardScaler dan OneHotEncoder(drop='first') (33 kolom), Random Forest memakai skala numerik asli (passthrough) dan OrdinalEncoder (26 kolom), sedangkan Gradient Boosting memakai skala numerik asli dan OneHotEncoder penuh (48 kolom). Perbandingan Baseline (t = 0,50) melawan Improvement dirangkum pada Tabel 4.9.")
 
     add_image_box(
         "assets/evaluasi_15/fig_02e_feature_importance_selection.png",
         "Gambar 4.13 Pemeringkatan Feature Importance dan Seleksi 26 Fitur (Sebelum Pemodelan)",
         width_inch=5.0
+    )
+
+    add_image_box(
+        "assets/evaluasi_15/fig_02f_keadaan_dataset_setelah_seleksi.png",
+        "Gambar 4.14 Perubahan Komposisi Fitur (35 -> 26) dan Partisi Dataset Final",
+        width_inch=5.3
     )
 
     add_styled_table(
@@ -1135,27 +1144,33 @@ def create_laporan():
         bold_last_row=False
     )
 
-    add_body_p("Grafik Confusion Matrix untuk setiap model pada tahap Baseline (Gambar 4.14) dan setelah Improvement (Gambar 4.15) membuktikan penurunan drastis kasus risiko tinggi yang terlewat (False Negative): Logistic Regression turun dari 340 menjadi 274 kasus, Random Forest turun dari 546 menjadi 280 kasus, dan Gradient Boosting turun dari 469 menjadi 159 kasus. Model Gradient Boosting Improved (n_estimators=400, learning_rate=0,08, max_depth=4, subsample=0,8, t=0,46) meraih performa puncak dengan ROC-AUC 0,9906, PR-AUC 0,9741, Akurasi 95,36%, Recall 88,47%, Presisi 92,08%, dan F1-Score 0,9024 (Gambar 4.16).")
+    add_body_p("Pada tahap Improvement, ambang keputusan dikalibrasi menggunakan Validation Set pada grid 0,20 sampai 0,70 untuk memperoleh puncak F1-Score terbaik masing-masing model (LR t = 0,42; RF t = 0,41; GB t = 0,46; Ensemble t = 0,44), sebagaimana divisualisasikan pada Gambar 4.16. Grafik Confusion Matrix untuk setiap model pada tahap Baseline (Gambar 4.15) dan setelah Improvement (Gambar 4.17) membuktikan penurunan drastis kasus risiko tinggi yang terlewat (False Negative): Logistic Regression turun dari 340 menjadi 274 kasus, Random Forest turun dari 546 menjadi 280 kasus, dan Gradient Boosting turun dari 469 menjadi 159 kasus. Model Gradient Boosting Improved (n_estimators=400, learning_rate=0,08, max_depth=4, subsample=0,8, t=0,46) meraih performa puncak dengan ROC-AUC 0,9906, PR-AUC 0,9741, Akurasi 95,36%, Recall 88,47%, Presisi 92,08%, dan F1-Score 0,9024 (Gambar 4.18).")
 
     add_image_box(
         "assets/evaluasi_15/fig_03_cm_baseline.png",
-        "Gambar 4.14 Matriks Kebingungan Semua Model: Tahap Baseline (t = 0,50)",
+        "Gambar 4.15 Matriks Kebingungan Semua Model: Tahap Baseline (t = 0,50)",
+        width_inch=5.3
+    )
+
+    add_image_box(
+        "assets/evaluasi_15/fig_03b_threshold_tuning_val.png",
+        "Gambar 4.16 Kurva Pencarian Threshold Optimal pada Validation Set",
         width_inch=5.3
     )
 
     add_image_box(
         "assets/evaluasi_15/fig_04_cm_improved.png",
-        "Gambar 4.15 Matriks Kebingungan Semua Model: Tahap After Improvement",
+        "Gambar 4.17 Matriks Kebingungan Semua Model: Tahap After Improvement",
         width_inch=5.0
     )
 
     add_image_box(
         "assets/evaluasi_15/fig_05_komparasi_roc_pr.png",
-        "Gambar 4.16 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)",
+        "Gambar 4.18 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)",
         width_inch=5.3
     )
 
-    add_body_p("Untuk membuktikan kestabilan hasil dan mencegah ketergantungan pada satu partisi acak, diterapkan validasi silang 5-Fold Stratified Cross-Validation out-of-fold pada 32.249 baris pengembangan (menggunakan ambang optimal masing-masing model) serta uji Bootstrap 1.000 iterasi pada Test Set (Tabel 4.10). Hasil Learning Curve (Gambar 4.17) memastikan tidak terjadi overfitting.")
+    add_body_p("Untuk membuktikan kestabilan hasil dan mencegah ketergantungan pada satu partisi acak, diterapkan validasi silang 5-Fold Stratified Cross-Validation out-of-fold pada 32.249 baris pengembangan (menggunakan ambang optimal masing-masing model) serta uji Bootstrap 1.000 iterasi pada Test Set (Tabel 4.10). Hasil Learning Curve (Gambar 4.19) memastikan tidak terjadi overfitting, dan simulasi prediksi pada 5 pasien individual dari Test Set ditunjukkan pada Tabel 4.11.")
 
     add_styled_table(
         "Tabel 4.10 Validasi 5-Fold Stratified CV dan Bootstrap 95% CI (37.940 Pasien, 26 Fitur)",
@@ -1172,8 +1187,22 @@ def create_laporan():
 
     add_image_box(
         "assets/evaluasi_15/fig_06a_learning_curve.png",
-        "Gambar 4.17 Kurva Belajar (Learning Curve) Korpus Penuh",
+        "Gambar 4.19 Kurva Belajar (Learning Curve) Korpus Penuh",
         width_inch=4.8
+    )
+
+    add_styled_table(
+        "Tabel 4.11 Simulasi Prediksi Individual pada 5 Pasien Test Set (Gradient Boosting, t = 0,46)",
+        ["Usia", "SBP", "Glukosa", "HbA1c", "TIA", "AF", "Prob.", "Prediksi", "Aktual", "Cek"],
+        [
+            ("69", "158", "218,3", "4,7", "No", "No", "0,9824", "High (1)", "High (1)", "Tepat"),
+            ("29", "160", "209,8", "8,8", "Yes", "No", "0,9847", "High (1)", "High (1)", "Tepat"),
+            ("80", "168", "102,6", "8,3", "No", "No", "0,4222", "Non-High (0)", "High (1)", "Meleset"),
+            ("26", "136", "199,5", "8,1", "No", "No", "0,0341", "Non-High (0)", "Non-High (0)", "Tepat"),
+            ("65", "102", "120,5", "8,5", "No", "No", "0,0146", "Non-High (0)", "Non-High (0)", "Tepat")
+        ],
+        [0.38, 0.42, 0.56, 0.45, 0.36, 0.34, 0.55, 0.78, 0.78, 0.52],
+        bold_last_row=False
     )
 
     # ==========================================
@@ -1269,7 +1298,7 @@ def create_laporan():
         ("12", "12_pemeriksaan_ulang.ipynb", "Uji statistik Nadeau-Bengio, Learning Curve, Net Benefit", "Tugas G"),
         ("13", "13_uji_kombinasi_atribut.ipynb", "Eksplorasi 8 kombinasi atribut terhadap confidence level", "-"),
         ("14", "14_optimalisasi_dataset_biomarker_klinis.ipynb", "Optimalisasi dataset 3k, Soft Voting Ensemble, dan biomarker klinis ROC-AUC 0,962", "Tambahan"),
-        ("15", "15_presentasi_uas_full_dataset.ipynb", "Presentasi UAS Colab: korpus penuh 37.940 baris (dropna & drop_duplicates), preprocessing spesifik 3 model, Baseline vs Improvement + CM, validasi berlapis (ROC-AUC 0,9859)", "UAS")
+        ("15", "15_presentasi_uas_full_dataset.ipynb", "Presentasi UAS Colab: korpus penuh 37.940 baris (dropna & drop_duplicates), seleksi 26 fitur via Feature Importance, preprocessing spesifik 3 model, Baseline vs Improvement + CM, validasi berlapis (ROC-AUC 0,9906, F1 0,9024)", "UAS")
     ]
     for row_idx, r_data in enumerate(lamp_rows, start=1):
         for col_idx, val in enumerate(r_data):

@@ -280,6 +280,23 @@ plt.show()"""
 
     cells.append(
         nbf.v4.new_code_cell(
+            r"""# Bukti Target Leakage pada 4 Kolom yang Dibuang (Mengapa Wajib Dihapus)
+print("=== BUKTI TARGET LEAKAGE (KOLOM PASCA-DIAGNOSIS YANG DIBUANG) ===")
+display(
+    df_clean[["Patient_ID", "Stroke_Risk_Score", "AI_Health_Recommendation", "Doctor_Consultation_Needed", "Stroke_Risk"]]
+    .groupby("Stroke_Risk", group_keys=False)
+    .head(2)
+    .sort_values("Stroke_Risk_Score", ascending=False)
+    .reset_index(drop=True)
+)
+score_range = df_clean.groupby("Stroke_Risk")["Stroke_Risk_Score"].agg(["min", "max", "count"]).reset_index()
+print("\nRentang Stroke_Risk_Score terhadap Label Target (Stroke_Risk):")
+display(score_range)"""
+        )
+    )
+
+    cells.append(
+        nbf.v4.new_code_cell(
             r"""# Visualisasi Alur Proses Pembersihan Data (50.000 -> 37.940 -> Split)
 plt.figure(figsize=(9.5, 4.2))
 steps_label = [
@@ -802,6 +819,57 @@ display(df_improved.round(4))"""
     )
 
     cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Visualisasi Threshold Tuning pada Validation Set (Dasar Pemilihan Ambang Optimal)
+fig, axes = plt.subplots(1, 2, figsize=(13.4, 4.6))
+
+palette_thr = {
+    "Logistic Regression": "#1f77b4",
+    "Random Forest": "#2ca02c",
+    "Gradient Boosting": "#d62728",
+    "Ensemble Soft Voting": "#9467bd",
+}
+
+for name in improved_models.keys():
+    p_v = improved_probs_val[name]
+    f1_curve = [f1_score(y_val, (p_v >= t).astype(int)) for t in threshold_grid]
+    t_opt = optimal_thresholds[name]
+    f1_opt = f1_score(y_val, (p_v >= t_opt).astype(int))
+    lw = 2.5 if name == "Gradient Boosting" else 1.8
+    axes[0].plot(threshold_grid, f1_curve, color=palette_thr[name], lw=lw, label=f"{name} (t*={t_opt:.2f})")
+    axes[0].scatter([t_opt], [f1_opt], color=palette_thr[name], s=55, zorder=5, edgecolor="black")
+
+axes[0].axvline(0.50, color="gray", linestyle=":", lw=1.3, label="Baseline Default (t=0.50)")
+axes[0].set_title("Kurva Pencarian Threshold Optimal (F1 di Validation Set)", fontweight="bold")
+axes[0].set_xlabel("Threshold Keputusan")
+axes[0].set_ylabel("Validation F1-Score")
+axes[0].legend(loc="lower left", fontsize=8.5)
+axes[0].grid(True, linestyle=":", alpha=0.6)
+
+gb_val_p = improved_probs_val["Gradient Boosting"]
+gb_rec_c = [recall_score(y_val, (gb_val_p >= t).astype(int)) for t in threshold_grid]
+gb_prec_c = [precision_score(y_val, (gb_val_p >= t).astype(int)) for t in threshold_grid]
+gb_f1_c = [f1_score(y_val, (gb_val_p >= t).astype(int)) for t in threshold_grid]
+t_gb = optimal_thresholds["Gradient Boosting"]
+
+axes[1].plot(threshold_grid, gb_rec_c, color="#e6550d", lw=2.2, label="Recall")
+axes[1].plot(threshold_grid, gb_prec_c, color="#3182bd", lw=2.2, label="Presisi")
+axes[1].plot(threshold_grid, gb_f1_c, color="#2ca02c", lw=2.4, label="F1-Score")
+axes[1].axvline(0.50, color="gray", linestyle=":", lw=1.3, label="Baseline (t=0.50)")
+axes[1].axvline(t_gb, color="#d62728", linestyle="--", lw=1.6, label=f"Optimal GB (t*={t_gb:.2f})")
+axes[1].set_title("Trade-Off Recall, Presisi & F1: Gradient Boosting (Val Set)", fontweight="bold")
+axes[1].set_xlabel("Threshold Keputusan")
+axes[1].set_ylabel("Skor Metrik")
+axes[1].legend(loc="lower left", fontsize=8.5)
+axes[1].grid(True, linestyle=":", alpha=0.6)
+
+plt.tight_layout()
+plt.savefig(ASSET_DIR / "fig_03b_threshold_tuning_val.png", dpi=150, bbox_inches="tight")
+plt.show()"""
+        )
+    )
+
+    cells.append(
         nbf.v4.new_markdown_cell(
             """### 9.1 Perbandingan Head-to-Head Baseline vs Improvement & Confusion Matrix Tiap Model"""
         )
@@ -1072,6 +1140,31 @@ plt.show()"""
 
     cells.append(
         nbf.v4.new_code_cell(
+            r"""# Simulasi Prediksi Pasien Individual dari Test Set (Model Terbaik)
+sim_df = X_test.copy()
+sim_df["Probabilitas_High_Risk"] = np.round(best_probs, 4)
+sim_df["Ambang_Keputusan"] = best_t
+sim_df["Prediksi_Model"] = np.where(best_probs >= best_t, "High Risk (1)", "Non-High (0)")
+sim_df["Status_Aktual"] = np.where(y_test.to_numpy() == 1, "High Risk (1)", "Non-High (0)")
+sim_df["Hasil_Cek"] = np.where(sim_df["Prediksi_Model"] == sim_df["Status_Aktual"], "Tepat", "Meleset")
+
+idx_high = sim_df[sim_df["Probabilitas_High_Risk"] >= 0.85].index[:2].tolist()
+idx_mid = sim_df[(sim_df["Probabilitas_High_Risk"] >= 0.38) & (sim_df["Probabilitas_High_Risk"] <= 0.58)].index[:1].tolist()
+idx_low = sim_df[sim_df["Probabilitas_High_Risk"] <= 0.15].index[:2].tolist()
+sample_indices = idx_high + idx_mid + idx_low
+
+cols_show = [
+    "Age", "Blood_Pressure_Systolic", "Blood_Glucose", "HbA1c",
+    "Previous_TIA", "Atrial_Fibrillation",
+    "Probabilitas_High_Risk", "Ambang_Keputusan", "Prediksi_Model", "Status_Aktual", "Hasil_Cek"
+]
+print(f"=== SIMULASI PREDIKSI 5 PASIEN UJI ({best_model_name}, t={best_t:.2f}) ===")
+display(sim_df.loc[sample_indices, cols_show].reset_index(drop=True))"""
+        )
+    )
+
+    cells.append(
+        nbf.v4.new_code_cell(
             r"""# Simpan ringkasan numerik lengkap ke artifacts/uas_full_dataset_results.json
 summary_export = {
     "dataset_raw_rows": int(len(df_raw)),
@@ -1113,7 +1206,7 @@ print(f"Ringkasan hasil lengkap tersimpan di: {out_json.resolve()}")"""
             """## 11. Kesimpulan Presentasi UAS
 
 1. **Pembersihan Korpus Penuh**: Dari 50.000 baris mentah, penghapusan 12.060 baris kosong (`dropna`) dan pemeriksaan 0 duplikasi menghasilkan **37.940 pasien bersih** (bebas 4 kolom *target leakage*).
-2. **Seleksi Fitur Berbasis *Feature Importance* di Awal Pipeline**: Evaluasi pada Data Latih menyaring **26 fitur klinis dengan kontribusi >= 0,5%** (membuang 9 fitur kontribusi sangat kecil seperti `Country`, `Work_Type`, `Gender`, `Heart_Rate`, dll.), memangkas dimensi masukan Gradient Boosting dari 88 menjadi 42 kolom.
+2. **Seleksi Fitur Berbasis *Feature Importance* di Awal Pipeline**: Evaluasi pada Data Latih menyaring **26 fitur klinis dengan kontribusi >= 0,5%** (membuang 9 fitur kontribusi sangat kecil seperti `Country`, `Work_Type`, `Gender`, `Heart_Rate`, dll.), memangkas dimensi masukan Gradient Boosting dari 88 menjadi 48 kolom.
 3. **Perlakuan Preprocessing Berbeda & Dampak Improvement**:
    - Seluruh model mengalami peningkatan tajam setelah *Hyperparameter Tuning* dan *Threshold Tuning*: penurunan drastis *False Negative* di ketiga model.
    - **Gradient Boosting Improved** (`n_estimators=400, lr=0.08, max_depth=4, subsample=0.8`) mencapai performa puncak **ROC-AUC > 0,99**, **Recall > 88%**, dan **F1-Score > 0,90** pada data uji independen dengan validasi konsisten di 5-Fold Stratified CV dan Bootstrap 95% CI."""
