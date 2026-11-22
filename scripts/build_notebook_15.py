@@ -268,7 +268,7 @@ print(f"Fitur prediktor valid          : {X.shape[1]} kolom ({len(num_cols)} num
 print(f"Distribusi Target (0 vs 1)     : {(y == 0).sum():,} Non-High (75,77%) | {(y == 1).sum():,} High Risk ({y.mean()*100:.2f}%)")
 
 # Visualisasi Ringkasan Audit Data & Distribusi Kelas
-fig, axes = plt.subplots(1, 2, figsize=(13.5, 4.8))
+fig, axes = plt.subplots(1, 2, figsize=(12.5, 4.5))
 
 # Panel 1: Missing Values per Kolom
 na_plot = na_nonzero.sort_values("Jumlah_Kosong", ascending=True)
@@ -300,10 +300,14 @@ axes[1].set_ylim(0, 58000)
 
 plt.tight_layout()
 plt.savefig(ASSET_DIR / "fig_01_audit_dan_pembersihan.png", dpi=150, bbox_inches="tight")
-plt.show()
+plt.show()"""
+        )
+    )
 
-# Visualisasi Tambahan: Peta Pola Missing Values & Alur Proses Pembersihan Data
-fig, axes = plt.subplots(1, 2, figsize=(15, 4.8))
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Visualisasi Alur Proses Pembersihan Data & Peta Pola Missing Values
+fig, axes = plt.subplots(1, 2, figsize=(13.5, 4.6))
 
 # Panel Kiri: Diagram Alur Proses Data (50.000 -> 37.940 -> Split)
 steps_label = [
@@ -325,7 +329,7 @@ axes[0].set_xlim(0, 62000)
 for b, v in zip(bars_s, steps_vals):
     axes[0].text(v + 800, b.get_y() + b.get_height()/2, f"{v:,} baris", va="center", fontsize=9, fontweight="bold")
 
-# Panel Kanan: Heatmap Pola Missing Value pada 500 Sampel Baris Mentah
+# Panel Kanan: Heatmap Pola Missing Value pada 400 Sampel Baris Mentah
 na_cols_list = na_nonzero["Kolom"].tolist()
 sample_na = df_raw[na_cols_list].sample(n=400, random_state=SEED).isna().astype(int).T
 sns.heatmap(
@@ -355,14 +359,14 @@ Sebagai konteks sebelum masuk ke rekayasa fitur dan pemodelan, grafik di bawah m
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""fig, axes = plt.subplots(1, 3, figsize=(15, 4.3))
+            r"""fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.2))
 
 plot_df = X[["Age", "Blood_Pressure_Systolic", "Blood_Glucose", "Previous_TIA", "Atrial_Fibrillation"]].copy()
 plot_df["Risk_Label"] = np.where(y == 1, "High Risk (1)", "Non-High (0)")
 
 # 1. Boxplot TD Sistolik
 sns.boxplot(data=plot_df, x="Risk_Label", y="Blood_Pressure_Systolic", order=["Non-High (0)", "High Risk (1)"], palette=["#4c72b0", "#c44e52"], ax=axes[0])
-axes[0].set_title("Tekanan Darah Sistolik vs Risiko Stroke", fontweight="bold")
+axes[0].set_title("TD Sistolik vs Risiko Stroke", fontweight="bold")
 axes[0].set_xlabel("")
 axes[0].set_ylabel("TD Sistolik (mmHg)")
 
@@ -384,7 +388,7 @@ risk_rates = pd.DataFrame({
 })
 colors_bar = ["#4c72b0", "#c44e52", "#4c72b0", "#c44e52"]
 bars = axes[2].barh(risk_rates["Faktor Klinis"], risk_rates["Proporsi High Risk (%)"], color=colors_bar)
-axes[2].set_title("Proporsi High Risk pada Riwayat Klinis Kunci", fontweight="bold")
+axes[2].set_title("Proporsi High Risk (Riwayat Klinis)", fontweight="bold")
 axes[2].set_xlabel("Persentase High Risk (%)")
 axes[2].set_xlim(0, 100)
 for b in bars:
@@ -393,41 +397,51 @@ for b in bars:
 
 plt.tight_layout()
 plt.savefig(ASSET_DIR / "fig_02_eda_klinis.png", dpi=150, bbox_inches="tight")
-plt.show()
+plt.show()"""
+        )
+    )
 
-# Visualisasi Tambahan EDA: Distribusi Biomarker Utama & Korelasi Fitur ke Target
-fig = plt.figure(figsize=(15.5, 5.2))
-gs = fig.add_gridspec(2, 3, width_ratios=[1, 1, 1.35])
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Visualisasi EDA 2 (Terpisah): Histogram Distribusi 4 Biomarker Klinis Utama
+fig, axes = plt.subplots(2, 2, figsize=(11.5, 6.8))
 
 dist_feats = [
-    ("Age", "Distribusi Usia (Tahun)"),
-    ("Blood_Pressure_Systolic", "TD Sistolik (mmHg)"),
-    ("Blood_Glucose", "Glukosa Darah (mg/dL)"),
-    ("HbA1c", "Kadar HbA1c (%)"),
+    ("Age", "Distribusi Usia Pasien (Tahun)"),
+    ("Blood_Pressure_Systolic", "Distribusi Tekanan Darah Sistolik (mmHg)"),
+    ("Blood_Glucose", "Distribusi Kadar Glukosa Darah (mg/dL)"),
+    ("HbA1c", "Distribusi Kadar HbA1c (%)"),
 ]
-for i, (col_f, ttl_f) in enumerate(dist_feats):
-    ax_d = fig.add_subplot(gs[i // 2, i % 2])
+for idx_f, (col_f, ttl_f) in enumerate(dist_feats):
+    ax_d = axes[idx_f // 2, idx_f % 2]
     ax_d.hist(X.loc[y == 0, col_f], bins=25, density=True, alpha=0.55, color="#4c72b0", label="Non-High (0)")
     ax_d.hist(X.loc[y == 1, col_f], bins=25, density=True, alpha=0.55, color="#c44e52", label="High Risk (1)")
-    ax_d.set_title(ttl_f, fontweight="bold", fontsize=10)
-    ax_d.set_ylabel("Densitas", fontsize=8.5)
-    if i == 0:
-        ax_d.legend(fontsize=8, loc="upper left")
+    ax_d.set_title(ttl_f, fontweight="bold", fontsize=10.5)
+    ax_d.set_ylabel("Densitas")
+    ax_d.legend(fontsize=8.5, loc="upper left")
 
-# Panel Kanan: Korelasi Pearson Top Fitur Numerik terhadap Target
-ax_corr = fig.add_subplot(gs[:, 2])
+plt.tight_layout()
+plt.savefig(ASSET_DIR / "fig_02b_distribusi_biomarker.png", dpi=150, bbox_inches="tight")
+plt.show()"""
+        )
+    )
+
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Visualisasi EDA 3 (Terpisah): Matriks Korelasi Fitur Numerik Kunci vs Target
 corr_df = X[num_cols].copy()
 corr_df["stroke_risk_high"] = y
 corr_target = corr_df.corr(numeric_only=True)["stroke_risk_high"].drop("stroke_risk_high").sort_values()
 top_corr_cols = corr_target.index.tolist()[-6:] + ["stroke_risk_high"]
+
+plt.figure(figsize=(8.2, 6.2))
 sns.heatmap(
     corr_df[top_corr_cols].corr(), annot=True, fmt=".2f", cmap="coolwarm",
-    center=0, vmin=-0.4, vmax=1.0, ax=ax_corr, annot_kws={"size": 8.5}
+    center=0, vmin=-0.4, vmax=1.0, annot_kws={"size": 9.5}
 )
-ax_corr.set_title("Matriks Korelasi Fitur Numerik Kunci vs Target", fontweight="bold", fontsize=10)
-
+plt.title("Matriks Korelasi Fitur Numerik Terkuat terhadap Target Risiko Stroke", fontweight="bold", fontsize=11)
 plt.tight_layout()
-plt.savefig(ASSET_DIR / "fig_02b_distribusi_dan_korelasi.png", dpi=150, bbox_inches="tight")
+plt.savefig(ASSET_DIR / "fig_02d_matriks_korelasi.png", dpi=150, bbox_inches="tight")
 plt.show()"""
         )
     )
@@ -775,81 +789,56 @@ Di bawah ini disajikan tabel perbandingan menyeluruh antara kondisi **Baseline**
 df_all_compare = df_all_compare[[
     "Model", "Tahap", "Threshold", "ROC_AUC", "PR_AUC", "Akurasi", "Recall", "Presisi", "F1_Score", "TP", "FN", "FP", "TN"
 ]]
-display(df_all_compare.round(4))
-
-# Grid Confusion Matrix: Baris 1 = Baseline (3 model), Baris 2 = Improved (3 model + Ensemble)
-fig, axes = plt.subplots(2, 4, figsize=(17.5, 8.2))
-
-base_list = ["Logistic Regression", "Random Forest", "Gradient Boosting"]
-for col_idx, name in enumerate(base_list):
-    preds_b = (baseline_probs_test[name] >= 0.50).astype(int)
-    cm_b = confusion_matrix(y_test, preds_b)
-    rec_b = recall_score(y_test, preds_b)
-    f1_b = f1_score(y_test, preds_b)
-    sns.heatmap(
-        cm_b, annot=True, fmt="d", cmap="Oranges", cbar=False, ax=axes[0, col_idx],
-        xticklabels=["Non-High", "High"], yticklabels=["Non-High", "High"],
-        annot_kws={"size": 11, "weight": "bold"},
+display(df_all_compare.round(4))"""
+        )
     )
-    axes[0, col_idx].set_title(f"{name}\n[Baseline t=0.50] Rec: {rec_b*100:.1f}% | F1: {f1_b:.3f}", fontsize=10, fontweight="bold")
-    axes[0, col_idx].set_xlabel("Prediksi")
-    axes[0, col_idx].set_ylabel("Aktual")
 
-# Panel kosong di kanan atas diisi ringkasan penurunan FN
-axes[0, 3].axis("off")
-summary_lines = [
-    "Ringkasan Penurunan False Negative",
-    "(Kasus High Risk yang Terlewat):",
-    "",
-]
-for name in base_list:
-    fn_b = int(((y_test == 1) & (baseline_probs_test[name] < 0.50)).sum())
-    fn_i = int(((y_test == 1) & (improved_probs_test[name] < optimal_thresholds[name])).sum())
-    summary_lines.append(f"- {name}:")
-    summary_lines.append(f"  {fn_b} -> {fn_i} kasus terlewat")
-fn_ens = int(((y_test == 1) & (improved_probs_test["Ensemble Soft Voting"] < optimal_thresholds["Ensemble Soft Voting"])).sum())
-summary_lines.append(f"- Ensemble Soft Voting:")
-summary_lines.append(f"  {fn_ens} kasus terlewat")
-axes[0, 3].text(
-    0.05, 0.5, "\n".join(summary_lines),
-    fontsize=10, va="center", ha="left",
-    bbox=dict(boxstyle="round,pad=0.6", facecolor="#f4f6f9", edgecolor="#b0bec5"),
-)
-
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Confusion Matrix After Improvement (Terpisah dari Baseline, Grid 2x2 Lega)
 imp_list = ["Logistic Regression", "Random Forest", "Gradient Boosting", "Ensemble Soft Voting"]
-for col_idx, name in enumerate(imp_list):
+fig, axes = plt.subplots(2, 2, figsize=(10.5, 8.2))
+
+for idx, name in enumerate(imp_list):
+    ax = axes[idx // 2, idx % 2]
     t_opt = optimal_thresholds[name]
     preds_i = (improved_probs_test[name] >= t_opt).astype(int)
     cm_i = confusion_matrix(y_test, preds_i)
     rec_i = recall_score(y_test, preds_i)
+    prec_i = precision_score(y_test, preds_i)
     f1_i = f1_score(y_test, preds_i)
     sns.heatmap(
-        cm_i, annot=True, fmt="d", cmap="Blues", cbar=False, ax=axes[1, col_idx],
-        xticklabels=["Non-High", "High"], yticklabels=["Non-High", "High"],
-        annot_kws={"size": 11, "weight": "bold"},
+        cm_i, annot=True, fmt="d", cmap="Blues", cbar=False, ax=ax,
+        xticklabels=["Non-High (0)", "High Risk (1)"],
+        yticklabels=["Non-High (0)", "High Risk (1)"],
+        annot_kws={"size": 12, "weight": "bold"},
     )
-    axes[1, col_idx].set_title(f"{name}\n[Improved t={t_opt:.2f}] Rec: {rec_i*100:.1f}% | F1: {f1_i:.3f}", fontsize=10, fontweight="bold")
-    axes[1, col_idx].set_xlabel("Prediksi")
-    axes[1, col_idx].set_ylabel("Aktual")
+    ax.set_title(
+        f"{name} (Improved, t={t_opt:.2f})\nRecall: {rec_i*100:.1f}% | Presisi: {prec_i*100:.1f}% | F1: {f1_i:.3f}",
+        fontsize=10.5, fontweight="bold"
+    )
+    ax.set_xlabel("Prediksi Model")
+    ax.set_ylabel("Kondisi Aktual")
 
-plt.suptitle("Confusion Matrix Semua Model: Baseline (Atas) vs After Improvement (Bawah)", fontsize=13, fontweight="bold", y=1.01)
+plt.suptitle("Confusion Matrix Semua Model Setelah Improvement (Test Set: 5.691 Pasien)", fontsize=12.5, fontweight="bold", y=1.01)
 plt.tight_layout()
-plt.savefig(ASSET_DIR / "fig_04_cm_baseline_vs_improved.png", dpi=150, bbox_inches="tight")
+plt.savefig(ASSET_DIR / "fig_04_cm_improved.png", dpi=150, bbox_inches="tight")
 plt.show()"""
         )
     )
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""# Grafik Grouped Bar Chart (Recall & F1 Baseline vs Improved) + Kurva ROC & PR
-fig, axes = plt.subplots(1, 3, figsize=(17, 5))
+            r"""# Grafik Perbandingan Recall & F1 serta Penurunan False Negative (Baseline vs Improved)
+fig, axes = plt.subplots(1, 2, figsize=(13, 4.6))
 
-# Panel 1: Grouped Bar Chart F1-Score
 models_3 = ["Logistic Regression", "Random Forest", "Gradient Boosting"]
 f1_base = [df_baseline.loc[df_baseline["Model"] == m, "F1_Score"].values[0] for m in models_3]
 f1_imp = [df_improved.loc[df_improved["Model"] == m, "F1_Score"].values[0] for m in models_3]
 rec_base = [df_baseline.loc[df_baseline["Model"] == m, "Recall"].values[0] for m in models_3]
 rec_imp = [df_improved.loc[df_improved["Model"] == m, "Recall"].values[0] for m in models_3]
+fn_base = [int(df_baseline.loc[df_baseline["Model"] == m, "FN"].values[0]) for m in models_3]
+fn_imp = [int(df_improved.loc[df_improved["Model"] == m, "FN"].values[0]) for m in models_3]
 
 x_idx = np.arange(len(models_3))
 w = 0.2
@@ -858,16 +847,39 @@ axes[0].bar(x_idx - 0.5*w, rec_imp, width=w, label="Recall Improved", color="#e6
 axes[0].bar(x_idx + 0.5*w, f1_base, width=w, label="F1 Baseline", color="#9ecae1")
 axes[0].bar(x_idx + 1.5*w, f1_imp, width=w, label="F1 Improved", color="#08519c")
 axes[0].set_xticks(x_idx)
-axes[0].set_xticklabels(["LogReg", "Random\nForest", "Gradient\nBoosting"])
+axes[0].set_xticklabels(["Logistic\nRegression", "Random\nForest", "Gradient\nBoosting"])
 axes[0].set_ylim(0, 1.18)
 axes[0].set_ylabel("Skor")
 axes[0].set_title("Lonjakan Recall & F1 Setelah Improvement", fontweight="bold")
-axes[0].legend(fontsize=8, loc="upper center", ncol=2, frameon=True)
+axes[0].legend(fontsize=8.5, loc="upper center", ncol=2, frameon=True)
 for i in range(len(models_3)):
-    axes[0].text(i - 0.5*w, rec_imp[i] + 0.02, f"{rec_imp[i]:.2f}", ha="center", fontsize=8, fontweight="bold")
-    axes[0].text(i + 1.5*w, f1_imp[i] + 0.02, f"{f1_imp[i]:.2f}", ha="center", fontsize=8, fontweight="bold")
+    axes[0].text(i - 0.5*w, rec_imp[i] + 0.02, f"{rec_imp[i]:.2f}", ha="center", fontsize=8.5, fontweight="bold")
+    axes[0].text(i + 1.5*w, f1_imp[i] + 0.02, f"{f1_imp[i]:.2f}", ha="center", fontsize=8.5, fontweight="bold")
 
-# Panel 2: Kurva ROC (Improved + Ensemble)
+w2 = 0.32
+axes[1].bar(x_idx - w2/2, fn_base, width=w2, label="False Negative Baseline", color="#fc9272")
+axes[1].bar(x_idx + w2/2, fn_imp, width=w2, label="False Negative Improved", color="#2ca02c")
+axes[1].set_xticks(x_idx)
+axes[1].set_xticklabels(["Logistic\nRegression", "Random\nForest", "Gradient\nBoosting"])
+axes[1].set_ylim(0, 740)
+axes[1].set_ylabel("Jumlah Pasien High Risk Terlewat (FN)")
+axes[1].set_title("Penurunan Kasus High Risk Terlewat (False Negative)", fontweight="bold")
+axes[1].legend(fontsize=8.5, loc="upper right", frameon=True)
+for i in range(len(models_3)):
+    axes[1].text(i - w2/2, fn_base[i] + 12, f"{fn_base[i]}", ha="center", fontsize=9, fontweight="bold")
+    axes[1].text(i + w2/2, fn_imp[i] + 12, f"{fn_imp[i]}", ha="center", fontsize=9, fontweight="bold")
+
+plt.tight_layout()
+plt.savefig(ASSET_DIR / "fig_05a_lonjakan_performa_dan_fn.png", dpi=150, bbox_inches="tight")
+plt.show()"""
+        )
+    )
+
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Kurva ROC dan Precision-Recall (Terpisah agar Jelas)
+fig, axes = plt.subplots(1, 2, figsize=(13, 5))
+
 palette_roc = {
     "Logistic Regression": "#1f77b4",
     "Random Forest": "#2ca02c",
@@ -878,24 +890,23 @@ for name in imp_list:
     fpr, tpr, _ = roc_curve(y_test, improved_probs_test[name])
     auc_v = roc_auc_score(y_test, improved_probs_test[name])
     lw = 2.5 if name == "Gradient Boosting" else 1.8
-    axes[1].plot(fpr, tpr, lw=lw, color=palette_roc[name], label=f"{name} (AUC={auc_v:.4f})")
-axes[1].plot([0, 1], [0, 1], "--", color="gray", lw=1.2, label="Random (0.500)")
-axes[1].set_title("Kurva ROC pada Test Set (5.691 Pasien)", fontweight="bold")
-axes[1].set_xlabel("False Positive Rate")
-axes[1].set_ylabel("True Positive Rate (Recall)")
-axes[1].legend(loc="lower right", fontsize=8.5)
+    axes[0].plot(fpr, tpr, lw=lw, color=palette_roc[name], label=f"{name} (AUC={auc_v:.4f})")
+axes[0].plot([0, 1], [0, 1], "--", color="gray", lw=1.2, label="Random (0.500)")
+axes[0].set_title("Kurva ROC pada Test Set (5.691 Pasien)", fontweight="bold")
+axes[0].set_xlabel("False Positive Rate")
+axes[0].set_ylabel("True Positive Rate (Recall)")
+axes[0].legend(loc="lower right", fontsize=9)
 
-# Panel 3: Kurva Precision-Recall
 for name in imp_list:
     prec_c, rec_c, _ = precision_recall_curve(y_test, improved_probs_test[name])
     ap_v = average_precision_score(y_test, improved_probs_test[name])
     lw = 2.5 if name == "Gradient Boosting" else 1.8
-    axes[2].plot(rec_c, prec_c, lw=lw, color=palette_roc[name], label=f"{name} (AP={ap_v:.4f})")
-axes[2].axhline(y_test.mean(), linestyle="--", color="gray", lw=1.2, label=f"Prevalensi ({y_test.mean():.3f})")
-axes[2].set_title("Kurva Precision-Recall (Test Set)", fontweight="bold")
-axes[2].set_xlabel("Recall")
-axes[2].set_ylabel("Presisi")
-axes[2].legend(loc="lower left", fontsize=8.5)
+    axes[1].plot(rec_c, prec_c, lw=lw, color=palette_roc[name], label=f"{name} (AP={ap_v:.4f})")
+axes[1].axhline(y_test.mean(), linestyle="--", color="gray", lw=1.2, label=f"Prevalensi ({y_test.mean():.3f})")
+axes[1].set_title("Kurva Precision-Recall (Test Set)", fontweight="bold")
+axes[1].set_xlabel("Recall")
+axes[1].set_ylabel("Presisi")
+axes[1].legend(loc="lower left", fontsize=9)
 
 plt.tight_layout()
 plt.savefig(ASSET_DIR / "fig_05_komparasi_roc_pr.png", dpi=150, bbox_inches="tight")
@@ -984,10 +995,7 @@ display(boot_table.round(4))"""
 
     cells.append(
         nbf.v4.new_code_cell(
-            r"""# Validasi 3: Learning Curve & Validasi 4: Feature Importance Klinis
-fig, axes = plt.subplots(1, 2, figsize=(15, 5.2))
-
-# Learning Curve (3-Fold pada X_dev untuk kecepatan eksekusi yang nyaman di Colab)
+            r"""# Validasi 3: Learning Curve (Terpisah)
 cv3 = StratifiedKFold(n_splits=3, shuffle=True, random_state=SEED)
 lc_models = {
     "Logistic Regression": ("#1f77b4", pipe_lr_imp),
@@ -998,26 +1006,35 @@ lc_models = {
     ])),
 }
 
+plt.figure(figsize=(8.8, 5.0))
 for name, (col, mod) in lc_models.items():
     train_sizes, _, val_scores = learning_curve(
         mod, X_dev, y_dev, cv=cv3, scoring="roc_auc",
         train_sizes=np.linspace(0.2, 1.0, 5), n_jobs=-1
     )
-    axes[0].plot(train_sizes, val_scores.mean(axis=1), "o-", color=col, lw=2, label=name)
-    axes[0].fill_between(
+    plt.plot(train_sizes, val_scores.mean(axis=1), "o-", color=col, lw=2, label=name)
+    plt.fill_between(
         train_sizes,
         val_scores.mean(axis=1) - val_scores.std(axis=1),
         val_scores.mean(axis=1) + val_scores.std(axis=1),
         color=col, alpha=0.12
     )
 
-axes[0].set_title("Learning Curve (3-Fold CV ROC-AUC vs Ukuran Data Latih)", fontweight="bold")
-axes[0].set_xlabel("Jumlah Sampel Data Latih")
-axes[0].set_ylabel("Validation ROC-AUC")
-axes[0].set_ylim(0.92, 1.00)
-axes[0].legend(loc="lower right")
+plt.title("Learning Curve (3-Fold CV ROC-AUC vs Ukuran Data Latih)", fontweight="bold")
+plt.xlabel("Jumlah Sampel Data Latih")
+plt.ylabel("Validation ROC-AUC")
+plt.ylim(0.92, 1.00)
+plt.legend(loc="lower right")
+plt.grid(True, linestyle=":", alpha=0.6)
+plt.tight_layout()
+plt.savefig(ASSET_DIR / "fig_06a_learning_curve.png", dpi=150, bbox_inches="tight")
+plt.show()"""
+        )
+    )
 
-# Feature Importance dari Gradient Boosting Improved
+    cells.append(
+        nbf.v4.new_code_cell(
+            r"""# Validasi 4: Feature Importance Klinis (Terpisah)
 ohe_names = pipe_gb_imp.named_steps["prep"].transformers_[1][1].get_feature_names_out(cat_cols).tolist()
 all_gb_features = num_cols + ohe_names
 gb_imp = pd.DataFrame({
@@ -1026,16 +1043,17 @@ gb_imp = pd.DataFrame({
 }).sort_values("Importance", ascending=False)
 
 top15 = gb_imp.head(15).sort_values("Importance", ascending=True)
-bars = axes[1].barh(top15["Fitur"], top15["Importance"], color="#1f77b4", alpha=0.88)
-axes[1].set_title("Top 15 Biomarker Pendorong Risiko Stroke (Gradient Boosting)", fontweight="bold")
-axes[1].set_xlabel("Relative Feature Importance")
+plt.figure(figsize=(9.5, 5.8))
+bars = plt.barh(top15["Fitur"], top15["Importance"], color="#1f77b4", alpha=0.88)
+plt.title("Top 15 Biomarker Pendorong Risiko Stroke (Gradient Boosting)", fontweight="bold")
+plt.xlabel("Relative Feature Importance")
 for b in bars:
     w_bar = b.get_width()
-    axes[1].text(w_bar + 0.002, b.get_y() + b.get_height()/2, f"{w_bar*100:.1f}%", va="center", fontsize=8.5)
-axes[1].set_xlim(0, top15["Importance"].max() * 1.18)
-
+    plt.text(w_bar + 0.002, b.get_y() + b.get_height()/2, f"{w_bar*100:.1f}%", va="center", fontsize=8.8)
+plt.xlim(0, top15["Importance"].max() * 1.18)
+plt.grid(axis="x", linestyle=":", alpha=0.6)
 plt.tight_layout()
-plt.savefig(ASSET_DIR / "fig_06_validasi_learning_curve_importance.png", dpi=150, bbox_inches="tight")
+plt.savefig(ASSET_DIR / "fig_06b_feature_importance.png", dpi=150, bbox_inches="tight")
 plt.show()
 
 print("Top 10 Fitur Terpenting:")

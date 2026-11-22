@@ -632,10 +632,10 @@ Validation Set, dan *Ensemble Soft Voting*):
 | Logistic Regression | Baseline | 0,50 | 0,9571 | 0,8916 | 89,95% | 76,07% | 81,25% | 0,7858 | 330 |
 | Logistic Regression | Improved | 0,42 | 0,9571 | 0,8916 | 90,02% | 81,15% | 78,42% | 0,7976 | 260 |
 | Random Forest | Baseline | 0,50 | 0,9503 | 0,8663 | 87,61% | 54,17% | 91,10% | 0,6794 | 632 |
-| Random Forest | Improved | 0,44 | 0,9524 | 0,8768 | 89,07% | 83,10% | 74,66% | 0,7865 | 233 |
+| Random Forest | Improved | 0,47 | 0,9533 | 0,8772 | 89,77% | 78,83% | 78,94% | 0,7888 | 292 |
 | Gradient Boosting | Baseline | 0,50 | 0,9795 | 0,9456 | 91,14% | 65,63% | 96,79% | 0,7822 | 474 |
 | **Gradient Boosting** | **Improved** | **0,38** | **0,9859** | **0,9623** | **94,43%** | **88,03%** | **88,87%** | **0,8845** | **165** |
-| Ensemble Soft Voting | Improved | 0,43 | 0,9805 | 0,9484 | 93,38% | 85,21% | 87,17% | 0,8618 | 204 |
+| Ensemble Soft Voting | Improved | 0,42 | 0,9807 | 0,9490 | 93,39% | 86,87% | 86,00% | 0,8644 | 181 |
 
 Validasi berlapis pada *Gradient Boosting Improved* memastikan ketangguhan model: *5-Fold
 Stratified CV* meraih **ROC-AUC 0,9872 +/- 0,0007** dan **PR-AUC 0,9640 +/- 0,0024**, serta

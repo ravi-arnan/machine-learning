@@ -189,7 +189,7 @@ def build_artikel_docx():
         "Data dibagi bertingkat (70% latih, 15% validasi, 15% uji), lalu dimodelkan dengan tiga algoritma yang diberi perlakuan preprocessing berbeda: "
         "Logistic Regression (StandardScaler + OneHotEncoder drop='first'), Random Forest (skala asli + OrdinalEncoder), dan Gradient Boosting (skala asli + OneHotEncoder penuh), serta digabungkan via Ensemble Soft Voting. "
         "Penerapan improvement berupa hyperparameter tuning, pembobotan kelas pada Random Forest, dan threshold tuning berbasis data validasi berhasil menurunkan kasus risiko tinggi yang terlewat (False Negative) secara drastis: "
-        "Random Forest turun dari 632 menjadi 233 kasus (Recall 54,17% -> 83,10%; F1 0,6794 -> 0,7865) dan Gradient Boosting turun dari 474 menjadi 165 kasus (Recall 65,63% -> 88,03%; F1 0,7822 -> 0,8845). "
+        "Random Forest turun dari 632 menjadi 292 kasus (Recall 54,17% -> 78,83%; F1 0,6794 -> 0,7888) dan Gradient Boosting turun dari 474 menjadi 165 kasus (Recall 65,63% -> 88,03%; F1 0,7822 -> 0,8845). "
         "Gradient Boosting teroptimasi meraih performa puncak pada data uji dengan ROC-AUC 0,9859, PR-AUC 0,9623, Akurasi 94,43%, dan Presisi 88,87%. "
         "Validasi silang 5-Fold Stratified CV (ROC-AUC 0,9872 +/- 0,0007), Bootstrap 95% CI (0,9835 - 0,9880), Learning Curve, dan pemeringkatan Feature Importance membuktikan stabilitas model serta kesesuaiannya dengan faktor klinis medis.",
         indent=False, size=10.5, after=4
@@ -250,7 +250,7 @@ def build_artikel_docx():
     add_p(
         "Tahap Baseline mengevaluasi parameter bawaan scikit-learn pada ambang default t = 0,50. "
         "Tahap Improvement menerapkan penyetelan hyperparameter berbasis data validasi (C = 0,5 pada Logistic Regression; n_estimators=200, max_depth=14, min_samples_leaf=4, class_weight='balanced_subsample' pada Random Forest; n_estimators=200, learning_rate=0,05, max_depth=4, subsample=0,8 pada Gradient Boosting), "
-        "kalibrasi ambang batas (threshold tuning) optimal F1 pada data validasi, serta penggabungan Ensemble Soft Voting. "
+        "kalibrasi ambang batas (threshold tuning) optimal F1 pada data validasi (t=0,42 untuk LR, t=0,47 untuk RF, t=0,38 untuk GB), serta penggabungan Ensemble Soft Voting (t=0,42). "
         "Validasi dilakukan secara berlapis menggunakan 5-Fold Stratified Cross-Validation pada 32.249 baris pengembangan, Bootstrap 95% Confidence Interval (1.000 iterasi) pada Test Set, Learning Curve 3-Fold, dan analisis Feature Importance."
     )
 
@@ -268,31 +268,37 @@ def build_artikel_docx():
             ("Logistic Regression", "Baseline", "0,50", "0,9571", "0,8916", "89,95%", "76,07%", "81,25%", "0,7858", "330"),
             ("Logistic Regression", "Improved", "0,42", "0,9571", "0,8916", "90,02%", "81,15%", "78,42%", "0,7976", "260"),
             ("Random Forest", "Baseline", "0,50", "0,9503", "0,8663", "87,61%", "54,17%", "91,10%", "0,6794", "632"),
-            ("Random Forest", "Improved", "0,44", "0,9524", "0,8768", "89,07%", "83,10%", "74,66%", "0,7865", "233"),
+            ("Random Forest", "Improved", "0,47", "0,9533", "0,8772", "89,77%", "78,83%", "78,94%", "0,7888", "292"),
             ("Gradient Boosting", "Baseline", "0,50", "0,9795", "0,9456", "91,14%", "65,63%", "96,79%", "0,7822", "474"),
             ("Gradient Boosting", "Improved", "0,38", "0,9859", "0,9623", "94,43%", "88,03%", "88,87%", "0,8845", "165"),
-            ("Ensemble Soft Voting", "Improved", "0,43", "0,9805", "0,9484", "93,38%", "85,21%", "87,17%", "0,8618", "204"),
+            ("Ensemble Soft Voting", "Improved", "0,42", "0,9807", "0,9490", "93,39%", "86,87%", "86,00%", "0,8644", "181"),
         ],
         [1.38, 0.65, 0.36, 0.58, 0.58, 0.58, 0.56, 0.56, 0.56, 0.45],
         bold_rows={6}
     )
 
     add_p(
-        "Visualisasi Confusion Matrix seluruh model (Gambar 2) memperlihatkan penurunan tajam jumlah pasien risiko tinggi yang terlewat (False Negative): "
-        "Random Forest berhasil menurunkan FN dari 632 menjadi 233 pasien (+28,93% Recall), sedangkan Gradient Boosting menurunkan FN dari 474 menjadi 165 pasien (+22,40% Recall). "
-        "Kurva ROC dan Precision-Recall (Gambar 3) mengonfirmasi keunggulan Gradient Boosting Improved (ROC-AUC 0,9859; PR-AUC 0,9623) dibandingkan model linear dan bagging."
+        "Visualisasi Confusion Matrix seluruh model pada tahap Baseline (Gambar 2) dan setelah Improvement (Gambar 3) memperlihatkan penurunan tajam jumlah pasien risiko tinggi yang terlewat (False Negative): "
+        "Random Forest berhasil menurunkan FN dari 632 menjadi 292 pasien (+24,66% Recall), sedangkan Gradient Boosting menurunkan FN dari 474 menjadi 165 pasien (+22,40% Recall). "
+        "Kurva ROC dan Precision-Recall (Gambar 4) mengonfirmasi keunggulan Gradient Boosting Improved (ROC-AUC 0,9859; PR-AUC 0,9623) dibandingkan model linear dan bagging."
     )
 
     add_fig(
-        "assets/evaluasi_15/fig_04_cm_baseline_vs_improved.png",
-        "Gambar 2. Matriks Kebingungan (Confusion Matrix) Seluruh Model: Baseline vs After Improvement.",
-        width_in=6.2
+        "assets/evaluasi_15/fig_03_cm_baseline.png",
+        "Gambar 2. Matriks Kebingungan (Confusion Matrix) Semua Model pada Tahap Baseline (t = 0,50).",
+        width_in=6.1
+    )
+
+    add_fig(
+        "assets/evaluasi_15/fig_04_cm_improved.png",
+        "Gambar 3. Matriks Kebingungan (Confusion Matrix) Semua Model Setelah Improvement.",
+        width_in=5.7
     )
 
     add_fig(
         "assets/evaluasi_15/fig_05_komparasi_roc_pr.png",
-        "Gambar 3. Perbandingan Lonjakan Recall & F1 serta Kurva ROC dan Precision-Recall pada Test Set.",
-        width_in=6.2
+        "Gambar 4. Kurva ROC dan Precision-Recall pada Test Set Independen (5.691 Pasien).",
+        width_in=6.1
     )
 
     add_subsec("3.2 Hasil Validasi Berlapis dan Biomarker Klinis Dominan")
@@ -306,7 +312,7 @@ def build_artikel_docx():
         ["Pengujian Validasi", "ROC-AUC", "PR-AUC", "Akurasi", "F1-Score"],
         [
             ("5-Fold CV: Logistic Regression", "0,9607 +/- 0,0021", "0,8977 +/- 0,0055", "0,9051 +/- 0,0028", "0,7957 +/- 0,0068"),
-            ("5-Fold CV: Random Forest", "0,9515 +/- 0,0030", "0,8699 +/- 0,0084", "0,8922 +/- 0,0048", "0,7599 +/- 0,0125"),
+            ("5-Fold CV: Random Forest", "0,9517 +/- 0,0029", "0,8702 +/- 0,0074", "0,8922 +/- 0,0042", "0,7603 +/- 0,0107"),
             ("5-Fold CV: Gradient Boosting", "0,9872 +/- 0,0007", "0,9640 +/- 0,0024", "0,9275 +/- 0,0045", "0,8286 +/- 0,0119"),
             ("Bootstrap 95% CI (GB Improved, Test)", "0,9835 - 0,9880", "-", "-", "0,8712 - 0,8960"),
         ],
@@ -315,14 +321,20 @@ def build_artikel_docx():
     )
 
     add_fig(
-        "assets/evaluasi_15/fig_06_validasi_learning_curve_importance.png",
-        "Gambar 4. Kurva Belajar (Learning Curve) dan Top 15 Biomarker Klinis Terpenting (Gradient Boosting).",
-        width_in=6.2
+        "assets/evaluasi_15/fig_06a_learning_curve.png",
+        "Gambar 5. Kurva Belajar (Learning Curve) 3-Fold CV ROC-AUC terhadap Ukuran Data Latih.",
+        width_in=5.4
+    )
+
+    add_fig(
+        "assets/evaluasi_15/fig_06b_feature_importance.png",
+        "Gambar 6. Pemeringkatan Top 15 Biomarker Klinis Terpenting (Gradient Boosting).",
+        width_in=5.6
     )
 
     add_p(
-        "Kurva belajar pada Gambar 4 (kiri) memperlihatkan konvergensi stabil tanpa overfitting seiring bertambahnya ukuran data latih. "
-        "Pemeringkatan fitur pada Gambar 4 (kanan) menempatkan Age (14,8%), Blood_Pressure_Systolic (13,3%), Blood_Glucose (9,0%), HbA1c (6,5%), Blood_Pressure_Diastolic (4,8%), Total_Cholesterol (4,5%), LDL (4,3%), dan Previous_TIA_Yes (3,9%) sebagai kontributor utama, "
+        "Kurva belajar pada Gambar 5 memperlihatkan konvergensi stabil tanpa overfitting seiring bertambahnya ukuran data latih. "
+        "Pemeringkatan fitur pada Gambar 6 menempatkan Age (14,8%), Blood_Pressure_Systolic (13,3%), Blood_Glucose (9,0%), HbA1c (6,5%), Blood_Pressure_Diastolic (4,8%), Total_Cholesterol (4,5%), LDL (4,3%), dan Previous_TIA_Yes (3,5%) sebagai kontributor utama, "
         "seluruhnya selaras dengan konsensus etiologi stroke klinis (Tang et al., 2025)."
     )
 

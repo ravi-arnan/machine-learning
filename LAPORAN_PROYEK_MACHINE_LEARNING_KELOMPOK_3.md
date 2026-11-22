@@ -411,12 +411,12 @@ Data dibagi secara *stratified* menjadi 70% latih (26.558), 15% validasi (5.691)
 | Logistic Regression | Baseline | 0,50 | 0,9571 | 0,8916 | 89,95% | 76,07% | 81,25% | 0,7858 | 330 |
 | Logistic Regression | Improved | 0,42 | 0,9571 | 0,8916 | 90,02% | 81,15% | 78,42% | 0,7976 | 260 |
 | Random Forest | Baseline | 0,50 | 0,9503 | 0,8663 | 87,61% | 54,17% | 91,10% | 0,6794 | 632 |
-| Random Forest | Improved | 0,44 | 0,9524 | 0,8768 | 89,07% | 83,10% | 74,66% | 0,7865 | 233 |
+| Random Forest | Improved | 0,47 | 0,9533 | 0,8772 | 89,77% | 78,83% | 78,94% | 0,7888 | 292 |
 | Gradient Boosting | Baseline | 0,50 | 0,9795 | 0,9456 | 91,14% | 65,63% | 96,79% | 0,7822 | 474 |
 | **Gradient Boosting** | **Improved** | **0,38** | **0,9859** | **0,9623** | **94,43%** | **88,03%** | **88,87%** | **0,8845** | **165** |
-| Ensemble Soft Voting | Improved | 0,43 | 0,9805 | 0,9484 | 93,38% | 85,21% | 87,17% | 0,8618 | 204 |
+| Ensemble Soft Voting | Improved | 0,42 | 0,9807 | 0,9490 | 93,39% | 86,87% | 86,00% | 0,8644 | 181 |
 
-Seluruh model menunjukkan penurunan signifikan jumlah kasus berisiko tinggi yang terlewat (*False Negative*) setelah *hyperparameter tuning* dan *threshold tuning*: Logistic Regression turun dari 330 menjadi 260 kasus, Random Forest turun dari 632 menjadi 233 kasus, dan Gradient Boosting turun dari 474 menjadi 165 kasus. **Gradient Boosting Improved** (`n_estimators=200`, `learning_rate=0,05`, `max_depth=4`, `subsample=0,8`, `t = 0,38`) meraih capaian tertinggi dengan **ROC-AUC 0,9859**, **PR-AUC 0,9623**, **Akurasi 94,43%**, dan **F1-Score 0,8845**. Validasi berlapis menggunakan *5-Fold Stratified Cross-Validation* (`ROC-AUC 0,9872 +/- 0,0007`), *Bootstrap 95% Confidence Interval* (`0,9835 - 0,9880`), *Learning Curve*, dan pemeringkatan *Feature Importance* (`Age` 14,8%, `Blood_Pressure_Systolic` 13,3%, `Blood_Glucose` 9,0%, `HbA1c` 6,5%, `Blood_Pressure_Diastolic` 4,8%, `Total_Cholesterol` 4,5%, `LDL` 4,3%, `Previous_TIA_Yes` 3,9%) memastikan stabilitas generalisasi serta validitas klinis penuh.
+Seluruh model menunjukkan penurunan signifikan jumlah kasus berisiko tinggi yang terlewat (*False Negative*) setelah *hyperparameter tuning* dan *threshold tuning*: Logistic Regression turun dari 330 menjadi 260 kasus, Random Forest turun dari 632 menjadi 292 kasus, dan Gradient Boosting turun dari 474 menjadi 165 kasus. **Gradient Boosting Improved** (`n_estimators=200`, `learning_rate=0,05`, `max_depth=4`, `subsample=0,8`, `t = 0,38`) meraih capaian tertinggi dengan **ROC-AUC 0,9859**, **PR-AUC 0,9623**, **Akurasi 94,43%**, dan **F1-Score 0,8845**. Validasi berlapis menggunakan *5-Fold Stratified Cross-Validation* (`ROC-AUC 0,9872 +/- 0,0007`), *Bootstrap 95% Confidence Interval* (`0,9835 - 0,9880`), *Learning Curve*, dan pemeringkatan *Feature Importance* (`Age` 14,8%, `Blood_Pressure_Systolic` 13,3%, `Blood_Glucose` 9,0%, `HbA1c` 6,5%, `Blood_Pressure_Diastolic` 4,8%, `Total_Cholesterol` 4,5%, `LDL` 4,3%, `Previous_TIA_Yes` 3,9%) memastikan stabilitas generalisasi serta validitas klinis penuh.
 
 ---
 

@@ -531,9 +531,11 @@ def create_laporan():
         ("Gambar 4.10 Matriks Kebingungan Komparatif Penyetelan Ambang Keputusan", "31"),
         ("Gambar 4.11 Pemeringkatan Top 15 Biomarker Klinis Terpenting", "32"),
         ("Gambar 4.12 Audit Missing Values dan Dampak Pembersihan Data (50.000 -> 37.940 Baris)", "33"),
-        ("Gambar 4.13 Matriks Kebingungan Semua Model: Baseline vs After Improvement", "34"),
-        ("Gambar 4.14 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)", "34"),
-        ("Gambar 4.15 Kurva Belajar (Learning Curve) dan Top 15 Biomarker Klinis (Korpus Penuh)", "35")
+        ("Gambar 4.13 Matriks Kebingungan Semua Model: Tahap Baseline (t = 0,50)", "34"),
+        ("Gambar 4.14 Matriks Kebingungan Semua Model: Tahap After Improvement", "34"),
+        ("Gambar 4.15 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)", "35"),
+        ("Gambar 4.16 Kurva Belajar (Learning Curve) Korpus Penuh", "36"),
+        ("Gambar 4.17 Pemeringkatan Top 15 Biomarker Klinis (Korpus Penuh)", "36")
     ]
     for g_tit, g_hlm in daftar_gambar_items:
         add_toc_line(g_tit, g_hlm, is_bold=False, indent_inch=0.0)
@@ -1118,37 +1120,43 @@ def create_laporan():
             ("Logistic Regression", "Baseline", "0,50", "0,9571", "0,8916", "89,95%", "76,07%", "81,25%", "0,7858"),
             ("Logistic Regression", "Improved", "0,42", "0,9571", "0,8916", "90,02%", "81,15%", "78,42%", "0,7976"),
             ("Random Forest", "Baseline", "0,50", "0,9503", "0,8663", "87,61%", "54,17%", "91,10%", "0,6794"),
-            ("Random Forest", "Improved", "0,44", "0,9524", "0,8768", "89,07%", "83,10%", "74,66%", "0,7865"),
+            ("Random Forest", "Improved", "0,47", "0,9533", "0,8772", "89,77%", "78,83%", "78,94%", "0,7888"),
             ("Gradient Boosting", "Baseline", "0,50", "0,9795", "0,9456", "91,14%", "65,63%", "96,79%", "0,7822"),
             ("Gradient Boosting", "Improved", "0,38", "0,9859", "0,9623", "94,43%", "88,03%", "88,87%", "0,8845"),
-            ("Ensemble Soft Voting", "Improved", "0,43", "0,9805", "0,9484", "93,38%", "85,21%", "87,17%", "0,8618")
+            ("Ensemble Soft Voting", "Improved", "0,42", "0,9807", "0,9490", "93,39%", "86,87%", "86,00%", "0,8644")
         ],
         [1.30, 0.58, 0.35, 0.56, 0.56, 0.56, 0.54, 0.54, 0.52],
         bold_last_row=False
     )
 
-    add_body_p("Grafik Confusion Matrix untuk setiap model (Gambar 4.13) membuktikan penurunan drastis kasus risiko tinggi yang terlewat (False Negative): Logistic Regression turun dari 330 menjadi 260 kasus, Random Forest turun dari 632 menjadi 233 kasus, dan Gradient Boosting turun dari 474 menjadi 165 kasus. Model Gradient Boosting Improved (n_estimators=200, learning_rate=0,05, max_depth=4, subsample=0,8, t=0,38) meraih performa puncak dengan ROC-AUC 0,9859, PR-AUC 0,9623, Akurasi 94,43%, Recall 88,03%, Presisi 88,87%, dan F1-Score 0,8845 (Gambar 4.14).")
+    add_body_p("Grafik Confusion Matrix untuk setiap model pada tahap Baseline (Gambar 4.13) dan setelah Improvement (Gambar 4.14) membuktikan penurunan drastis kasus risiko tinggi yang terlewat (False Negative): Logistic Regression turun dari 330 menjadi 260 kasus, Random Forest turun dari 632 menjadi 292 kasus, dan Gradient Boosting turun dari 474 menjadi 165 kasus. Model Gradient Boosting Improved (n_estimators=200, learning_rate=0,05, max_depth=4, subsample=0,8, t=0,38) meraih performa puncak dengan ROC-AUC 0,9859, PR-AUC 0,9623, Akurasi 94,43%, Recall 88,03%, Presisi 88,87%, dan F1-Score 0,8845 (Gambar 4.15).")
 
     add_image_box(
-        "assets/evaluasi_15/fig_04_cm_baseline_vs_improved.png",
-        "Gambar 4.13 Matriks Kebingungan Semua Model: Baseline vs After Improvement",
-        width_inch=5.4
+        "assets/evaluasi_15/fig_03_cm_baseline.png",
+        "Gambar 4.13 Matriks Kebingungan Semua Model: Tahap Baseline (t = 0,50)",
+        width_inch=5.3
+    )
+
+    add_image_box(
+        "assets/evaluasi_15/fig_04_cm_improved.png",
+        "Gambar 4.14 Matriks Kebingungan Semua Model: Tahap After Improvement",
+        width_inch=5.0
     )
 
     add_image_box(
         "assets/evaluasi_15/fig_05_komparasi_roc_pr.png",
-        "Gambar 4.14 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)",
-        width_inch=5.4
+        "Gambar 4.15 Kurva ROC dan Precision-Recall Korpus Penuh (Test Set 5.691 Pasien)",
+        width_inch=5.3
     )
 
-    add_body_p("Untuk membuktikan kestabilan hasil dan mencegah ketergantungan pada satu partisi acak, diterapkan validasi silang 5-Fold Stratified Cross-Validation pada 32.249 baris pengembangan serta uji Bootstrap 1.000 iterasi pada Test Set (Tabel 4.10). Hasil Learning Curve dan pemeringkatan Feature Importance (Gambar 4.15) memastikan tidak terjadi overfitting serta menegaskan dominasi faktor klinis medis (Age 14,8%, Blood_Pressure_Systolic 13,3%, Blood_Glucose 9,0%, HbA1c 6,5%, Blood_Pressure_Diastolic 4,8%, Total_Cholesterol 4,5%, LDL 4,3%, dan Previous_TIA_Yes 3,9%).")
+    add_body_p("Untuk membuktikan kestabilan hasil dan mencegah ketergantungan pada satu partisi acak, diterapkan validasi silang 5-Fold Stratified Cross-Validation pada 32.249 baris pengembangan serta uji Bootstrap 1.000 iterasi pada Test Set (Tabel 4.10). Hasil Learning Curve (Gambar 4.16) dan pemeringkatan Feature Importance (Gambar 4.17) memastikan tidak terjadi overfitting serta menegaskan dominasi faktor klinis medis (Age 14,8%, Blood_Pressure_Systolic 13,3%, Blood_Glucose 9,0%, HbA1c 6,5%, Blood_Pressure_Diastolic 4,8%, Total_Cholesterol 4,5%, LDL 4,3%, dan Previous_TIA_Yes 3,5%).")
 
     add_styled_table(
         "Tabel 4.10 Validasi 5-Fold Stratified CV dan Bootstrap 95% CI (37.940 Pasien)",
         ["Uji Validasi / Model", "ROC-AUC", "PR-AUC", "Akurasi", "F1-Score"],
         [
             ("5-Fold CV: Logistic Regression", "0,9607 +/- 0,0021", "0,8977 +/- 0,0055", "0,9051 +/- 0,0028", "0,7957 +/- 0,0068"),
-            ("5-Fold CV: Random Forest", "0,9515 +/- 0,0030", "0,8699 +/- 0,0084", "0,8922 +/- 0,0048", "0,7599 +/- 0,0125"),
+            ("5-Fold CV: Random Forest", "0,9517 +/- 0,0029", "0,8702 +/- 0,0074", "0,8922 +/- 0,0042", "0,7603 +/- 0,0107"),
             ("5-Fold CV: Gradient Boosting", "0,9872 +/- 0,0007", "0,9640 +/- 0,0024", "0,9275 +/- 0,0045", "0,8286 +/- 0,0119"),
             ("Bootstrap 95% CI (GB Improved, Test)", "0,9835 - 0,9880", "-", "-", "0,8712 - 0,8960")
         ],
@@ -1157,9 +1165,15 @@ def create_laporan():
     )
 
     add_image_box(
-        "assets/evaluasi_15/fig_06_validasi_learning_curve_importance.png",
-        "Gambar 4.15 Kurva Belajar (Learning Curve) dan Top 15 Biomarker Klinis (Korpus Penuh)",
-        width_inch=5.4
+        "assets/evaluasi_15/fig_06a_learning_curve.png",
+        "Gambar 4.16 Kurva Belajar (Learning Curve) Korpus Penuh",
+        width_inch=4.8
+    )
+
+    add_image_box(
+        "assets/evaluasi_15/fig_06b_feature_importance.png",
+        "Gambar 4.17 Pemeringkatan Top 15 Biomarker Klinis (Korpus Penuh)",
+        width_inch=4.9
     )
 
     # ==========================================
